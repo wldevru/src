@@ -40,7 +40,6 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)comEnc_getData<<(quint8)getIndex();
 
-//qDebug()<<"sendGetPWMData"<< i;
 emit sendCommand(data);
 return true;
 }	

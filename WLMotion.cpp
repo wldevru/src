@@ -26,7 +26,7 @@ if(name=="WLModuleWhell")   Module=new WLModuleWhell;
 else								 
 if(name=="WLModulePlanner") Module=new WLModulePlanner;
 else								 
-if(name=="WLModuleAxis"&&getModuleIOPut()!=NULL)    Module=new WLModuleAxis(getModuleIOPut());
+if(name=="WLModuleAxis"&&getModuleIOPut())    Module=new WLModuleAxis(getModuleIOPut());
 else								 
 if(name=="WLModulePWM")     Module=new WLModulePWM();		  
 
