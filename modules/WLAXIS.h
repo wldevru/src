@@ -123,14 +123,14 @@ const QString errorAxis("0,no error\
 #define errorAxis_dma 35
 
 //Axis flags
-#define AF_dir           1<<0  //направление
-#define AF_latch2        1<<1  //защёлкнуто значение при положительном фронте
-#define AF_latch3        1<<2  //защёлкнуто значение при отрицательном фронте
-#define AF_update        1<<3  //произошло лми обновление
-#define AF_enable        1<<4  //активен
-#define AF_sdstop        1<<5  //остановка при снижении скорости до начальной
-#define AF_typePulseABxx 1<<6  //тип выхода AB_ (AB,ABx2,ABx4)
-#define AF_disableLimit  1<<7  //отключены пределы
+#define AF_dir           1<<0  //direction
+#define AF_latch2        1<<1  //latch rise
+#define AF_latch3        1<<2  //latch false
+#define AF_update        1<<3  //update state
+#define AF_enable        1<<4  //enable
+#define AF_sdstop        1<<5  //stop when F=Fst
+#define AF_typePulseABxx 1<<6  //type out AB_ (AB,ABx2,ABx4)
+#define AF_disableLimit  1<<7  //no use limit
 
 
 enum typeIOPutAXIS{IO_inEMGStop,IO_inSDStop,IO_inProbe};
@@ -140,8 +140,8 @@ enum typeInputAxis{AXIS_inORG,AXIS_inALM,AXIS_inPEL,AXIS_inMEL};//_inEMG
 enum typeOutputAxis{AXIS_outENB,AXIS_outRALM};//
 
 
-enum statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec}; //ускорение,пост скорость,замедление
-enum   modeAxis{AXIS_standby,AXIS_pos,AXIS_slave,AXIS_vel,AXIS_traxis} ;//остановлен,движение,подчинёный
+enum statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec};
+enum   modeAxis{AXIS_standby,AXIS_pos,AXIS_slave,AXIS_vel,AXIS_traxis} ;
 
 enum   typePulseAxis{AXIS_pulse_SD
                     ,AXIS_pulse_CWCCW
@@ -192,13 +192,13 @@ float kGear;
 quint8 typePulse;
 quint8 outSDinv;
 
-WLIOPut *inORG; //оригинальная позиция
-WLIOPut *inPEL; //положительный предел
+WLIOPut *inORG;
+WLIOPut *inPEL;
 WLIOPut *inMEL; 
-WLIOPut *inALM; //тревога
+WLIOPut *inALM;
 
-WLIOPut *outENB; //enable
-WLIOPut *outRALM;//сброс ошибки
+WLIOPut *outENB;
+WLIOPut *outRALM;
 
 WLModuleIOPut *ModuleIOPut;
 
