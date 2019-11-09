@@ -54,7 +54,7 @@ void setInEMGStop(int index);
 void setInSDStop(int index);
 void setInProbe(int index);
 
-int getSizeAxis() {return Axis.size();}
+ int getSizeAxis() {return Axis.size();}
 
 private:
 	QTimer *updateTimer;
@@ -74,13 +74,15 @@ private slots:
 	void setLatchProbe2(qint32 *Pos,quint8);
 	void setLatchProbe3(qint32 *Pos,quint8);
 	void callDataAxis();
-	
+
+public slots:
+virtual void update();
+
 public:
     bool setInputMAxis(typeIOPutAXIS type,quint8 num);
     bool setActInProbe(typeActIOPutAxis typeAct);
 
 signals:
-
 	void changedInEMGStop(bool);
 	
 

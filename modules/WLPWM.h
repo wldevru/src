@@ -14,16 +14,15 @@
 #define comPWM_setPmaxOut    4 //set max percent outPWM
 #define comPWM_setInvOut     5 //set inverse outPWM
 #define comPWM_setFOut       6 //set frequency outPWM
-#define comPWM_setOnOut      7 //on outPWM
+#define comPWM_setUnlockOut  7 //unlock outPWM
 
 #define comPWM_getDataOut  100 //call data outPWM
 
 #define sendPWM_dataOut 200 //send data ooutPWM
 
 #define PWMF_enable 1<<0
-
 #define PWMF_inv    1<<2
-#define PWMF_on     1<<3
+#define PWMF_unlock 1<<3
 
 const QString errorPWM("0,no error");
 

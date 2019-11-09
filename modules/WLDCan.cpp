@@ -84,6 +84,20 @@ emit sendCommand(data);
 return true;
 }
 
+bool WLDCan::sendGetData()
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comDCan_getData<<getIndex();
+
+emit sendCommand(data);
+return true;
+}
+
 void WLDCan::writeXMLData(QXmlStreamWriter &stream)
 {
 stream.writeAttribute("adrCan", QString::number(getAdrCan(),16).toUpper());

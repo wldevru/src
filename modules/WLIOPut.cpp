@@ -159,7 +159,7 @@ if((Flags.get(IOPF_inv))^_inv)
  }
 }
 
-void WLIOPut::setOut(bool _now)   
+void WLIOPut::setOut(bool now)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -167,7 +167,20 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comIOPut_setOutput<<getIndex()<<(quint8)_now;
+Stream<<(quint8)comIOPut_setOutputTo<<getIndex()<<(uint8_t)now;
+
+emit sendCommand(data);
+}
+
+void WLIOPut::setOutPulse(bool _now,uint32_t time_ms)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comIOPut_setOutputPulse<<getIndex()<<(quint8)_now<<time_ms;
 
 emit sendCommand(data);
 }

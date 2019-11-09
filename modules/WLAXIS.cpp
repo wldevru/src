@@ -30,7 +30,7 @@ typePulse=AXIS_pulse_empty;
 homePosition=0;
 orgSize=100;
 
-ModuleIOPut=NULL;
+ModuleIOPut=nullptr;
 
 inORG=&WLIOPut::In0;
 inPEL=&WLIOPut::In0;
@@ -51,7 +51,7 @@ WLAxis::~WLAxis()
 
 WLIOPut*  WLAxis::getInput(typeInputAxis type)
 {
-WLIOPut *ret=NULL;
+WLIOPut *ret=nullptr;
 switch(type)
 {
 case AXIS_inORG: ret=inORG;break;
@@ -67,7 +67,7 @@ return ret;
 
 WLIOPut*  WLAxis::getOutput(typeOutputAxis type)
 {
-WLIOPut *ret=NULL;
+WLIOPut *ret=nullptr;
 switch(type)
 {
 case AXIS_outRALM: ret=outRALM;break;
@@ -325,7 +325,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLAxis::setParMov(float Aac,float Ade,float Fst,float Fma)
+bool WLAxis::setParMov(float Aac,float Ade,float Fst,float Fma,typeMParAxis type)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -333,35 +333,9 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_setParMov<<getIndex()<<Aac<<Ade<<Fst<<Fma;
+Stream<<(quint8)comAxis_setParMov<<getIndex()<<Aac<<Ade<<Fst<<Fma<<(static_cast<uint8_t>(type));
 
-emit sendCommand(data);
-return true;
-}
-
-bool WLAxis::setParMovPlus(float Aac,float Ade,float Fst,float Fma)
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)comAxis_setParMovPlus<<getIndex()<<Aac<<Ade<<Fst<<Fma;
-
-emit sendCommand(data);
-return true;
-}
-
-bool WLAxis::setParMovMinus(float Aac,float Ade,float Fst,float Fma)
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)comAxis_setParMovMinus<<getIndex()<<Aac<<Ade<<Fst<<Fma;
+qDebug()<<"typeMPar"<<(static_cast<uint8_t>(type));
 
 emit sendCommand(data);
 return true;
@@ -484,10 +458,10 @@ return true;
 
 bool WLAxis::setMinMaxPos(qint32 minpos,qint32 maxpos)
 {
-if(maxpos>minpos)
+if(minpos<maxpos)
 {
-maxPosition=maxpos;
 minPosition=minpos;
+maxPosition=maxpos;
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -539,11 +513,11 @@ void WLAxis::setData(quint8 statusMode,quint8 _flag,qint32 Pos,float F)
 {
 Flags.m_Data=_flag;
 
-modeAxis nmode=(modeAxis)(statusMode&0x0F);
-statusAxis nstatus=(statusAxis)(statusMode>>4);     
+modeAxis nmode=static_cast<modeAxis>(statusMode&0x0F);
+statusAxis nstatus=static_cast<statusAxis>(statusMode>>4);
 
 if(Flags.get(AF_update)||mode!=nmode)       
-	                     emit ChangedMode(mode=nmode); 
+                       emit ChangedMode(mode=nmode);
 if(Flags.get(AF_update)||status!=nstatus)   
 	                   emit ChangedStatus(status=nstatus); 
 if(Flags.get(AF_update)||nowPosition!=Pos)  

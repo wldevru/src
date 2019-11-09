@@ -12,8 +12,8 @@ WLElement::~WLElement()
 {
 
 }
-
-void WLElement::callState()
+/*
+void WLElement::callStatus()
 {
 if(typeE!=0)
  {
@@ -26,5 +26,5 @@ if(typeE!=0)
  emit sendCommand(data); 
  }
 }
-
+*/
 

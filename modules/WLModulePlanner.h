@@ -45,7 +45,7 @@ enum typeSignalBuf{_sigChgEmptyBuf_ui8
 //#define sendPlanner_error  255
 
 #define MASK_abs       1<<1 //абсолютные координаты
-//#define MASK_nomov     1<<2 //нет движения
+#define MASK_spiral    1<<2 //спираль
 #define MASK_ccw       1<<3 //против часовой стрелки
 #define MASK_fline     1<<4 //быстрая линия
 #define MASK_ensmooth  1<<5 //сглаживание вкл.
@@ -132,7 +132,7 @@ quint32 getCurIdElement() {return curIdElementBuf;}
 
 	bool addULine(quint8 mask,quint8 size,quint8 indexs[],long endPos[],long midPos[],float S,float Fmov,quint32 _id);
 	bool addLine(quint8 mask,quint8 size,quint8 indexs[],long endPos[],float S,float Fmov,quint32 _id);
-	bool addCirc(quint8 mask,quint8 iI,quint8 iJ,quint8 iK,long endPos[],long cenPos[],float S,float Fmov,quint32 _id);
+    bool addCirc(quint8 mask,quint8 size,quint8 indexs[],long endPos[],long cenPosIJ[],float S,float Fmov,quint32 _id);
 
 	bool startMov();
 	bool stopMov();
@@ -154,6 +154,9 @@ statusPlanner getStatus() {return status;}
 
 public slots:
 	void sendGetDataBuf();
+
+public slots:
+    virtual void update();
 
 signals:
 	void ChangedFree(int);

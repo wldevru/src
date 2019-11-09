@@ -23,6 +23,10 @@
 
 #define comWhell_setEncoder     10
 
+#define comWhell_getData 11
+
+#define sendWhell_data 1
+
 #define WHF_enable    1<<0
 #define WHF_vtype     1<<1
 #define WHF_useinput  1<<2
@@ -64,13 +68,6 @@ signals:
  void ChangedError(quint8);
 
 public:
-	/*
-	bool setOut(float F);
-    bool setEnable(bool enable);
-	bool setKTrack(float k)
-	bool setTypeTrack(uint8_t) ;
-	bool setAxis(uint8_t index);  
-	*/
 
 	bool setEncoder(quint8 _iEncoder);
 

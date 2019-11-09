@@ -37,6 +37,12 @@ else
 return true;
 }
 
+void WLModuleEncoder::update()
+{
+foreach(WLEncoder *encoder,Encoder)
+    encoder->sendGetData();
+}
+
 void  WLModuleEncoder::readCommand(QByteArray Data)
 {
 quint8 index,ui1,ui2,ui3,ui4;

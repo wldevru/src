@@ -47,6 +47,8 @@ const QString errorAxis("0,no error\
 ,15,error servo period\
 ,16,wrong accel/decel\
 ,17,wrong Fstart\
+,18,wrong Fmov\
+,19,wrong type par mov\
 ,35,error DMA");
 
 //Axis coonect
@@ -87,10 +89,6 @@ const QString errorAxis("0,no error\
 
 #define comAxis_setDelaySCurve     27//set inertion time (S curve)
 
-#define comAxis_setParMovPlus   28 //set parametr moving plus  (dir=1)
-#define comAxis_setParMovMinus  29 //set parametr moving minus (dir=0)
-
-
 #define comAxis_getData   100 //call data Axis
 
 #define sendAxis_signal 200
@@ -120,6 +118,8 @@ const QString errorAxis("0,no error\
 #define errorAxis_bufactiv 15
 #define errorAxis_aad 16
 #define errorAxis_fst 17
+#define errorAxis_fmov 18
+#define errorAxis_typeMPar 19
 #define errorAxis_dma 35
 
 //Axis flags
@@ -133,15 +133,20 @@ const QString errorAxis("0,no error\
 #define AF_disableLimit  1<<7  //no use limit
 
 
+
+
 enum typeIOPutAXIS{IO_inEMGStop,IO_inSDStop,IO_inProbe};
 
 enum typeActIOPutAxis{AXIS_actNo,AXIS_actSdStop,AXIS_actEmgStop};
 enum typeInputAxis{AXIS_inORG,AXIS_inALM,AXIS_inPEL,AXIS_inMEL};//_inEMG
 enum typeOutputAxis{AXIS_outENB,AXIS_outRALM};//
 
-
 enum statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec};
 enum   modeAxis{AXIS_standby,AXIS_pos,AXIS_slave,AXIS_vel,AXIS_traxis} ;
+
+enum   typeMParAxis{AXIS_MParAll
+                   ,AXIS_MParPlus
+                   ,AXIS_MParMinus};
 
 enum   typePulseAxis{AXIS_pulse_SD
                     ,AXIS_pulse_CWCCW
@@ -161,8 +166,7 @@ class WLAxis : public WLElement
 {
 	Q_OBJECT
 
-public:
-	
+public:	
  WLAxis(QObject *parent=0);
 ~WLAxis();
 
@@ -175,7 +179,7 @@ statusAxis status;
   modeAxis mode;
    WLFlags Flags;
 
- float Freq;
+  float Freq;
  qint32 latchPos2;
  qint32 latchPos3;
 
@@ -267,9 +271,7 @@ private:
 
 public:
 	bool sendGetData();
-	bool setParMov(float Aac,float Ade,float Fst,float Fma);
-    bool setParMovPlus(float Aac,float Ade,float Fst,float Fma);
-    bool setParMovMinus(float Aac,float Ade,float Fst,float Fma);
+    bool setParMov(float Aac,float Ade,float Fst,float Fma,typeMParAxis type=typeMParAxis::AXIS_MParAll);
     bool mov(quint8 mask,qint32 Dist,float Fmov);
 	bool acc();
 	bool dec();

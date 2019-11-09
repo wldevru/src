@@ -17,7 +17,7 @@ public:
 	WLModulePWM(QObject *parent=0);
    ~WLModulePWM();
 
-    bool Init(int _sizeOutPWM) {return  InitOut(_sizeOutPWM);};	
+    bool Init(int _sizeOutPWM);
 	bool InitOut(int _sizeOutPWM);	
 
 private:
@@ -28,19 +28,9 @@ public:
 	WLPWM* getOutPWM(int index) {if(index>=getSizeOutPWM()) index=0; return outPWM[index];}
 public:
 
-	/*
-	bool setOutPWM(int index,float perpower);
-    bool setInvOutPWM(int index,bool inv);
-	bool setEnableOutPWM(int index,bool enable);
-	bool setPmaxOutPWM(quint8 index,float Pmax);
-	bool sendGetDataOutPWM(int i);
-	bool setKOutPWM(int index,float k);
-    bool setFOutPWM(int index,float f);
-*/
-/*
-signals:
-	void ChangedDataOutPWM(int index,float per);	
-*/
+public slots:
+virtual void update();
+
 public:
 
 //virtual void callProp();

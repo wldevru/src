@@ -12,6 +12,17 @@ WLModulePWM::~WLModulePWM()
 {
 }
 
+bool WLModulePWM::Init(int _sizeOutPWM)
+{
+if(InitOut(_sizeOutPWM))
+{
+update();
+return true;
+}
+else
+ return false;
+}
+
 bool WLModulePWM::InitOut(int sizeOutPWM)
 {
 if(sizeOutPWM<1||outPWM.size()== sizeOutPWM) return false;
@@ -36,6 +47,12 @@ else
 
 
 return true;
+}
+
+void WLModulePWM::update()
+{
+foreach(WLPWM *pwm,outPWM)
+    pwm->sendGetData();
 }
 
 void  WLModulePWM::readCommand(QByteArray Data)

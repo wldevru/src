@@ -27,6 +27,9 @@ public:
 
 	WLDCan* getDCan(int index) {if(index>=getSizeDCan()) index=0; return DCan[index];}
 
+public slots:
+virtual void update();
+
 public:
 
 virtual void writeXMLData(QXmlStreamWriter &stream);

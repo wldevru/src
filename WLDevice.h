@@ -18,20 +18,19 @@
 #include "modules\WLModuleConnect.h"
 #include "WLFlags.h"
 
-#define comDev_reset       1 //reset device
-#define comDev_getVer      2 //call version
-#define comDev_getProp     3 //call property
-#define comDev_getModule   4 //call modules
-#define comDev_getUID      5 //call unique id
-#define comDev_getStatus   6 //call status
+//WLDevice
+#define comDev_getVersion  1 //call version
+#define comDev_getModule   2 //call modules
+#define comDev_getUID      3 //call unique id
+#define comDev_getStatus   4 //call status
 
-#define comDev_setReady    10 //set status Ready
+#define comDev_setStatus    10 //set status
 
-#define sendDev_Prop     100 //send prop
 #define sendDev_Module   101 //send modules
 #define sendDev_UID      102 //send uid
 #define sendDev_status   103 //send status
-#define sendDev_error    sendModule_error
+#define sendDev_version  104 //send version
+
 
 #define errorDevice_nomodule 20
 
@@ -46,6 +45,9 @@ class WLDevice: public WLModule
 	Q_OBJECT
 
 public:
+
+   enum statusDevice{DEVICE_empty,DEVICE_init,DEVICE_ready};
+
 	enum flag{fl_connect = 1<<0
 	         ,fl_ready   = 1<<1};
 
@@ -57,9 +59,12 @@ public:
 QList <WLModule*> Modules;
 
 quint32 UID96[3];
+quint32 version;
+
 public:
 
-bool initSerialPort(QString portName);
+bool initFromSerialPort(QString portName);
+bool initSerialPort(QString portName="");
 
 
 WLModule* getModule(typeModule type);
@@ -70,6 +75,8 @@ WLModuleConnect* getModuleConnect() {return static_cast<WLModuleConnect*>(getMod
 void setNameDevice(QString _name) {nameDevice=_name;}
 QString getNameDevice() {return nameDevice;}
 
+bool initFromFile(QString nameFile);                              
+
 bool readFromFile(QString nameFile,bool add=true);
 bool writeToFile(QString nameFile);
 bool writeToDir(QString dir) {return writeToFile(dir+"\\"+getNameDevice()+".xml");}
@@ -77,19 +84,24 @@ bool writeToDir(QString dir) {return writeToFile(dir+"\\"+getNameDevice()+".xml"
 bool isReady()   {return Flags.get(fl_ready);}
 bool isConnect() {return Flags.get(fl_connect);}
 
+statusDevice getStatus() {return status;}
+
+quint32 getVersion() {return version;}
+
 private:	
 	QMutex InputDataMutex;
 	QMutex OutDataMutex;
 	QMutex SendOutMutex;
 
-	
+    enum statusDevice status;
+
 	QByteArray outData;
 
 	QByteArray inBuf;
 
 	QString nameDevice;
 
-	QSerialPort *serialPort;
+    QSerialPort *serialPort;
 
 	WLFlags Flags;
 
@@ -107,6 +119,11 @@ virtual void callPropModules();
 public:
 
 private slots:	
+void updateModules() {
+                     foreach(WLModule *Module,Modules)
+                              Module->update();
+                     }
+void setStatusEmpty() {if(status!=DEVICE_empty) emit ChangedStatus(status=DEVICE_empty);}
 
 virtual	void readSlot();
 
@@ -115,11 +132,16 @@ virtual	void readSlot();
 
 public slots:
 	void removeModules();
-	void callModules();
+	void callModules();  
+    void callVersion();
 	void reconnectSerialPort();
+
+public slots:
+ virtual void callStatus();
 
 signals:
     void readDataDevice();
+    void createdModules();
 
 	void sendMessage(QString,QString,int); 
 
@@ -129,17 +151,21 @@ signals:
 	void ChangedModules(int);
 	void ChangedReady(bool);
 	void ChangedProp(QString);
+    void ChangedStatus(statusDevice);
 	void ChangedUID96(quint32 *);
 
+private:
+
+void init(QXmlStreamReader &stream);
 
 public:
-    QString	getPortName()  {QString ret; if(serialPort) ret+=serialPort->portName(); return ret;}
-inline	QString  getProp()  {return prop;}
+
+QString getPortName()  {QString ret=""; if(serialPort) ret=serialPort->portName(); return ret;}
+QString getProp()  {return prop;}
 void 	getUID96(quint32 *uid) {memcpy(uid,UID96,12);}
 
 private slots:
 
-    void callProp();
 	void callUID();
 
 public:

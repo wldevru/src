@@ -23,7 +23,7 @@ delete timerHeart;
 
 void WLModuleConnect::setTimeoutConnect()
 {
-emit sendMessage("WLModuleConnect","timeout",0);		
+emit sendMessage("WLModuleConnect","timeout",0);
 emit timeoutConnect();
 
 conOk=false;
@@ -32,6 +32,8 @@ conOk=false;
 void WLModuleConnect::restartHeart()
 {
 timerHeart->start(1000);
+
+if(!conOk) emit backupConnect();
 sendHeart();
 }
 

@@ -37,6 +37,12 @@ else
 return true;
 }
 
+void WLModuleFreq::update()
+{
+foreach(WLFreq *freq,outFreq)
+    freq->sendGetData();
+}
+
 void  WLModuleFreq::readCommand(QByteArray Data)
 {
 quint8 index,ui1,ui2,ui3,ui4;

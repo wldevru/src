@@ -37,6 +37,12 @@ else
 return true;
 }
 
+void WLModuleDCan::update()
+{
+foreach(WLDCan *dcan,DCan)
+    dcan->sendGetData();
+}
+
 void  WLModuleDCan::readCommand(QByteArray Data)
 {
 quint8 index,ui1,ui2,ui3,ui4;

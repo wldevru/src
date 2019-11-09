@@ -43,6 +43,7 @@ quint16 sizeOutBuf;
 QTimer *timerHeart;
 public:
 	bool isConnect() {return conOk;}
+
 public slots:	
 	void sendHeart();
 	void restartHeart();
@@ -51,7 +52,8 @@ private slots:
 	void setTimeoutConnect();
 
 signals:
-	void timeoutConnect();	
+    void timeoutConnect();
+    void backupConnect();
 
 public:
 virtual void writeXMLData(QXmlStreamWriter &stream);

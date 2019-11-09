@@ -21,7 +21,8 @@ public:
    ~WLModuleIOPut();
    
 public:
-bool Init(int _sizeInputs,int _sizeOutputs) {return InitInputs(_sizeInputs)&&InitOutputs(_sizeOutputs);}
+
+bool Init(int _sizeInputs,int _sizeOutputs);
 bool InitInputs(int _sizeInputs);
 bool InitOutputs(int _sizeOutputs);
 
@@ -78,7 +79,10 @@ private slots:
 
 	void sendSetOData(bool all=true);
  
-public:	
+public slots:
+virtual void update();
+
+public:
 
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);

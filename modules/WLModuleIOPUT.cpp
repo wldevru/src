@@ -11,7 +11,17 @@ Init(2,1);
 WLModuleIOPut::~WLModuleIOPut()
 {
 //if(inputs!=NULL)  delete []inputs;
-//if(outputs!=NULL) delete []outputs;
+    //if(outputs!=NULL) delete []outputs;
+}
+
+bool WLModuleIOPut::Init(int _sizeInputs, int _sizeOutputs)
+{
+if(InitInputs(_sizeInputs)&&InitOutputs(_sizeOutputs))
+{
+update();
+return true;
+}
+return false;
 }
 
 bool WLModuleIOPut::InitInputs(int sizeInputs)
@@ -45,7 +55,6 @@ Inputs[1]->setNow(1);
 Inputs[0]->setComment("inLock0");
 Inputs[1]->setComment("inLock1");
 
-QTimer::singleShot(250,this,SLOT(sendGetAllInputData()));
 return true;
 }
 
@@ -74,7 +83,7 @@ else
 //QTimer *timer=new QTimer;
 //connect(timer,SIGNAL(timeout()),SLOT(sendDataOutput()));
 //timer->start(3);
-QTimer::singleShot(250,this,SLOT(sendGetAllOutputData()));
+
 return true;
 }
 
@@ -266,12 +275,14 @@ for(int i=0;i<Outputs.size();i++)
 
 	i=(i+1)*8; 
     }
-  }
+}
 }
 
-
-
-
+void WLModuleIOPut::update()
+{
+sendGetAllInputData();
+sendGetAllOutputData();
+}
 
 void WLModuleIOPut::readXMLData(QXmlStreamReader &stream)
 {
@@ -323,11 +334,10 @@ if(stream.name()=="outputs")
     if(stream.name()=="outputs") break;
     if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
 
-    }
-	
+    }	
    }
 }
-
+update();
 }
 
 void WLModuleIOPut::writeXMLData(QXmlStreamWriter &stream)

@@ -87,6 +87,20 @@ emit sendCommand(data);
 return true;
 }
 
+bool WLWhell::sendGetData()
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comWhell_getData<<getIndex();
+
+emit sendCommand(data);
+return true;
+}
+
 void WLWhell::writeXMLData(QXmlStreamWriter &stream)
 {
 //stream.writeAttribute("Freq",QString::number(getFreq()));

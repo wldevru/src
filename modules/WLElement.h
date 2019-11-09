@@ -55,7 +55,7 @@ signals:
 
 public slots:
 virtual void reset() {}
-virtual void callState();
+virtual void callStatus() {}
 
 public:
 virtual void writeXMLData(QXmlStreamWriter &stream) {}

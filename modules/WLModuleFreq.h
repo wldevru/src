@@ -28,8 +28,8 @@ public:
 	int getSizeOutFreq() {return outFreq.size();}
 	WLFreq* getOutFreq(int index) {if(index>=getSizeOutFreq()) index=0; return outFreq[index];}
 
-public:
-
+public slots:
+virtual void update();
 
 public:
 

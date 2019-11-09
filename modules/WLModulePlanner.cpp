@@ -11,6 +11,7 @@ status=stop;
 flags=0;
 flags|=PLF_empty;
 curIdElementBuf=0;
+lastIndexElementBuf=0;
 
 smoothAng=0;
 }
@@ -30,10 +31,16 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_getData;
 
-qDebug()<<"_getDataBuf";
+qDebug()<<"getDataBuf";
 
 emit sendCommand(data);
 }
+
+void WLModulePlanner::update()
+{
+sendGetDataBuf();
+}
+
 
 bool WLModulePlanner::setIAxisSlave(quint8 *indexsAxis,quint8 size)
 {
@@ -163,7 +170,7 @@ return true;
 }
 
 
-bool WLModulePlanner::addLine(quint8 mask,quint8 size,quint8 indexs[],long endPos[],float S,float Fmov,quint32 _id)
+bool WLModulePlanner:: addLine(quint8 mask,quint8 size,quint8 indexs[],long endPos[],float S,float Fmov,quint32 _id)
 {
 QMutexLocker locker(&Mutex);
 QByteArray data;
@@ -172,7 +179,10 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_addLine<<mask<<size;//<<endPos[0]<<endPos[1]<<endPos[2]<<S<<Fmov   ;
+Stream<<(quint8)typeMPlanner
+      <<(quint8)comPlanner_addLine
+      <<mask
+      <<size;
 
 for(int i=0;i<size;i++)
    Stream<<indexs[i]<<(qint32)endPos[i];
@@ -195,7 +205,8 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLModulePlanner::addCirc(quint8 mask,quint8 iI,quint8 iJ,quint8 iK,long endPos[],long cenPos[],float S,float Fmov,quint32 _id)
+bool WLModulePlanner::addCirc(quint8 mask,quint8 size,quint8 indexs[],long endPos[],long cenPosIJ[],float S,float Fmov,quint32 _id)
+
 {
 QMutexLocker locker(&Mutex);
 QByteArray data;
@@ -205,20 +216,24 @@ Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_addCirc
+Stream<<(quint8)typeMPlanner
+      <<(quint8)comPlanner_addCirc
 	  <<mask
-	  <<iI<<iJ<<iK
-      <<(qint32)endPos[0]<<(qint32)endPos[1]<<(qint32)endPos[2]
-      <<(qint32)cenPos[0]<<(qint32)cenPos[1]
-	  <<S
+      <<size;
+
+for(int i=0;i<size;i++)
+   Stream<<indexs[i]<<(qint32)endPos[i];
+
+   Stream<<(qint32)cenPosIJ[0]<<(qint32)cenPosIJ[1];
+
+Stream<<S
 	  <<Fmov
 	  <<_id;
 
 
-qDebug()<<"addBufCirc3D"<<mask<<"S:"<<S<<"F:"<<Fmov<<iI<<iJ<<iK;
+qDebug()<<"addBufCirc3D"<<mask<<"S:"<<S<<"F:"<<Fmov<<indexs[0]<<indexs[1]<<indexs[2];
 qDebug()<<"ePos"<<endPos[0]<<endPos[1]<<endPos[2];
-qDebug()<<"cPos"<<cenPos[0]<<cenPos[1];
+qDebug()<<"cPos"<<cenPosIJ[0]<<cenPosIJ[1];
 
 free--;
 //emit ChangedFreeBuf(getFreeBuf());
@@ -239,8 +254,6 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-qDebug()<<"startMovBuf";
-
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_start;
 
 emit sendCommand(data);
@@ -254,8 +267,6 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
-
-qDebug()<<"stopMovBuf";
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_stop;
 
@@ -273,8 +284,6 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-qDebug()<<"pauseMovBuf";
-
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_pause;
 
 emit sendCommand(data);
@@ -289,8 +298,6 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
-
-qDebug()<<"setKFBuf"<<_KF;
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setKF<<_KF;
 
@@ -310,8 +317,6 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
-
-qDebug()<<"setSmoothAng"<<ang_gr;
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setSmoothAng<<ang_gr;
 
@@ -411,7 +416,7 @@ switch(ui1)
 						//if(flagsBuf&MBF_reset) emit ChangedResetBuf();
 						emit ChangedSOut(f1);
 
-	                            	 if(lastIndexElementBuf==ui2)     
+                           if(lastIndexElementBuf==ui2)
 			                   {
 						 curIdElementBuf=ui32;
 
@@ -425,6 +430,7 @@ switch(ui1)
 								
 	case  sendModule_prop: Stream>>ui1; 
 	                       sizeBuf=ui1;
+                           update();
                            break;
 	case sendModule_error:   
 				                  Stream>>ui1;  //Error

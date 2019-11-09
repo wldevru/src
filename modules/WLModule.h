@@ -69,8 +69,9 @@ signals:
 public slots:
 virtual void reset();	
 virtual void callProp();	
+virtual void update() {}
 
-private slots:
+public slots:
  void setCommand(QByteArray data);
 
 public:

@@ -9,14 +9,18 @@
 #include "WLModule.h"
 #include "WLEncoder.h"
 
-#define comEnc_setSendChgData 1
-#define comEnc_setEnable      2
-#define comEnc_setScale       3
-#define comEnc_setPos         4
+//Encoder
+#define comEnc_setASendData   1 //set autosend data
+#define comEnc_setEnable      2 //set enable encoder
+#define comEnc_setScale       3 //set scale count
+#define comEnc_setPos         4 //set cur position
 
-#define comEnc_getData  100
+#define comEnc_getData  100 //call data encoder
 
-#define sendEnc_data 200
+#define sendEnc_data 200 //send data encoder
+
+#define ENCF_enable  1<<0
+#define ENCF_asend   1<<1
 
 
 class WLModuleEncoder : public WLModule
@@ -36,8 +40,9 @@ public:
 	int getSizeEncoder() {return Encoder.size();}
 	WLEncoder* getEncoder(int index) {if(index>=getSizeEncoder()) index=0; return Encoder[index];}
 
-public:
 
+public slots:
+virtual void update();
 
 public:
 

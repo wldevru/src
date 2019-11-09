@@ -19,6 +19,7 @@
 #define comDCan_setEnable  13
 #define comDCan_addRemElement 14
 #define comDCan_clearAllRemElement 15
+#define comDCan_getData 16
 
 #define comDCan_getInputsData      50
 
@@ -129,6 +130,9 @@ public:
 	bool addRemoteElement(WLRemElement remE);
 	bool clearAllRemoteElement();
 	bool setEnable(bool enable);
+
+    bool sendGetData();
+
 
 public:
 

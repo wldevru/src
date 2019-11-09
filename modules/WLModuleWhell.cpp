@@ -38,6 +38,12 @@ else
 return true;
 }
 
+void WLModuleWhell::update()
+{
+foreach(WLWhell *whell,Whell)
+        whell->sendGetData();
+}
+
 /*
 bool WLModuleWhell::setAxisTrackWhell(int iWhell,int iAxis)
 {

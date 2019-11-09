@@ -45,20 +45,12 @@ public:
 
 int getSizeWhell()  {return Whell.size();}
 WLWhell *getWhell(int index) {if(index>=getSizeWhell()) index=0; return  Whell[index]; }
-/*
-bool setAxisTrackWhell(int iWhell,int iAxis);
-bool setKTrackWhell(int iWhell,float k);
-bool setEnableTrackWhell(int iWhell,quint8 enable);
-bool setTypeTrackWhell(int iWhell,quint8 type);
-bool setIInAxisTrackWHL(int iWhell,int index8[]);
-bool setIInKTrackWHL(int iWhell,int index8[]);
-bool setIInTypeTrackWHL(int iWhell,int index);
-bool setUseInputWHL(int iWhell,bool enable);
-bool setKTrackDataWHL(int iWhell,float K8[],double mainDim);
-*/
+
+public slots:
+virtual void update();
+
 public:
 
-//virtual void callProp();
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 virtual void readCommand(QByteArray data); 

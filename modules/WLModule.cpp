@@ -28,39 +28,35 @@ return ret;
 
 void WLModule::setCommand(QByteArray data)
 {
-if(typeM!=0) data.prepend(typeM);
+data.prepend(typeM);
+
 emit sendCommand(data); 
 }
 
 void WLModule::callProp()
 {
-if(typeM!=0)
- {
- QByteArray data;
- QDataStream Stream(&data,QIODevice::WriteOnly);
- 
- Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
- Stream.setByteOrder(QDataStream::LittleEndian);
- 
- Stream<<(quint8)typeM<<(quint8)comModule_getProp;
- 
- emit sendCommand(data); 
- }
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comModule_getProp;
+
+setCommand(data);
 }
+
 
 void WLModule::reset()
 {
-if(typeM!=0)
- {
- QByteArray data;
- QDataStream Stream(&data,QIODevice::WriteOnly);
- 
- Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
- Stream.setByteOrder(QDataStream::LittleEndian);
- 
- Stream<<(quint8)typeM<<(quint8)comModule_reset;
- 
- emit sendCommand(data); 
- }
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comModule_reset;
+
+setCommand(data);
 }
 

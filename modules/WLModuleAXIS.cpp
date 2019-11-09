@@ -4,6 +4,7 @@ WLModuleAxis::WLModuleAxis(WLModuleIOPut *_ModuleIOPut,QObject *parent)
 	:WLModule(parent)
 {
 setTypeModule(typeMAxis);
+ModuleIOPut=_ModuleIOPut;
 
 Fmax=0;
 
@@ -53,6 +54,7 @@ else
   posLatchProbe2.takeLast();
   posLatchProbe3.takeLast();
   }
+update();
 return true;
 }
 
@@ -82,8 +84,14 @@ Flags.set(MAF_latchProbe3);
 
 void WLModuleAxis::callDataAxis()
 {
-for(int i=0;i<getSizeAxis();i++)	Axis[i]->sendGetData();
-} 
+    for(int i=0;i<getSizeAxis();i++)	Axis[i]->sendGetData();
+}
+
+void WLModuleAxis::update()
+{
+foreach(WLAxis *A,Axis)
+      A->sendGetData();
+}
 
 void WLModuleAxis::readCommand(QByteArray Data)
 {

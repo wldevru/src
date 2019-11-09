@@ -23,7 +23,7 @@
 #define comIOPut_setOutputInv  2 //set invers output
 
 #define comIOPut_setOutputByte 3 //set group output (index,index+1....)
-#define comIOPut_setOutput     4 //set output
+#define comIOPut_setOutputTo   4 //set output
 
 #define comIOPut_setInputByte  5 //set group input
 #define comIOPut_setInput      6 //set input
@@ -81,7 +81,7 @@ public:
                             }
 	
 void setInv(bool _inv=true);
-void togInv()           {setInv(!Flags.get(IOPF_inv));}
+void togInv()  {setInv(!Flags.get(IOPF_inv));}
 
    void setComment(QString _comment) {comment=_comment;} 
    void addComment(QString _comment);
@@ -142,16 +142,11 @@ void setNow(bool _now)     {
 						   if(getCond()>1) sendChanged();
                            }
 
-void setOut(bool _now);     
+void setOut(bool now);
+void setOutPulse(bool _now,uint32_t time_ms);
 
-void setOutPulse(bool _out,int time){
-	                                setOut(_out);
-									QTimer::singleShot(time+setTime+resetTime,this,SLOT(setTog()));
-									//QTimer::singleShot(time,this,SLOT(setOutTogg()));
-                                    }
-
+void setTogPulse(uint32_t time_ms) {setOutPulse(!getNow(),time_ms);}
 void setTog()  {setOut(!getNow());}
-
 
 signals:		    
   void changed(bool);
@@ -177,7 +172,7 @@ public:
    WLIOData(WLIOPut *_IOput,bool _state=0) {IOput=_IOput;state=_state;}
    WLIOData() {IOput=&(WLIOPut::In0); state=0;}
    QString toString()   {return QString::number(IOput->getIndex())+","+QString::number(state);}     
-   bool  isState() {return IOput==NULL ? true : IOput->getNow()==state;}
+   bool  isTry() {return IOput==NULL ? true : IOput->getNow()==state;}
 };
 
 
