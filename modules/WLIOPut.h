@@ -55,6 +55,7 @@
 #define IOPF_asend     1<<5
 #define IOPF_pulse     1<<6
 
+
 const QString errorIOPut("0,no error\
 ,1,add connect ioput\
 ,1,add pulse output");
@@ -77,7 +78,8 @@ public:
 						    comment=_comment; 
 							Flags.reset();
 							Flags.set(IOPF_input,input);
-							setTime=resetTime=0;				
+                            setTime=resetTime=0;
+                            setObjectName("IO");
                             }
 	
 void setInv(bool _inv=true);
@@ -143,9 +145,9 @@ void setNow(bool _now)     {
                            }
 
 void setOut(bool now);
-void setOutPulse(bool _now,uint32_t time_ms);
+void setOutPulse(bool _now,quint32 time_ms);
 
-void setTogPulse(uint32_t time_ms) {setOutPulse(!getNow(),time_ms);}
+void setTogPulse(quint32 time_ms) {setOutPulse(!getNow(),time_ms);}
 void setTog()  {setOut(!getNow());}
 
 signals:		    

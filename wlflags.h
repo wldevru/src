@@ -15,4 +15,5 @@ void reset();
 long m_Data;	
 };
 
+
 #endif // WLFLAGS_H

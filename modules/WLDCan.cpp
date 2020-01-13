@@ -45,8 +45,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)comDCan_addRemElement<<(quint8)getIndex()
 	  <<(quint8)remElement.typeE
 	  <<(quint8)remElement.indexLocal
-	  <<(quint8)remElement.indexRemote
-	  <<(quint8)remElement.master;
+      <<(quint8)remElement.indexRemote;
 
 emit sendCommand(data);
 return true;
@@ -104,8 +103,14 @@ stream.writeAttribute("adrCan", QString::number(getAdrCan(),16).toUpper());
 
 stream.writeStartElement("remoteElements");
 
-for(int i=0;i<remEList.size();i++)
-  	 remEList[i].writeXMLData(stream);
+if(remEList.isEmpty())
+    {
+    WLRemElement remElement;
+    remElement.writeXMLData(stream);
+    }
+else
+   for(int i=0;i<remEList.size();i++)
+        remEList[i].writeXMLData(stream);
 
  stream.writeEndElement();
 
@@ -125,7 +130,7 @@ while(!stream.atEnd())
 qDebug()<<stream.name();
 stream.readNextStartElement();
     qDebug()<<stream.name();
-if(stream.name()=="DCan") break;
+if(stream.name()==metaObject()->className()) break;
 if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
 
 if(stream.name()=="remoteElements")

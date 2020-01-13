@@ -84,6 +84,7 @@ public:
 
 signals:
 	void changedInEMGStop(bool);
+    void changedInSDStop(bool);
 	
 
 public:

@@ -50,6 +50,8 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)comPWM_setInvOut<<(quint8)indexPWM<<(quint8)inv;
 
 emit sendCommand(data);
+
+//sendGetData();
 return true;
 }
 
@@ -94,6 +96,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)comPWM_getDataOut<<(quint8)indexPWM;
 
 emit sendCommand(data);
+
 return true;
 }	
 

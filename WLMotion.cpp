@@ -58,6 +58,7 @@ case typeMAxis:   if(getModuleIOPut()!=NULL)    Module=new WLModuleAxis(getModul
 	              break;
 case typeMPWM:    Module=new WLModulePWM();		  
 	              break;
+default: break;
 }
 
 addModule(Module);

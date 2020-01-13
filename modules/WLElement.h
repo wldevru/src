@@ -7,7 +7,7 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStringList>
-#include "..\wlflags.h"
+#include "WLFlags.h"
 
 #define idAxis 0
 #define idCut  10
@@ -58,8 +58,8 @@ virtual void reset() {}
 virtual void callStatus() {}
 
 public:
-virtual void writeXMLData(QXmlStreamWriter &stream) {}
-virtual void  readXMLData(QXmlStreamReader &stream) {}
+virtual void writeXMLData(QXmlStreamWriter &) {}
+virtual void  readXMLData(QXmlStreamReader &) {}
 };
 
 #endif // WLELEMENT_H

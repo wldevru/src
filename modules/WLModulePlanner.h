@@ -6,7 +6,7 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStringList>
-#include <QMutex.h>
+#include <QMutex>
 #include "WLModule.h"
 
 //Planner connect
@@ -44,11 +44,11 @@ enum typeSignalBuf{_sigChgEmptyBuf_ui8
 
 //#define sendPlanner_error  255
 
-#define MASK_abs       1<<1 //абсолютные координаты
-#define MASK_spiral    1<<2 //спираль
-#define MASK_ccw       1<<3 //против часовой стрелки
-#define MASK_fline     1<<4 //быстрая линия
-#define MASK_ensmooth  1<<5 //сглаживание вкл.
+#define MASK_abs       1<<1 //absolute coordinate
+#define MASK_circxyz   1<<2 //3 axis circ
+#define MASK_ccw       1<<3 //counter clock wise
+#define MASK_fast      1<<4 //fast
+#define MASK_ensmooth  1<<5 //enable smooth
 
 #define errorPlanner_emg       1
 #define errorPlanner_buffull   2

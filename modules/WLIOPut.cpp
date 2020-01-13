@@ -6,7 +6,12 @@ WLIOPut WLIOPut::Out("Out.-1",0);
 
 void WLIOPut::setData(quint8 _flags)
 {
-Flags.m_Data&=0xFF00;
+Flags.m_Data&= //IOPF_inv
+              // IOPF_enable
+               IOPF_input
+              |IOPF_asend
+              |IOPF_pulse;
+
 Flags.m_Data|=_flags;
 
 if(getCond()>1) sendChanged();	
@@ -14,8 +19,8 @@ if(getCond()>1) sendChanged();
 
 void WLIOPut::addComment(QString _comment)
 {
-if((Flags.get(IOPF_input)&&(getIndex()>2))
-||(!Flags.get(IOPF_input)&&(getIndex()>1)))
+if((Flags.get(IOPF_input)&&(getIndex()>=2))
+||(!Flags.get(IOPF_input)&&(getIndex()>=1)))
  {
  if(!comment.isEmpty()) comment+=",";
 
@@ -128,11 +133,12 @@ QString List;
 
 for(int i=0;i<size;i++)
      if(ioputs[i].isInv()) 
+     {
 	  if(List.isEmpty())
 		  List+=QString::number(i);
 	  else
 		  List+=","+QString::number(i);
-
+      }
 return  List;
 }
 
@@ -140,7 +146,7 @@ return  List;
 
 void WLIOPut::setInv(bool _inv)
 {
-if((Flags.get(IOPF_inv))^_inv)
+//if((Flags.get(IOPF_inv))^_inv)
  {
  Flags.set(IOPF_inv,_inv);
  
@@ -154,7 +160,7 @@ if((Flags.get(IOPF_inv))^_inv)
   Stream<<(quint8)comIOPut_setInputInv<<getIndex()<<(quint8)_inv;
  else
   Stream<<(quint8)comIOPut_setOutputInv<<getIndex()<<(quint8)_inv;
- 
+
  emit sendCommand(data);
  }
 }
@@ -167,12 +173,12 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comIOPut_setOutputTo<<getIndex()<<(uint8_t)now;
+Stream<<(quint8)comIOPut_setOutputTo<<getIndex()<<(quint8)now;
 
 emit sendCommand(data);
 }
 
-void WLIOPut::setOutPulse(bool _now,uint32_t time_ms)
+void WLIOPut::setOutPulse(bool _now,quint32 time_ms)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);

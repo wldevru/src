@@ -32,7 +32,7 @@ class WLPWM : public WLElement
 
 public:
 	
- WLPWM(QObject *parent=0);
+ WLPWM(QObject *parent=nullptr);
 ~WLPWM();
 
 private:
@@ -47,10 +47,10 @@ WLFlags Flags;
  quint8 flag;
 
 public:
-	void setData(quint8 _flag,float P,float F) {flag=_flag;Power=P;Freq=F;};
+    void setData(quint8 _flag,float P,float F) {flag=_flag;Power=P;Freq=F;}
 
-	void setIndex(quint8 _index) {indexPWM=_index;};
-  quint8 getIndex() {return indexPWM;};
+    void setIndex(quint8 _index) {indexPWM=_index;}
+  quint8 getIndex() {return indexPWM;}
 
   float getFreq() {return Freq;}
 

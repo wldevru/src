@@ -6,6 +6,12 @@ WLModulePWM::WLModulePWM(QObject *parent)
 setTypeModule(typeMPWM);
 
 Init(1);
+
+QTimer *updateTimer = new QTimer;
+connect(updateTimer,SIGNAL(timeout()),SLOT(update()));
+updateTimer->start(100);
+
+
 }
 
 WLModulePWM::~WLModulePWM()
@@ -74,7 +80,7 @@ case sendPWM_dataOut:Stream>>index;//index8
    	                 Stream>>ui1;//flag
 					 Stream>>f1;
 					 Stream>>f2;
-						// qDebug()<<"ChangedDataOutPWM"<<index<<f1;
+                      //   qDebug()<<"ChangedDataOutPWM"<<index<<f1;
 					 if(index<getSizeOutPWM()) outPWM[index]->setData(ui1,f1,f2);	
 					 break;
 

@@ -3,13 +3,13 @@
 
 #include "WLDevice.h"
 
-#include "modules\WLModuleDCAN.h"
-#include "modules\WLModuleIOPUT.h"
-#include "modules\WLModuleEncoder.h"
-#include "modules\WLModuleAXIS.h"
-#include "modules\WLModuleWHELL.h"
-#include "modules\WLModulePlanner.h"
-#include "modules\WLModulePWM.h"
+#include "modules/WLModuleDCan.h"
+#include "modules/WLModuleIOPut.h"
+#include "modules/WLModuleEncoder.h"
+#include "modules/WLModuleAxis.h"
+#include "modules/WLModuleWhell.h"
+#include "modules/WLModulePlanner.h"
+#include "modules/WLModulePWM.h"
 
 class WLMotion: public WLDevice
 {

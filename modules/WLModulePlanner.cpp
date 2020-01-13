@@ -416,17 +416,17 @@ switch(ui1)
 						//if(flagsBuf&MBF_reset) emit ChangedResetBuf();
 						emit ChangedSOut(f1);
 
-                           if(lastIndexElementBuf==ui2)
-			                   {
-						 curIdElementBuf=ui32;
+                        if(lastIndexElementBuf==ui2)
+                             {
+                             curIdElementBuf=ui32;
 
-			                   flags =ui4;
-                                  if(status!=(statusPlanner)(ui3)) 
-							 emit ChangedStatus(status=(statusPlanner)(ui3));
+                             flags =ui4;
+                             if(status!=(statusPlanner)(ui3))
+                              emit ChangedStatus(status=(statusPlanner)(ui3));
 						 //if(freeBuf!=ui1)
-						 emit ChangedFree(free=ui1);
-			                   }
-						break;
+                             emit ChangedFree(free=ui1);
+                             }
+                           break;
 								
 	case  sendModule_prop: Stream>>ui1; 
 	                       sizeBuf=ui1;

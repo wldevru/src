@@ -31,6 +31,10 @@ connect(this,SIGNAL(sendCommand(QByteArray)),this,SLOT(startSend(QByteArray)));
  
 WLDevice::~WLDevice()
 {
+getModuleConnect()->setEnableHeart(false);
+setStatus(DEVICE_init);
+
+sendData();
 removeModules();
 
 if(serialPort!=nullptr)
@@ -43,7 +47,33 @@ if(serialPort!=nullptr)
 void WLDevice::callPropModules()
 {
 for(int i=0;i<Modules.size();i++) 	
-	Modules[i]->callProp();
+    Modules[i]->callProp();
+}
+
+void WLDevice::callProp()
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<static_cast<quint8>(comDev_getProp);
+
+setCommand(data);
+}
+
+void WLDevice::reset()
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<static_cast<quint8>(comDev_resetAll);
+
+setCommand(data);
 }
 
 void WLDevice::removeModules()
@@ -59,9 +89,10 @@ void WLDevice::reconnectSerialPort()
 {
 if(serialPort!=nullptr)
  {
+ qDebug()<<"reconnect serial port";
  serialPort->close();
  if(!serialPort->open(QIODevice::ReadWrite)) QTimer::singleShot(100,this,SLOT(reconnectSerialPort()));
-}
+ }
 }
 
 void WLDevice::callStatus()
@@ -75,6 +106,21 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<static_cast<quint8>(comDev_getStatus);
 
 setCommand(data);
+}
+
+void WLDevice::setStatus(enum statusDevice _status)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<static_cast<quint8>(comDev_setStatus)<<static_cast<quint8>(_status);
+
+setCommand(data);
+
+callStatus();
 }
 
 void WLDevice::callModules()
@@ -160,8 +206,8 @@ if(serialPort)
  if(portName.isEmpty()) return false;
  }
 
-if(portList.size()==1
-&&!portName.isEmpty()) portName=portList.first().portName();
+//if(portList.size()==1
+//&&!portName.isEmpty()) portName=portList.first().portName();
 
 serialPort = new QSerialPort(portName);
 
@@ -250,6 +296,7 @@ qint32 l1;
 quint8 index;
 float f1;
 QChar buf[256];
+QString bufStr;
 
 int curi=0;
 quint8 size;
@@ -289,7 +336,7 @@ switch(ui1)
                     				   qDebug()<<"WLDevice Detect Error"<<index<<ui1;
                     				  
                     			  	   emit sendMessage("WLDevice "+getErrorStr(errorDevice,ui1),QString::number(index),-(int)(ui1));				     
-									  // emit ChangedErrorDevice(index,ui1);
+                                     //emit ChangedErrorDevice(index,ui1);
 									   
 									   if(ui1==errorDevice_nomodule)
                                         {
@@ -302,19 +349,27 @@ switch(ui1)
                                          }
                     			       break;                    
 
-                    case sendModule_prop:
+                    case sendDev_prop:
                                       for(int i=0;i<(size-4);i++)
                                        {
                                        Stream>>ui1;
                                        buf[i]=ui1;
                                        }
 
-                                      prop=QString(buf,size-4);
-									  
-									  setNameDevice(prop.split(".").first());
+                                      bufStr=QString(buf,size-4);
 
-                                      emit ChangedProp(prop);
-                                      emit ChangedConnect(Flags.set(fl_connect));
+                                      if(!bufStr.isEmpty())
+                                       {
+                                       prop=bufStr;
+
+                                       setNameDevice(prop.split(".").first());
+
+                                       emit ChangedProp(prop);
+                                       emit ChangedConnect(Flags.set(fl_connect));
+
+                                       setStatus(DEVICE_ready);
+                                       getModuleConnect()->setEnableHeart(true);
+                                       }
                     			      break;
 
                    case sendDev_Module:   
@@ -332,7 +387,7 @@ switch(ui1)
 									  emit ChangedReady(true);                                     
                     			      break;
 
-                    case sendDev_UID: Stream>>UID96[0];
+                   case sendDev_UID:  Stream>>UID96[0];
 						              Stream>>UID96[1];
 						              Stream>>UID96[2];
 									  emit ChangedUID96(UID96);
@@ -349,6 +404,7 @@ switch(ui1)
                                        if(ui1!=status)
                                            emit ChangedStatus(status=static_cast<statusDevice>(ui1));
                                       break;
+
                     case typeMFW:  if(getModule((typeModule)ui1)==nullptr) //oldFW
 									     {
 									     createModule((typeModule)ui1);										 
@@ -427,7 +483,7 @@ if(name=="WLModuleConnect")
   connect(MConnect,SIGNAL(timeoutConnect()),this,SLOT(reconnectSerialPort()));
   connect(MConnect,SIGNAL(backupConnect()),this,SLOT(updateModules()));
 
-  connect(MConnect,SIGNAL(timeoutConnect()),this,SLOT(setStatusEmpty()));
+  //connect(MConnect,SIGNAL(timeoutConnect()),this,SLOT(setStatusEmpty()));
 
   Module=MConnect;
   }
@@ -443,7 +499,7 @@ void WLDevice::readXMLData(QXmlStreamReader &stream)
 {
 QString port;
 int i;
-int iSize=0,oSize=0;
+
 WLModule *Module;
 bool add=true;
 		
@@ -485,8 +541,10 @@ if(stream.name()=="Modules")
 
         if(i==Modules.size()&&add)
 		  {
-		  Module=createModule(stream.name().toString());	  
-		  Module->readXMLData(stream);
+          Module=createModule(stream.name().toString());
+
+          if(Module)
+             Module->readXMLData(stream);
 		  }
 	    }
 	   }
@@ -569,7 +627,6 @@ if(FileXML.open(QIODevice::ReadOnly))
       stream.readNextStartElement();
       readXMLData(stream);
       }
-
      }
 
   FileXML.close();

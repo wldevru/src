@@ -56,9 +56,10 @@ const QString errorAxis("0,no error\
 #define MASK_ccw       1<<3 //counter clock wise
 #define MASK_fline     1<<4 //fast line
 #define MASK_ensmooth  1<<5 //enable smooth
+#define MASK_dir       1<<6 //dir vel mode
 
 //Axis
-#define comAxis_mov         1 //moving Axis
+#define comAxis_movPos      1 //mov position mode Axis
 #define comAxis_sdStop      2 //slow down stop
 #define comAxis_emgStop     3 //emergency stop
 #define comAxis_addSyhData  4 //set syh position
@@ -88,6 +89,7 @@ const QString errorAxis("0,no error\
 #define comAxis_setEnable     26//enable Axis
 
 #define comAxis_setDelaySCurve     27//set inertion time (S curve)
+#define comAxis_movVel      28 //mov vellocity mode Axis
 
 #define comAxis_getData   100 //call data Axis
 
@@ -264,6 +266,7 @@ signals:
  void ChangedStatus(statusAxis);
  void ChangedMode(modeAxis);
  void ChangedFreq(float);
+ void ChangedInALM(bool);
 
 private:
     bool setInput(typeInputAxis type,quint8 num);
@@ -272,7 +275,8 @@ private:
 public:
 	bool sendGetData();
     bool setParMov(float Aac,float Ade,float Fst,float Fma,typeMParAxis type=typeMParAxis::AXIS_MParAll);
-    bool mov(quint8 mask,qint32 Dist,float Fmov);
+    bool movPos(quint8 mask,qint32 Dist,float Fmov);
+    bool movVel(quint8 mask,float Fmov);
 	bool acc();
 	bool dec();
 	bool sdStop();

@@ -99,7 +99,7 @@ stream.readNextStartElement();
 if(stream.name()==metaObject()->className()) break;
 if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
 
-if(stream.name()=="DCan")
+if(stream.name()=="WLDCan")
 	   {
 	   index=stream.attributes().value("index").toString().toInt();
 
@@ -119,7 +119,7 @@ stream.writeAttribute("size",QString::number(getSizeDCan()));
 
 for(int i=0;i<getSizeDCan();i++)
  {
- stream.writeStartElement("DCan");
+ stream.writeStartElement("WLDCan");
  stream.writeAttribute("index",QString::number(i));
    DCan[i]->writeXMLData(stream);
  stream.writeEndElement();

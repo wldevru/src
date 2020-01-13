@@ -23,6 +23,9 @@ const QString errorElementPlanner("0,no error\
 ,6,wrong Line count");
 */
 
+#define comMCon_setTimers 1
+#define comMCon_setEnableHeart 2
+
 #define sigMCon_heart 100 //heart connect
 
 class WLModuleConnect : public WLModule
@@ -40,9 +43,19 @@ bool conOk;
 quint16 sizeInBuf;
 quint16 sizeOutBuf;
 
+quint16 timeoutConnect_ms;
+quint16 timeHeart_ms;
+
 QTimer *timerHeart;
 public:
 	bool isConnect() {return conOk;}
+
+    bool setTimersConnect(quint16 timeout_ms,quint16 heart_ms);
+
+    quint16 getTimeoutConnectVal() {return timeoutConnect_ms;}
+    quint16 getTimeHeartVal() {return timeHeart_ms;}
+
+    bool setEnableHeart(bool enable);
 
 public slots:	
 	void sendHeart();

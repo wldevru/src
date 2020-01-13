@@ -5,8 +5,8 @@
 #include <QTimer>
 #include <QMutex>
 #include <QString>
-#include <QSerialPort>
-#include <QSerialPortInfo>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QDebug>
@@ -14,18 +14,22 @@
 #include <QTimer>
 #include <QFile>
 #include <QTextCodec>
-#include "modules\WLModule.h"
-#include "modules\WLModuleConnect.h"
+#include "modules/WLModule.h"
+#include "modules/WLModuleConnect.h"
 #include "WLFlags.h"
 
 //WLDevice
-#define comDev_getVersion  1 //call version
-#define comDev_getModule   2 //call modules
-#define comDev_getUID      3 //call unique id
-#define comDev_getStatus   4 //call status
+#define comDev_resetAll    1 //reset all
+#define comDev_getVersion  2 //call version
+#define comDev_getProp     3 //call prop
+#define comDev_getModule   4 //call modules
+#define comDev_getUID      5 //call	UID
+#define comDev_getStatus   6 //call status
 
-#define comDev_setStatus    10 //set status
+#define comDev_setStatus   10 //set status
 
+#define sendDev_prop     100
+#define sendDev_UID      102
 #define sendDev_Module   101 //send modules
 #define sendDev_UID      102 //send uid
 #define sendDev_status   103 //send status
@@ -72,12 +76,11 @@ WLModule* getModule(typeModule type);
 
 WLModuleConnect* getModuleConnect() {return static_cast<WLModuleConnect*>(getModule(typeMConnect));}
 
-void setNameDevice(QString _name) {nameDevice=_name;}
+void setNameDevice(QString _name) {if(nameDevice.isEmpty()||!_name.isEmpty()) nameDevice=_name;}
 QString getNameDevice() {return nameDevice;}
 
 bool initFromFile(QString nameFile);                              
 
-bool readFromFile(QString nameFile,bool add=true);
 bool writeToFile(QString nameFile);
 bool writeToDir(QString dir) {return writeToFile(dir+"\\"+getNameDevice()+".xml");}
 
@@ -115,6 +118,8 @@ virtual WLModule *createModule(typeModule type);
 
 public:
 virtual void callPropModules();
+virtual void callProp();
+virtual void reset();
 
 public:
 
@@ -123,7 +128,7 @@ void updateModules() {
                      foreach(WLModule *Module,Modules)
                               Module->update();
                      }
-void setStatusEmpty() {if(status!=DEVICE_empty) emit ChangedStatus(status=DEVICE_empty);}
+//void setStandby() {if(status!=DEVICE_empty) emit ChangedStatus(status=DEVICE_empty);}
 
 virtual	void readSlot();
 
@@ -135,6 +140,8 @@ public slots:
 	void callModules();  
     void callVersion();
 	void reconnectSerialPort();
+
+
 
 public slots:
  virtual void callStatus();
@@ -163,6 +170,7 @@ public:
 QString getPortName()  {QString ret=""; if(serialPort) ret=serialPort->portName(); return ret;}
 QString getProp()  {return prop;}
 void 	getUID96(quint32 *uid) {memcpy(uid,UID96,12);}
+void 	setStatus(enum statusDevice);
 
 private slots:
 

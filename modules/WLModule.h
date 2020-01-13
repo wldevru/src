@@ -8,7 +8,7 @@
 #include <QXmlStreamReader>
 #include <QStringList>
 #include "WLElement.h"
-#include "wlflags.h"
+#include "WLFlags.h"
 
 #define idAxis 0
 #define idCut  10
@@ -56,7 +56,7 @@ public:
 	WLModule(QObject *parent=0);
   ~WLModule();
 
-typeModule getTypeModule() {return typeM;};
+typeModule getTypeModule() {return typeM;}
       void setTypeModule(typeModule _type) {typeM=_type;}
 
 private:
@@ -76,7 +76,8 @@ public slots:
 
 public:
 
-virtual void  readCommand(QByteArray data)     {}
+virtual void  readCommand(QByteArray)     {}
+
 static QString getErrorStr(QString str,int);
 };
 

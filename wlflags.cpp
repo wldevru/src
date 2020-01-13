@@ -1,4 +1,4 @@
-#include "wlflags.h"
+#include "WLFlags.h"
 
 WLFlags::WLFlags()
 {
@@ -21,6 +21,8 @@ if(set_data) m_Data|=set_flag; else	m_Data&=~set_flag;
 
 return set_data;
 }
+
+
 
 void WLFlags::reset()
 {

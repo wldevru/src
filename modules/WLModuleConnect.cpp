@@ -5,6 +5,8 @@ WLModuleConnect::WLModuleConnect(QObject *parent)
 {
 setTypeModule(typeMConnect);
 
+timeoutConnect_ms=1000;
+timeHeart_ms=250;
 
 conOk=0;
 
@@ -16,14 +18,56 @@ connect(timerHeart,SIGNAL(timeout()),this,SLOT(setTimeoutConnect()));
 
 WLModuleConnect::~WLModuleConnect()
 {
-delete timerHeart;
+    delete timerHeart;
 }
+
+bool WLModuleConnect::setTimersConnect(quint16 timeout_ms, quint16 heart_ms)
+{
+timeout_ms = timeout_ms<500 ? 500: (timeout_ms>10000? 10000: timeout_ms);
+heart_ms = heart_ms<50 ? 50: (heart_ms>1000? 1000: heart_ms);
+
+if(timeout_ms<=heart_ms) return false;
+
+timeoutConnect_ms=timeout_ms;
+timeHeart_ms=heart_ms;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMConnect<<(quint8)comMCon_setTimers<<timeoutConnect_ms<<timeHeart_ms;
+
+qDebug()<<"setTimersConnect"<<timeout_ms<<heart_ms;
+
+emit sendCommand(data);
+return true;
+}
+
+
+bool WLModuleConnect::setEnableHeart(bool enable)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMConnect<<(quint8)comMCon_setEnableHeart<<(quint8)enable;
+
+qDebug()<<"setEnableHeart"<<enable;
+
+emit sendCommand(data);
+return true;
+}
+
 
 
 
 void WLModuleConnect::setTimeoutConnect()
 {
-emit sendMessage("WLModuleConnect","timeout",0);
+emit sendMessage("WLModuleConnect","timeout "+QString::number(timeoutConnect_ms),0);
 emit timeoutConnect();
 
 conOk=false;
@@ -31,9 +75,10 @@ conOk=false;
 
 void WLModuleConnect::restartHeart()
 {
-timerHeart->start(1000);
+timerHeart->start(timeoutConnect_ms);
 
 if(!conOk) emit backupConnect();
+
 sendHeart();
 }
 
@@ -51,17 +96,19 @@ conOk=true;
 emit sendCommand(data);
 }
 
-
-
 void WLModuleConnect::writeXMLData(QXmlStreamWriter &stream)
 {
-//stream.writeAttribute("SmoothAngGr",QString::number(getSmoothAng()));
+stream.writeAttribute("timeoutConnect_ms",QString::number(getTimeoutConnectVal()));
+stream.writeAttribute("timeHeart_ms",QString::number(getTimeHeartVal()));
 }
 
 void WLModuleConnect::readXMLData(QXmlStreamReader &stream)
 {
-//if(!stream.attributes().value("SmoothAngGr").isEmpty()) 
-//	 setSmoothAng(stream.attributes().value("SmoothAngGr").toString().toFloat());
+if(!stream.attributes().value("timeoutConnect_ms").isEmpty()
+ &&!stream.attributes().value("timeHeart_ms").isEmpty())
+     setTimersConnect(stream.attributes().value("timeoutConnect_ms").toString().toLong()
+                     ,stream.attributes().value("timeHeart_ms").toString().toLong());
+
 }
 
 
@@ -76,8 +123,6 @@ QDataStream Stream(&Data,QIODevice::ReadOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
-
-
 
 Stream>>ui1;
 

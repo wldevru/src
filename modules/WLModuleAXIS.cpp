@@ -229,9 +229,14 @@ setInputMAxis(IO_inEMGStop,index);
 
 void  WLModuleAxis::setInSDStop(int index)
 {
+disconnect(inSDStop,SIGNAL(changed(bool)),this,SIGNAL(changedInSDStop(bool)));
+
 inSDStop->removeComment("inSDStop");
 inSDStop=ModuleIOPut->getInputV(index);;
 inSDStop->addComment("inSDStop");
+
+
+connect(inSDStop,SIGNAL(changed(bool)),this,SIGNAL(changedInSDStop(bool)));
 
 setInputMAxis(IO_inSDStop,index);
 }

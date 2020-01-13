@@ -1,4 +1,6 @@
-#include "WLAXIS.h"
+#include "WLAxis.h"
+
+#include <limits>
 
 WLAxis::WLAxis(QObject *parent) 
 	:WLElement(parent)
@@ -6,8 +8,8 @@ WLAxis::WLAxis(QObject *parent)
 setTypeElement(typeEAxis);
 
 nowPosition=0;
-maxPosition=INT32_MAX;
-minPosition=INT32_MIN;
+maxPosition=std::numeric_limits<qint32>::max();
+minPosition=std::numeric_limits<qint32>::min();
 homePosition=0;
 
 status=AXIS_stop;
@@ -333,15 +335,15 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_setParMov<<getIndex()<<Aac<<Ade<<Fst<<Fma<<(static_cast<uint8_t>(type));
+Stream<<(quint8)comAxis_setParMov<<getIndex()<<Aac<<Ade<<Fst<<Fma<<(static_cast<quint8>(type));
 
-qDebug()<<"typeMPar"<<(static_cast<uint8_t>(type));
+qDebug()<<"typeMPar"<<(static_cast<quint8>(type));
 
 emit sendCommand(data);
 return true;
 }
 
-bool WLAxis::mov(quint8 mask,qint32 Dist,float Fmov)
+bool WLAxis::movPos(quint8 mask,qint32 Dist,float Fmov)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -349,7 +351,21 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_mov<<mask<<getIndex()<<Dist<<Fmov;
+Stream<<(quint8)comAxis_movPos<<mask<<getIndex()<<Dist<<Fmov;
+
+emit sendCommand(data);
+return true;
+}
+
+bool WLAxis::movVel(quint8 mask,float Fmov)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comAxis_movVel<<mask<<getIndex()<<Fmov;
 
 emit sendCommand(data);
 return true;

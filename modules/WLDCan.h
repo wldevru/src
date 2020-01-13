@@ -39,23 +39,7 @@
 
 const QString errorDCan("0,no error\
 ,1,size CAN\
-,2,set input\
-,3,set S curve\
-,4,wrong state inEMGStop 1\
-,5,wrong state inSDStop\
-,6,wrong state inALM\
-,7,wrong state inPEL\
-,8,wrong state inMEL\
-,9,out limit position\
-,10,no mov\
-,11,wrong mode or status\
-,12,wrong Fmax\
-,13,error calc F\
-,14,error calc Position\
-,15,error servo period\
-,16,wrong accel/decel\
-,17,wrong Fstart\
-,35,error DMA");
+,2,error connect");
 
 
 struct WLRemElement
@@ -63,9 +47,17 @@ struct WLRemElement
 typeElement typeE;
 quint8 indexLocal;   
 quint8 indexRemote;  
-  bool master;
-WLRemElement() {indexLocal=indexRemote=master=0; typeE=typeEInput;}
 
+WLRemElement() {indexLocal=indexRemote=0; typeE=typeEEmpty;}
+/*
+QString toString()
+{
+QStringList Names=namesTypeElement.split(",");
+Names[typeE];
+if(master)
+ return  Names[typeE]+" "+QString::number(indexLocal)+"<<>>>"+;
+}
+                            */
 void writeXMLData(QXmlStreamWriter &stream)
 {
 QStringList Names=namesTypeElement.split(",");
@@ -73,9 +65,8 @@ QStringList Names=namesTypeElement.split(",");
 if(typeE<Names.size())
 {
 stream.writeStartElement(Names[typeE]);  
-  stream.writeAttribute("indexLocal",QString::number(indexLocal));
-  stream.writeAttribute("indexRemote",QString::number(indexRemote));  
-  stream.writeAttribute("master",QString::number(master));  
+  stream.writeAttribute("ilocal",QString::number(indexLocal));
+  stream.writeAttribute("iremote",QString::number(indexRemote));
 stream.writeEndElement();
 }
 
@@ -84,16 +75,16 @@ stream.writeEndElement();
 void readXMLData(QXmlStreamReader &stream)
 {
 QStringList Names=namesTypeElement.split(",");
+
 for(int i=0;i<Names.size();i++)
 	if(stream.name()==Names[i]) 
 	 {
-	 typeE=(typeElement)i;
+     typeE=static_cast<typeElement>(i);
 	 break;
 	 };
 
-indexLocal   =stream.attributes().value("indexLocal").toString().toInt();
-indexRemote  =stream.attributes().value("indexRemote").toString().toInt();
-     master  =stream.attributes().value("master").toString().toInt();
+indexLocal   =stream.attributes().value("ilocal").toString().toInt();
+indexRemote  =stream.attributes().value("iremote").toString().toInt();
 }
 
 };

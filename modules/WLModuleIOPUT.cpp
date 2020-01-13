@@ -201,12 +201,21 @@ return  ret;
 
 void WLModuleIOPut::sendGetAllInputData()
 {
-for(int i=2;i<getSizeInputs();i++) callInputData(i);
+for(int i=2;i<getSizeInputs();i++)
+ {
+ Inputs[i]->setInv(Inputs[i]->isInv());
+ callInputData(i);
+ }
+
 }
 
 void WLModuleIOPut::sendGetAllOutputData()
 {
-for(int i=1;i<getSizeOutputs();i++) callOutputData(i);
+for(int i=1;i<getSizeOutputs();i++)
+ {
+ Outputs[i]->setInv(Outputs[i]->isInv());
+ callOutputData(i);
+ }
 }
 
 void WLModuleIOPut::callInputData(int index)
