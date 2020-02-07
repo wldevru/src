@@ -135,7 +135,8 @@ const QString errorAxis("0,no error\
 #define AF_disableLimit  1<<7  //no use limit
 
 
-
+#define MAF_invStep  1<<1
+#define MAF_invDir   1<<0
 
 enum typeIOPutAXIS{IO_inEMGStop,IO_inSDStop,IO_inProbe};
 

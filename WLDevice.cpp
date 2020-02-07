@@ -31,11 +31,11 @@ connect(this,SIGNAL(sendCommand(QByteArray)),this,SLOT(startSend(QByteArray)));
  
 WLDevice::~WLDevice()
 {
-getModuleConnect()->setEnableHeart(false);
 setStatus(DEVICE_init);
 
-sendData();
 removeModules();
+
+sendData();
 
 if(serialPort!=nullptr)
  {
@@ -368,7 +368,8 @@ switch(ui1)
                                        emit ChangedConnect(Flags.set(fl_connect));
 
                                        setStatus(DEVICE_ready);
-                                       getModuleConnect()->setEnableHeart(true);
+
+                                       if(getModuleConnect()!=nullptr)   getModuleConnect()->setEnableHeart(true);
                                        }
                     			      break;
 

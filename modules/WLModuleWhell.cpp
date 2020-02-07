@@ -207,7 +207,7 @@ return true;
 */
 void WLModuleWhell::readCommand(QByteArray Data)
 {
-quint8 index,ui1,ui2;
+quint8 index,ui1,ui2,ui3;
 qint32 l1;
 qint32 *posProbe;
 int size=Data.size();
@@ -222,6 +222,14 @@ Stream>>ui1;
 
 switch(ui1)
 {
+case sendWhell_data:  Stream>>index;//index8
+                      Stream>>ui1;  //Flag8
+                      Stream>>ui2;  //Flag8
+                      Stream>>ui3;  //Flag8
+
+                      Whell[index]->setData(ui1,ui2,ui3);
+                      break;
+
 case  sendModule_prop: Stream>>ui1;
 					                      
 					   Init(ui1);

@@ -18,7 +18,8 @@ connect(timerHeart,SIGNAL(timeout()),this,SLOT(setTimeoutConnect()));
 
 WLModuleConnect::~WLModuleConnect()
 {
-    delete timerHeart;
+setEnableHeart(false);
+delete timerHeart;
 }
 
 bool WLModuleConnect::setTimersConnect(quint16 timeout_ms, quint16 heart_ms)

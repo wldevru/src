@@ -199,7 +199,7 @@ return  ret;
 }
 
 
-void WLModuleIOPut::sendGetAllInputData()
+void WLModuleIOPut::updateAllInputData()
 {
 for(int i=2;i<getSizeInputs();i++)
  {
@@ -209,11 +209,12 @@ for(int i=2;i<getSizeInputs();i++)
 
 }
 
-void WLModuleIOPut::sendGetAllOutputData()
+void WLModuleIOPut::updateAllOutputData()
 {
 for(int i=1;i<getSizeOutputs();i++)
  {
  Outputs[i]->setInv(Outputs[i]->isInv());
+ Outputs[i]->setOut(Outputs[i]->getNow());
  callOutputData(i);
  }
 }
@@ -289,8 +290,8 @@ for(int i=0;i<Outputs.size();i++)
 
 void WLModuleIOPut::update()
 {
-sendGetAllInputData();
-sendGetAllOutputData();
+updateAllInputData();
+updateAllOutputData();
 }
 
 void WLModuleIOPut::readXMLData(QXmlStreamReader &stream)

@@ -124,10 +124,8 @@ virtual void reset();
 public:
 
 private slots:	
-void updateModules() {
-                     foreach(WLModule *Module,Modules)
-                              Module->update();
-                     }
+void updateModules() {foreach(WLModule *Module,Modules)     Module->update();}
+
 //void setStandby() {if(status!=DEVICE_empty) emit ChangedStatus(status=DEVICE_empty);}
 
 virtual	void readSlot();

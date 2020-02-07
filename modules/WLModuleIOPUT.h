@@ -74,8 +74,8 @@ private:
 	void sendGetIOSize();	
 
 private slots:
-	void sendGetAllInputData();
-	void sendGetAllOutputData();
+    void updateAllInputData();
+    void updateAllOutputData();
 
 	void sendSetOData(bool all=true);
  

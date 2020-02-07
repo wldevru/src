@@ -75,8 +75,6 @@ private:
 
 	statusMFW status;
 
-	int addSpeed;
-
 private:
 
    bool readFW();   

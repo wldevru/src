@@ -10,21 +10,7 @@
 
 
 //Whell
-#define comWhell_setEnable     1 //enable whell
-#define comWhell_setKTrack     2 //set K track axis
-#define comWhell_setTypeTrack  3 //set type track axis (vel/pos)
-#define comWhell_setAxis       4 //set track axis
 
-#define comWhell_setEncoder     10 //set encoder
-
-#define errorWhell_setdata 1
-#define errorWhell_enable  2
-
-#define WHF_enable    1<<0
-#define WHF_vtype     1<<1
-#define WHF_useinput  1<<2
-#define WHF_opinaxis  1<<3
-#define WHF_opink     1<<4
 
 class WLModuleWhell : public WLModule
 {

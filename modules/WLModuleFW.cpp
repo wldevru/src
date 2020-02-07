@@ -12,7 +12,6 @@ sizeFW=0;
 sizeBlockFW=0;
 prop.clear();
 
-addSpeed=5;
 }
  
 WLModuleFW::~WLModuleFW()
@@ -36,7 +35,6 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream>>ui1;
 
-
 switch(ui1)
 {
 case _sendFW:     Stream>>ui1;//status
@@ -48,7 +46,7 @@ case _sendFW:     Stream>>ui1;//status
 				   FWBuf+=ui1; 
 
 				   //if(FWBuf.size()<=32)  
-				   qDebug("%x",ui1);
+                   //qDebug("%x",ui1);
 				   }
 			
 				  if(status==MFW_read) 
@@ -62,7 +60,7 @@ case _sendFW:     Stream>>ui1;//status
 	              Stream>>ui1;
 	              switch(ui1)
 				  {
-				  case _sigEndReadFW:    emit ChangedEndReadFW();break;
+                  case _sigEndReadFW:    emit ChangedEndReadFW(); break;
 				  case _sigEndWriteFW:   emit ChangedEndWriteFW();break;
 				  case _sigChgStatus_u8: Stream>>ui1;
 					                     status=(statusMFW)ui1;
@@ -101,8 +99,7 @@ Stream<<(quint8)typeMFW<<(quint8)_startWriteFW<<mask;
 emit ChangedProgress(0);
 emit sendCommand(data);
 
-for(int i=0;i<addSpeed;i++)
-   writeFW();
+writeFW();
 
 return true;
 }
@@ -123,7 +120,6 @@ FWBuf.clear();
 emit ChangedProgress(0);
 emit sendCommand(data);
 
-for(int i=0;i<addSpeed;i++)
 readFW();
 
 return true;
