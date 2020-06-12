@@ -2,6 +2,7 @@
 #define WLELEMENT_H
 
 #include <QObject>
+#include <QDebug>
 #include <QTimer>
 #include <QDataStream>
 #include <QXmlStreamWriter>
@@ -17,18 +18,20 @@
 #define idBuff  102
 #define idWhell 103
 
-const QString namesTypeElement("typeEEmpty,typeEInput,typeEOutput,typeEOutPWM");
+const QString namesTypeElement("typeEEmpty,typeEInput,typeEOutput,typeEOutPWM,typeEEncoder,typeEAInput,typeEAxis,typeEDCan,typeEFreq,typeEWhell");
+
 
 enum typeElement{typeEEmpty=0
-	            ,typeEInput
+                ,typeEInput
                 ,typeEOutput
                 ,typeEOutPWM
+                ,typeEEncoder
+                ,typeEAInput
                 ,typeEAxis
                 ,typeEDCan
-                ,typeEEncoder
                 ,typeEFreq
-                ,typeEWhell};	
-
+                ,typeEWhell
+                };
 
 class WLElement : public QObject
 {
@@ -39,15 +42,26 @@ public:
     WLElement(QObject *parent=0);
    ~WLElement();
 
-typeElement getTypeElement() {return typeE;}
-       void setTypeElement(typeElement _type) {typeE=_type;}
+typeElement getTypeElement() {return m_typeE;}
+       void setTypeElement(typeElement _type) {m_typeE=_type;}
 
-quint8 getIndex() {return index;}
-  void setIndex(quint8 _index) {index=_index;}
+quint8 getIndex() {return m_index;}
+  void setIndex(quint8 _index) {m_index=_index;}
+
+
+  void setComment(QString _comment) {m_comment=_comment;}
+  void addComment(QString _comment);
+  void removeComment(QString _comment);
+
+QString getComment() {return m_comment;}
+
+QString getBasicComment() {return (m_comment.split(".")).last();}
 
 private:
- typeElement typeE;
-     quint8  index;
+ typeElement m_typeE;
+     quint8  m_index;
+
+QString m_comment;
 
 signals:
   void sendCommand(QByteArray data);

@@ -19,18 +19,21 @@
 #define idWhell 103
 
 enum typeModule {typeDevice=0
-                ,typeMAxis
-                ,typeMWhell
-                ,typeMPWM
-                ,typeMFreq
-                ,typeMIOPut
-                ,typeMPlanner
-                ,typeMCut
-                ,typeMEncoder
-                ,typeMConnect
-                ,typeMFW
-                ,typeMDCan
-                ,typeMCKey};
+                ,typeMAxis//1
+                ,typeMWhell//2
+                ,typeMPWM//3
+                ,typeMFreq//4
+                ,typeMIOPut	 //5
+                ,typeMPlanner//6
+                ,typeMCut//7
+                ,typeMEncoder//8
+                ,typeMConnect//9
+                ,typeMFW//10
+                ,typeMDCan//11
+                ,typeMCKey//12
+                ,typeMAIOPut//13
+                ,typeHeart=255
+                };
 
 
 #define comModule_getProp 255 //call property module
@@ -53,7 +56,7 @@ class WLModule : public WLElement
 
 public:
 
-	WLModule(QObject *parent=0);
+    WLModule(QObject *parent=nullptr);
   ~WLModule();
 
 typeModule getTypeModule() {return typeM;}
@@ -61,10 +64,6 @@ typeModule getTypeModule() {return typeM;}
 
 private:
  typeModule typeM;
-
-signals:
-  void sendCommand(QByteArray data);
-  void sendMessage(QString,QString,int); 
 
 public slots:
 virtual void reset();	

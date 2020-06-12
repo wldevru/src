@@ -43,16 +43,16 @@ private:
  quint8 flag;
 
 public:
-	void setData(float F) {Freq=F;};
+    void setData(float F) {Freq=F;}
 
   float getFreq() {return Freq;}
 
-   void setError(quint8 err)  {emit ChangedError(error=err);}
+   void setError(quint8 err)  {emit changedError(error=err);}
 
 signals:
  
- void ChangedError(quint8);
- void ChangedFreq(float);
+ void changedError(quint8);
+ void changedFreq(float);
 
 public:
 

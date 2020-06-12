@@ -5,6 +5,7 @@
 
 #include "modules/WLModuleDCan.h"
 #include "modules/WLModuleIOPut.h"
+#include "modules/WLModuleAIOPut.h"
 #include "modules/WLModuleEncoder.h"
 #include "modules/WLModuleAxis.h"
 #include "modules/WLModuleWhell.h"
@@ -28,6 +29,7 @@ public:
 WLModulePlanner* getModulePlanner() {return static_cast<WLModulePlanner*>(getModule(typeMPlanner));}
 WLModuleAxis*    getModuleAxis()    {return static_cast<WLModuleAxis*>(getModule(typeMAxis));}
 WLModuleIOPut*   getModuleIOPut()   {return static_cast<WLModuleIOPut*>(getModule(typeMIOPut));}
+WLModuleAIOPut*  getModuleAIOPut()  {return static_cast<WLModuleAIOPut*>(getModule(typeMAIOPut));}
 WLModuleWhell*   getModuleWhell()   {return static_cast<WLModuleWhell*>(getModule(typeMWhell));}
 WLModulePWM*     getModulePWM()     {return static_cast<WLModulePWM*>(getModule(typeMPWM));}
 WLModuleEncoder* getModuleEncoder() {return static_cast<WLModuleEncoder*>(getModule(typeMEncoder));}

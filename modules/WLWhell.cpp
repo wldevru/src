@@ -23,8 +23,6 @@ WLWhell::~WLWhell()
 }
 bool WLWhell::setEnable(bool enable)
 {
-Flags.set(WHF_enable,enable);
-
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 
@@ -45,7 +43,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comWhell_setDataAxis<<(quint8)getIndex()<<index<<iAxis<<kTrack;
+Stream<<(quint8)comWhell_setDataAxis<<getIndex()<<index<<iAxis<<kTrack;
 
 emit sendCommand(data);
 return true;
@@ -62,7 +60,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comWhell_setEncoder<<(quint8)getIndex()<<(quint8)iEncoder;
+Stream<<(quint8)comWhell_setEncoder<<getIndex()<<iEncoder;
 
 emit sendCommand(data);
 return true;
@@ -137,6 +135,8 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)comWhell_setFlag<<getIndex()<<flag;
 
 emit sendCommand(data);
+
+Flags.m_Data=flag|(Flags.m_Data&WHF_enable);
 return true;
 }
 
@@ -219,12 +219,15 @@ emit sendCommand(data);
 return true;
 }
 
-void WLWhell::setData(quint8 Flag, quint8 indexA, quint8 indexX)
+void WLWhell::setData(quint8 Flag, quint8 indexA, quint8 indexX,bool Vmode)
 {
+bool update=((Flags.m_Data&WHF_enable)^(Flag&WHF_enable))!=0;
+
 Flags.m_Data=Flag;
 
-if(curIndexAxis!=indexA) emit ChangedCurIndexAxis(curIndexAxis=indexA);
-if(curIndexX!=indexX)    emit ChangedCurIndexX(curIndexX=indexX);
+if(update||curIndexAxis!=indexA)   {qDebug()<<"Changed curWhell iA"<<curIndexAxis; emit changedCurIndexAxis(curIndexAxis=indexA);}
+if(update||curIndexX!=indexX)      {qDebug()<<"Changed curWhell iX"<<curIndexX; emit changedCurIndexX(curIndexX=indexX);      }
+if(update||curVmode!=Vmode)        {qDebug()<<"Changed curWhell Vmode"<<Vmode; emit changedCurVmode(curVmode=Vmode);         }
 }
 
 void WLWhell::writeXMLData(QXmlStreamWriter &stream)
@@ -248,9 +251,9 @@ for(quint8 i=0;i<sizeInX;i++)
     }
 
 stream.writeAttribute("inX",buf);
-stream.writeAttribute("inVmode",QString::number(iInVmode));
 
-stream.writeAttribute("outENB",QString::number(iInVmode));
+stream.writeAttribute("inVmode",QString::number(getInVmode()));
+stream.writeAttribute("outENB",QString::number(getOutENB()));
 
 stream.writeAttribute("flag",QString::number(getFlag()));
 }

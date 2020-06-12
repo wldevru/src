@@ -9,12 +9,13 @@ Init(1);
 
 WLModuleEncoder::~WLModuleEncoder()
 {
-//if(Encoder!=NULL) delete []Encoder;
+while(Encoder.isEmpty())
+       delete Encoder.takeLast();
 }
 
 bool WLModuleEncoder::Init(int sizeEncoder)
 {
-if(sizeEncoder<1||Encoder.size()== sizeEncoder) return false;
+if((sizeEncoder<1)||(Encoder.size()== sizeEncoder)) return false;
 
 WLEncoder *enc;
 
@@ -37,19 +38,23 @@ else
 return true;
 }
 
+WLEncoder *WLModuleEncoder::getEncoder(int index)
+{
+Q_ASSERT((index<getSizeEncoder())&&(index<255));
+
+return index<getSizeEncoder() ? Encoder[index]:nullptr;
+}
+
 void WLModuleEncoder::update()
 {
-foreach(WLEncoder *encoder,Encoder)
-    encoder->sendGetData();
+    foreach(WLEncoder *encoder,Encoder)
+        encoder->sendGetData();
 }
 
 void  WLModuleEncoder::readCommand(QByteArray Data)
 {
-quint8 index,ui1,ui2,ui3,ui4;
-quint32 ui32;
+quint8 index,ui1;
 qint32 i32;
-long l;
-float f1,f2;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
 

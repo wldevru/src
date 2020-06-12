@@ -22,7 +22,7 @@ public:
 
 	bool Init(int _sizeWhell);
 
-	void setConfigWhell(int index,double mainDim);
+	void setConfigWhell(int m_index,double mainDim);
 
 private:
    QList <WLWhell*> Whell;	
@@ -30,7 +30,7 @@ private:
 public:
 
 int getSizeWhell()  {return Whell.size();}
-WLWhell *getWhell(int index) {if(index>=getSizeWhell()) index=0; return  Whell[index]; }
+WLWhell *getWhell(int m_index);
 
 public slots:
 virtual void update();

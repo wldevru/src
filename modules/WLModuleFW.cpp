@@ -22,11 +22,7 @@ WLModuleFW::~WLModuleFW()
 
 void WLModuleFW::readCommand(QByteArray Data)
 {
-quint8 index,ui1,ui2;
-qint32 l1;
-qint32 *posProbe;
-int size=Data.size();
-float f1;
+quint8 ui1;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
 
@@ -46,12 +42,12 @@ case _sendFW:     Stream>>ui1;//status
 				   FWBuf+=ui1; 
 
 				   //if(FWBuf.size()<=32)  
-                   //qDebug("%x",ui1);
+                  // qDebug("%x",ui1);
 				   }
 			
 				  if(status==MFW_read) 
 					  {					  
-					  if(sizeFW!=0) emit ChangedProgress(100*FWBuf.size()/sizeFW);			
+                      if(sizeFW!=0) emit changedProgress(100*FWBuf.size()/sizeFW);
 					  readFW();
 				      }
                    break;		
@@ -60,12 +56,12 @@ case _sendFW:     Stream>>ui1;//status
 	              Stream>>ui1;
 	              switch(ui1)
 				  {
-                  case _sigEndReadFW:    emit ChangedEndReadFW(); break;
-				  case _sigEndWriteFW:   emit ChangedEndWriteFW();break;
+                  case _sigEndReadFW:    emit endReadFW(); break;
+                  case _sigEndWriteFW:   emit endWriteFW();break;
 				  case _sigChgStatus_u8: Stream>>ui1;
 					                     status=(statusMFW)ui1;
-										 emit ChangedActiv(status!=MFW_standby);
-										 if(status==MFW_standby) emit ChangedProgress(0);
+                                         emit changedActiv(status!=MFW_standby);
+                                         if(status==MFW_standby) emit changedProgress(0);
 									     break;
 
                   case _sigCallNextDataFW: if(status==MFW_write) 
@@ -78,7 +74,8 @@ case _sendFW:     Stream>>ui1;//status
 	              break;
 case _sendPropMFW: Stream>>sizeBlockFW;
 	               Stream>>sizeFW;
-	               break;
+                   qDebug()<<"Block="<<sizeBlockFW<<"sizeFW"<<sizeFW;
+                   break;
 }
 
 }
@@ -96,7 +93,7 @@ indexBuf=0;
 
 Stream<<(quint8)typeMFW<<(quint8)_startWriteFW<<mask;
 //qDebug()<<"Call Pos"<<i;
-emit ChangedProgress(0);
+emit changedProgress(0);
 emit sendCommand(data);
 
 writeFW();
@@ -114,13 +111,15 @@ Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMFW<<(quint8)_startReadFW<<mask;
-//qDebug()<<"Call Pos"<<i;
+
 FWBuf.clear();
 
-emit ChangedProgress(0);
+emit changedProgress(0);
 emit sendCommand(data);
 
 readFW();
+
+qDebug()<<"startReadFW"<<mask;
 
 return true;
 }
@@ -171,12 +170,14 @@ for(int i=0;i<sizeBlockFW;i++)
  
 indexBuf+=sizeBlockFW;
 //qDebug()<<"Call Pos"<<i;
-if(sizeFW!=0) emit ChangedProgress(100*(indexBuf+1)/sizeFW);
+if(sizeFW!=0) emit changedProgress(100*(indexBuf+1)/sizeFW);
+
+emit sendCommand(data);
 }
 else
 	qDebug()<<"outSize";
 
-emit sendCommand(data);
+
 return true;
 }
 

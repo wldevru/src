@@ -36,7 +36,7 @@ bool Init(int size);
 
 WLModuleIOPut *getModuleIOPut() {return  ModuleIOPut;}
 
-WLAxis *getAxis(int index) {if(index>=getSizeAxis()) index=0; return Axis[index]; }
+WLAxis *getAxis(int m_index);
 
 private:
 	WLModuleIOPut *ModuleIOPut;
@@ -50,9 +50,9 @@ private:
 public:
 WLIOPut *getInput(typeInputMAXIS type);
 
-void setInEMGStop(int index);
-void setInSDStop(int index);
-void setInProbe(int index);
+void setInEMGStop(int m_index);
+void setInSDStop(int m_index);
+void setInProbe(int m_index);
 
  int getSizeAxis() {return Axis.size();}
 

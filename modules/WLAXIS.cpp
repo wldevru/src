@@ -89,13 +89,13 @@ setIndex(index);
 void  WLAxis::setInALM(int index)
 {
 inALM->removeComment("inALM"+QString::number(getIndex()));
-disconnect(inALM,SIGNAL(changed(bool)),this,SIGNAL(ChangedInALM(bool)));
+disconnect(inALM,&WLIOPut::changed,this,&WLAxis::changedInALM);
 inALM=ModuleIOPut->getInputV(index);
 inALM->addComment("inALM"+QString::number(getIndex()));
 
 setInput(AXIS_inALM,index);
 
-connect(inALM,SIGNAL(changed(bool)),SIGNAL(ChangedInALM(bool)),Qt::QueuedConnection);
+connect(inALM,&WLIOPut::changed,this,&WLAxis::changedInALM,Qt::QueuedConnection);
 }
 
 void  WLAxis::setInORG(int index)
@@ -529,17 +529,30 @@ void WLAxis::setData(quint8 statusMode,quint8 _flag,qint32 Pos,float F)
 {
 Flags.m_Data=_flag;
 
-modeAxis nmode=static_cast<modeAxis>(statusMode&0x0F);
+statusAxis lstatus=status;
 statusAxis nstatus=static_cast<statusAxis>(statusMode>>4);
+  modeAxis nmode  =static_cast<modeAxis>(statusMode&0x0F);
 
+if(Flags.get(AF_update)||nowPosition!=Pos)
+                       emit changedPosition(nowPosition=Pos);
 if(Flags.get(AF_update)||mode!=nmode)       
-                       emit ChangedMode(mode=nmode);
+                       emit changedMode(mode=nmode);
 if(Flags.get(AF_update)||status!=nstatus)   
-	                   emit ChangedStatus(status=nstatus); 
-if(Flags.get(AF_update)||nowPosition!=Pos)  
-	                   emit ChangedPos(nowPosition=Pos);
-if(Flags.get(AF_update)||Freq!=F)           
-	                   emit ChangedFreq(Freq=F);
+                       {
+                       emit changedStatus(status=nstatus);
+
+                       if((lstatus!=statusAxis::AXIS_stop)
+                        &&(nstatus==statusAxis::AXIS_stop)
+                        &&(mode==modeAxis::AXIS_standby)) emit finished();
+
+                       if((lstatus==statusAxis::AXIS_stop)
+                        &&(nstatus!=statusAxis::AXIS_stop)
+                        &&(mode!=modeAxis::AXIS_standby)) emit started();
+
+                       }
+
+if(Flags.get(AF_update)||Freq!=F)
+                       emit changedFreq(Freq=F);
 }
 
 void WLAxis::readXMLData(QXmlStreamReader &stream)

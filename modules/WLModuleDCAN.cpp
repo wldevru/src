@@ -9,7 +9,8 @@ Init(1);
 
 WLModuleDCan::~WLModuleDCan()
 {
-//if(DCan!=NULL) delete []DCan;
+while(DCan.isEmpty())
+        delete DCan.takeLast();
 }
 
 bool WLModuleDCan::Init(int sizeDCan)
@@ -37,17 +38,22 @@ else
 return true;
 }
 
+WLDCan *WLModuleDCan::getDCan(int index)
+{
+Q_ASSERT((index<getSizeDCan())&&(index<255));
+
+return index<getSizeDCan()? DCan[index]:nullptr;
+}
+
 void WLModuleDCan::update()
 {
-foreach(WLDCan *dcan,DCan)
-    dcan->sendGetData();
+    foreach(WLDCan *dcan,DCan)
+        dcan->sendGetData();
 }
 
 void  WLModuleDCan::readCommand(QByteArray Data)
 {
-quint8 index,ui1,ui2,ui3,ui4;
-quint32 ui32;
-float f1,f2;
+quint8 index,ui1;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
 

@@ -21,7 +21,8 @@ Init(1);
 
 WLModuleAxis::~WLModuleAxis()
 {
-//if(Axis!=NULL) delete []Axis;
+while(Axis.isEmpty())
+    delete Axis.takeLast();
 }
 
 
@@ -58,10 +59,17 @@ update();
 return true;
 }
 
+WLAxis *WLModuleAxis::getAxis(int index)
+{
+Q_ASSERT(index<getSizeAxis());
+
+return index<getSizeAxis() ? Axis[index]:nullptr;
+}
+
 void WLModuleAxis::setLatchProbe2(qint32 *Pos,quint8 n)
 {
-qDebug()<<"setLatchProbe2";
-for(int i=0;i<n&&i<getSizeAxis();i++)
+    qDebug()<<"setLatchProbe2";
+    for(int i=0;i<n&&i<getSizeAxis();i++)
     {
 	posLatchProbe2[i]=Pos[i];
 	qDebug()<<Pos[i];
@@ -123,13 +131,13 @@ switch(ui1)
  				        if(ui2&AF_latch2)
  				            {
                             Stream>>l1;
- 					        qDebug()<<"ch Latch2";
+                            qDebug()<<"ch Latch2"<<l1;
  					        Axis[index]->setLatch2(l1);
  				            }
  				        if(ui2&AF_latch3)
  				            {
- 					        Stream>>l1;
- 					        qDebug()<<"ch Lacth3";
+                            Stream>>l1;
+                            qDebug()<<"ch Lacth3"<<l1;
  					        Axis[index]->setLatch3(l1);
  				            }
 					    }

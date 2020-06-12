@@ -38,7 +38,7 @@ private:
    
 public:	
 	int getSizeEncoder() {return Encoder.size();}
-	WLEncoder* getEncoder(int index) {if(index>=getSizeEncoder()) index=0; return Encoder[index];}
+    WLEncoder* getEncoder(int m_index);
 
 
 public slots:

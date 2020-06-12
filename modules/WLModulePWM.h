@@ -25,7 +25,7 @@ private:
    QList <int> outputInvList;
 public:
 	int getSizeOutPWM() {return outPWM.size();}
-	WLPWM* getOutPWM(int index) {if(index>=getSizeOutPWM()) index=0; return outPWM[index];}
+    WLPWM* getOutPWM(int m_index);
 public:
 
 public slots:
@@ -33,8 +33,7 @@ virtual void update();
 
 public:
 
-//virtual void callProp();
-virtual void writeXMLData(QXmlStreamWriter &stream);
+ virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 virtual void readCommand(QByteArray data); 
 };

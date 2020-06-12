@@ -26,8 +26,8 @@ bool Init(int _sizeInputs,int _sizeOutputs);
 bool InitInputs(int _sizeInputs);
 bool InitOutputs(int _sizeOutputs);
 
-WLIOPut* getInputV(int index)  {if(index>=Inputs.size())   index=0;    return  Inputs[index];}
-WLIOPut* getOutputV(int index) {if(index>=Outputs.size())  index=0;    return  Outputs[index];}
+WLIOPut* getInputV(int m_index);
+WLIOPut* getOutputV(int m_index);
 
 void setInputInvStr(QString data);
 QString getInputInvStr();
@@ -67,8 +67,8 @@ public slots:
     void outputTog(int index)   {getOutputV(index)->setTog();}
 
 public:
-	void callInputData(int index);
-	void callOutputData(int index);
+    void callInputData(quint8 m_index);
+    void callOutputData(quint8 m_index);
 
 private:
 	void sendGetIOSize();	

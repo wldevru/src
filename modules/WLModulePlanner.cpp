@@ -5,15 +5,14 @@ WLModulePlanner::WLModulePlanner(QObject *parent)
 {
 setTypeModule(typeMPlanner);
 
-sizeBuf=0;
-free=0;
-status=stop;
-flags=0;
-flags|=PLF_empty;
+m_sizeBuf=0;
+m_free=0;
+status=MPLANNER_stop;
+Flags.set(PLF_empty);
 curIdElementBuf=0;
 lastIndexElementBuf=0;
 
-smoothAng=0;
+m_smoothAng=0;
 }
 
 WLModulePlanner::~WLModulePlanner()
@@ -21,15 +20,20 @@ WLModulePlanner::~WLModulePlanner()
 
 }
 
+void WLModulePlanner::setSizeBuf(int value)
+{
+    m_sizeBuf = value;
+}
+
 void WLModulePlanner::sendGetDataBuf()
 {
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
+    QByteArray data;
+    QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_getData;
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_getDataPlanner;
 
 qDebug()<<"getDataBuf";
 
@@ -37,7 +41,7 @@ emit sendCommand(data);
 }
 
 void WLModulePlanner::update()
-{
+{    
 sendGetDataBuf();
 }
 
@@ -54,6 +58,25 @@ Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setISlaveAxis<<size;
 
 for(int i=0;i<size;i++)
   Stream<<indexsAxis[i];
+
+emit sendCommand(data);
+
+return true;
+}
+
+bool WLModulePlanner::setHPause(quint8 enable,qint32 hPause)
+{
+Flags.set(PLF_usehpause,enable);
+
+m_hPause=hPause;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setHPause<<enable<<m_hPause;
 
 emit sendCommand(data);
 
@@ -154,16 +177,16 @@ Stream<<S
 	  <<Fmov
 	  <<_id;
 
-qDebug()<<"index"<<lastIndexElementBuf<<free;
+qDebug()<<"index"<<lastIndexElementBuf<<m_free;
 qDebug()<<"addBufULine en:"<<midPos[0]<<midPos[1]<<midPos[2]<<_id;
 qDebug()<<"addBufULine en:"<<endPos[0]<<endPos[1]<<endPos[2]<<"S:"<<S<<"F:"<<Fmov;
 
-free--;
+m_free--;
 //emit ChangedFreeBuf(getFreeBuf());
 
 lastIndexElementBuf++;
 
-flags&=~PLF_empty;
+Flags.reset(PLF_empty);
 
 emit sendCommand(data);
 return true;
@@ -191,15 +214,15 @@ Stream<<S
 	  <<Fmov
 	  <<_id;
 
-qDebug()<<"index"<<lastIndexElementBuf<<free;
+qDebug()<<"index"<<lastIndexElementBuf<<m_free;
 qDebug()<<"addBufLine3D en:"<<endPos[0]<<endPos[1]<<endPos[2]<<"i:"<<_id<<"S:"<<S<<"F:"<<Fmov;
 
-free--;
+m_free--;
 //emit ChangedFreeBuf(getFreeBuf());
 
 lastIndexElementBuf++;
 
-flags&=~PLF_empty;
+Flags.reset(PLF_empty);
 
 emit sendCommand(data);
 return true;
@@ -221,10 +244,10 @@ Stream<<(quint8)typeMPlanner
 	  <<mask
       <<size;
 
-for(int i=0;i<size;i++)
+for(quint8 i=0;i<size;i++)
    Stream<<indexs[i]<<(qint32)endPos[i];
 
-   Stream<<(qint32)cenPosIJ[0]<<(qint32)cenPosIJ[1];
+Stream<<(qint32)cenPosIJ[0]<<(qint32)cenPosIJ[1];
 
 Stream<<S
 	  <<Fmov
@@ -235,11 +258,12 @@ qDebug()<<"addBufCirc3D"<<mask<<"S:"<<S<<"F:"<<Fmov<<indexs[0]<<indexs[1]<<index
 qDebug()<<"ePos"<<endPos[0]<<endPos[1]<<endPos[2];
 qDebug()<<"cPos"<<cenPosIJ[0]<<cenPosIJ[1];
 
-free--;
+m_free--;
 //emit ChangedFreeBuf(getFreeBuf());
 
 lastIndexElementBuf++;
-flags&=~PLF_empty;
+
+Flags.reset(PLF_empty);
 
 emit sendCommand(data);
 return true;
@@ -286,7 +310,9 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_pause;
 
+qDebug()<<"pauseMov0";
 emit sendCommand(data);
+qDebug()<<"pauseMov1";
 return true;
 }
 
@@ -310,7 +336,7 @@ bool WLModulePlanner::setSmoothAng(float ang_gr)
 {
 if(0<=ang_gr&&ang_gr<=30)  
 {
-smoothAng=ang_gr;
+m_smoothAng=ang_gr;
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -398,6 +424,8 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Mutex.lock();
 
+ qDebug()<<"readCommand MPlanner"<<Data.size();
+
 Stream>>ui1;
 
 switch(ui1)
@@ -411,25 +439,30 @@ switch(ui1)
 						 Stream>>f1;//Sout
 						//Stream>>f2;//Ftar
 
-	                     qDebug()<<"sendMBSize"<<lastIndexElementBuf<<ui32<<ui1;
+                         qDebug()<<"sendMBSize"<<lastIndexElementBuf<<ui32<<ui1<<ui2;
 			                  
 						//if(flagsBuf&MBF_reset) emit ChangedResetBuf();
-						emit ChangedSOut(f1);
+                        emit changedSOut(f1);
 
                         if(lastIndexElementBuf==ui2)
                              {
                              curIdElementBuf=ui32;
 
-                             flags =ui4;
+                             Flags.m_Data=ui4;
+                             qDebug()<<"sendMBSize0";
                              if(status!=(statusPlanner)(ui3))
-                              emit ChangedStatus(status=(statusPlanner)(ui3));
-						 //if(freeBuf!=ui1)
-                             emit ChangedFree(free=ui1);
+                                 {
+                                 qDebug()<<"sendMBSize1";
+                                 emit changedStatus(status=(statusPlanner)(ui3));
+                                 }
+                            //if(freeBuf!=ui1)
+                             emit changedFree(m_free=ui1);
+                             qDebug()<<"sendMBSize2";
                              }
                            break;
 								
 	case  sendModule_prop: Stream>>ui1; 
-	                       sizeBuf=ui1;
+                           m_sizeBuf=ui1;
                            update();
                            break;
 	case sendModule_error:   
@@ -448,7 +481,7 @@ switch(ui1)
 									default:                    emit sendMessage("WLMotionPlanner"+getErrorStr(errorPlanner,index),"",-(int)(ui1));break;                   				       
 								   }
 
-                   				  emit ChangedReset();                  
+                                  emit reset();
                    			      break;
 								  
     case sendPlanner_signal:    Stream>>ui1;

@@ -71,52 +71,56 @@ private:
 
  quint8 curIndexAxis;
  quint8 curIndexX;
+   bool curVmode;
 
 public:
 
-   void setError(quint8 err)  {emit ChangedError(error=err);}
-
+   void setError(quint8 err)  {emit changedError(error=err);}
    
-    quint8 getEncoder() {return iEncoder;}
-    quint8 getFlag()    {return Flags.m_Data;}
+   quint8 getEncoder() {return iEncoder;}
+   quint8 getFlag()    {return Flags.m_Data;}
 
-    quint8* getIndexInAxis() {return iInAxis;}
-    quint8* getIndexInX()    {return iInX;}
+   quint8* getIndexInAxis() {return iInAxis;}
+   quint8* getIndexInX()    {return iInX;}
 
-    quint8 getCurIndexAxis();
-    quint8 getCurIndexX();
+   quint8 getCurIndexAxis();
+   quint8 getCurIndexX();
 
 signals:
  
- void ChangedError(quint8);
+ void changedError(quint8);
 
- quint8 ChangedCurIndexAxis(quint8);
- quint8 ChangedCurIndexX(quint8);
+ void changedCurIndexAxis(quint8);
+ void changedCurIndexX(quint8);
+ void changedCurVmode(bool);
 
 public:
 
+   quint8 getInVmode() {return iInVmode;}
+   quint8 getOutENB()  {return iOutENB;}
+
 	bool setEncoder(quint8 _iEncoder);
 
-    bool setManualIndexAxis(quint8 index);
-    bool setManualIndexX(quint8 index);
-    bool setManualVmode(quint8 index);
+    bool setManualIndexAxis(quint8 m_index);
+    bool setManualIndexX(quint8 m_index);
+    bool setManualVmode(quint8 m_index);
 
     bool setInAxis(quint8 *indexs,quint8 size);
     bool setInX(quint8 *indexs,quint8 size);
 
-    bool setInVmode(quint8 index);
+    bool setInVmode(quint8 m_index);
 
-    bool setOutENB(quint8 index);
+    bool setOutENB(quint8 m_index);
 
     bool setFlag(quint8 flag);
 
     bool setEnable(bool enable);
 
-    bool setDataAxis(quint8 index,quint8 iAxis,float kTrack);
+    bool setDataAxis(quint8 m_index,quint8 iAxis,float kTrack);
 
 	bool sendGetData();
 
-    void setData(quint8 Flag,quint8 indexA,quint8 indexX);
+    void setData(quint8 Flag,quint8 indexA,quint8 indexX,bool Vmode);
 
 public:
 

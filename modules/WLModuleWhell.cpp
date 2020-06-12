@@ -9,7 +9,8 @@ Init(1);
 
 WLModuleWhell::~WLModuleWhell()
 {
-//if(Whell!=NULL) delete []Whell;
+while(Whell.isEmpty())
+         delete Whell.takeLast();
 }
 
 bool WLModuleWhell::Init(int sizeWhell)
@@ -38,9 +39,16 @@ else
 return true;
 }
 
+WLWhell *WLModuleWhell::getWhell(int index)
+{
+Q_ASSERT((index<getSizeWhell())&&(index<255));
+
+return index<getSizeWhell() ? Whell[index] : nullptr;
+}
+
 void WLModuleWhell::update()
 {
-foreach(WLWhell *whell,Whell)
+    foreach(WLWhell *whell,Whell)
         whell->sendGetData();
 }
 
@@ -208,10 +216,6 @@ return true;
 void WLModuleWhell::readCommand(QByteArray Data)
 {
 quint8 index,ui1,ui2,ui3;
-qint32 l1;
-qint32 *posProbe;
-int size=Data.size();
-float f1;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
 
@@ -224,10 +228,10 @@ switch(ui1)
 {
 case sendWhell_data:  Stream>>index;//index8
                       Stream>>ui1;  //Flag8
-                      Stream>>ui2;  //Flag8
-                      Stream>>ui3;  //Flag8
+                      Stream>>ui2;  //indexA
+                      Stream>>ui3;  //Vmode(0x80) indexX(0x7F)
 
-                      Whell[index]->setData(ui1,ui2,ui3);
+                      Whell[index]->setData(ui1,ui2,ui3&0x7F,ui3&0x80);
                       break;
 
 case  sendModule_prop: Stream>>ui1;

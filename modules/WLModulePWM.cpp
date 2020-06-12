@@ -16,6 +16,8 @@ updateTimer->start(100);
 
 WLModulePWM::~WLModulePWM()
 {
+while(outPWM.isEmpty())
+          delete outPWM.takeLast();
 }
 
 bool WLModulePWM::Init(int _sizeOutPWM)
@@ -55,16 +57,25 @@ else
 return true;
 }
 
+WLPWM *WLModulePWM::getOutPWM(int index)
+{
+Q_ASSERT(((index<getSizeOutPWM()))&&(index<255));
+
+return index<getSizeOutPWM() ? outPWM[index]: nullptr;
+}
+
 void WLModulePWM::update()
 {
 foreach(WLPWM *pwm,outPWM)
-    pwm->sendGetData();
+  {
+  pwm->sendGetData();
+  }
 }
 
 void  WLModulePWM::readCommand(QByteArray Data)
 {
-quint8 index,ui1,ui2,ui3,ui4;
-quint32 ui32;
+quint8 index,ui1;
+
 float f1,f2;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
@@ -76,6 +87,15 @@ Stream>>ui1;
 
 switch(ui1)
 {
+
+case comPWM_setValue:Stream>>index;//index8
+                     if(index<getSizeOutPWM())
+                      {
+                      outPWM[index]->setData(Stream);
+                      }
+
+                     break;
+
 case sendPWM_dataOut:Stream>>index;//index8
    	                 Stream>>ui1;//flag
 					 Stream>>f1;

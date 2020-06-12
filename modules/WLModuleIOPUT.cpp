@@ -10,8 +10,11 @@ Init(2,1);
 
 WLModuleIOPut::~WLModuleIOPut()
 {
-//if(inputs!=NULL)  delete []inputs;
-    //if(outputs!=NULL) delete []outputs;
+while(Inputs.isEmpty())
+      delete Inputs.takeLast();
+
+while(Outputs.isEmpty())
+      delete Outputs.takeLast();
 }
 
 bool WLModuleIOPut::Init(int _sizeInputs, int _sizeOutputs)
@@ -43,14 +46,11 @@ else
 	  {	
 	  input = Inputs.takeLast();
 	  disconnect(input,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-	  delete Inputs.takeLast();  
+      delete input;
       }
 
-Inputs[0]->setNow(0);
-Inputs[0]->setNow(0);
-
-Inputs[1]->setNow(1);
-Inputs[1]->setNow(1);
+Inputs[0]->setData(0);
+Inputs[1]->setData(IOPF_now|IOPF_old);
 
 Inputs[0]->setComment("inLock0");
 Inputs[1]->setComment("inLock1");
@@ -65,7 +65,7 @@ if(sizeOutputs<1||Outputs.size()==sizeOutputs) return false;
 WLIOPut *output;
 
 if(Outputs.size()<sizeOutputs)
- for(int i=Outputs.size();i<sizeOutputs;i++)  
+ for(quint8 i=Outputs.size();i<sizeOutputs;i++)
   {
   output = new WLIOPut;
   output->setIndex(i);  
@@ -87,16 +87,25 @@ else
 return true;
 }
 
+WLIOPut *WLModuleIOPut::getInputV(int index)
+{
+Q_ASSERT((index<Inputs.size())&&(index<255));
+
+return index<Inputs.size() ?  Inputs[index] :nullptr;
+}
+
+WLIOPut *WLModuleIOPut::getOutputV(int index)
+{
+Q_ASSERT((index<Outputs.size())&&(index<255));
+
+return index<Outputs.size()?  Outputs[index]:nullptr;
+}
+
 void WLModuleIOPut::readCommand(QByteArray Data)
 {
-quint8 index,ui1,ui2;
-quint16 ui16;
-qint32 l1;
-qint32 *posProbe;
-int size=Data.size();
-float f1;
+    quint8 index,ui1,ui2;
 
-QDataStream Stream(&Data,QIODevice::ReadOnly);
+    QDataStream Stream(&Data,QIODevice::ReadOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
@@ -106,29 +115,36 @@ Stream>>ui1;
 switch(ui1)
  {
  case sendIOPut_inputBData:
-                       Stream>>ui1;		
-					   while(!Stream.atEnd())
-					   {
-                       Stream>>ui2;					   
-                        for(int i=0;i<8;i++)
-                          getInputV(i+(ui1)*8)->setNow((ui2>>i)&0x1);   
+                       Stream>>ui1;
 
-					   ui1++;
-					   }
+                         while(!Stream.atEnd()){
+                           Stream>>ui2;
+
+                            for(int i=0;i<8;i++)
+                              {
+                              int index=(i+(ui1)*8);
+
+                              if(index<getSizeInputs())
+                                  Inputs[index]->setNow((ui2>>i)&0x1);
+                              }
+
+                           ui1++;
+                           }
+
                        break;
 
 case sendIOPut_ioputData: 
-	                  //qDebug()<<"start sendIData";                  
+                      qDebug()<<"start sendIOData";
                        Stream>>index;		
 					   Stream>>ui1;
 
 					   if(ui1&IOPF_input)
 					     {
-					     getInputV(index)->setData(ui1);
+                         if(index<getSizeInputs())  Inputs[index]->setData(ui1);
 					     }
 					   else
 						 {
-					     getOutputV(index)->setData(ui1);
+                         if(index<getSizeOutputs()) Outputs[index]->setData(ui1);
 					     }
                        break;
 
@@ -141,7 +157,7 @@ case  sendModule_prop: Stream>>ui1;
 case sendModule_error: Stream>>ui1;  //Error                				                  				 
 	                   Stream>>index;
                 	  
-                       emit sendMessage(metaObject()->className()+getErrorStr(errorIOPut,ui1),QString::number(index),-(int)(ui1));
+                       emit sendMessage(metaObject()->className()+getErrorStr(errorIOPut,ui1),QString::number(index),-(ui1));
 					   break;
  }
 
@@ -155,7 +171,7 @@ void WLModuleIOPut::setInputInvStr(QString data)
 QStringList List=data.split(",");
 
 for(int i=0;i<List.size();i++)
-  if(List[i].toInt()<Inputs.size()&&List[i].toInt()>1) getInputV(List[i].toInt())->setInv();
+  if((List[i].toInt()<Inputs.size())&&(List[i].toInt()>1)) getInputV(List[i].toInt())->setInv(true);
 }
 
 QString WLModuleIOPut::getInputInvStr()
@@ -186,7 +202,7 @@ QString WLModuleIOPut::getOutputInvStr()
 {
 QString ret;
 
-for(int i=2;i<Outputs.size();i++)
+for(int i=1;i<Outputs.size();i++)
   {
   if(Outputs[i]->isInv())
     {
@@ -203,7 +219,8 @@ void WLModuleIOPut::updateAllInputData()
 {
 for(int i=2;i<getSizeInputs();i++)
  {
- Inputs[i]->setInv(Inputs[i]->isInv());
+ if(Inputs[i]->isEnable())
+     Inputs[i]->setInv(Inputs[i]->isInv());
  callInputData(i);
  }
 
@@ -213,13 +230,15 @@ void WLModuleIOPut::updateAllOutputData()
 {
 for(int i=1;i<getSizeOutputs();i++)
  {
- Outputs[i]->setInv(Outputs[i]->isInv());
- Outputs[i]->setOut(Outputs[i]->getNow());
+ if(Outputs[i]->isEnable()) {
+  Outputs[i]->setInv(Outputs[i]->isInv());
+  Outputs[i]->setOut(Outputs[i]->getNow());
+  }
  callOutputData(i);
  }
 }
 
-void WLModuleIOPut::callInputData(int index)
+void WLModuleIOPut::callInputData(quint8 index)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -227,14 +246,14 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)typeMIOPut<<(quint8)comIOPut_getInputData<<(quint8)index;
+Stream<<(quint8)typeMIOPut<<(quint8)comIOPut_getInputData<<index;
 
 //qDebug()<<"Call getIData";
 
 emit sendCommand(data);
 }
 
-void WLModuleIOPut::callOutputData(int index)
+void WLModuleIOPut::callOutputData(quint8 index)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -242,7 +261,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)typeMIOPut<<(quint8)comIOPut_getOutputData<<(quint8)index;
+Stream<<(quint8)typeMIOPut<<(quint8)comIOPut_getOutputData<<index;
 
 emit sendCommand(data);
 }
@@ -255,11 +274,10 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-quint8 b;
 quint8 out,mask;
 int index;
 
-for(int i=0;i<Outputs.size();i++)
+for(quint8 i=0;i<Outputs.size();i++)
   {
   if(Outputs[i]->getOld()!=Outputs[i]->getNow()||all)
     {  
@@ -277,7 +295,7 @@ for(int i=0;i<Outputs.size();i++)
 		 //outputLast[index]=outputNow[index];
 	     }
 	//qDebug()<<"setOutput"<<i<<out<<mask<<"BA";
-	Stream<<(quint8)typeMIOPut<<(quint8)comIOPut_setOutputByte<<(quint8)i<<out<<mask;
+    Stream<<(quint8)typeMIOPut<<(quint8)comIOPut_setOutputByte<<i<<out<<mask;
 	emit sendCommand(data);
 
 	Stream.device()->reset();

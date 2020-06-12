@@ -54,6 +54,7 @@
 #define IOPF_input     1<<4
 #define IOPF_asend     1<<5
 #define IOPF_pulse     1<<6
+#define IOPF_invalid   1<<7
 
 
 const QString errorIOPut("0,no error\
@@ -64,54 +65,41 @@ class WLIOPut: public WLElement
 {        
 Q_OBJECT
 
+public:
+
+Q_PROPERTY(bool inv READ isInv() WRITE setInv() NOTIFY invChanged)
+Q_PROPERTY(bool now READ getNow() NOTIFY changed)
+Q_PROPERTY(bool out READ getNow() WRITE setOut())
+
 private:
          WLFlags Flags;
-		 QString comment;//коментарии
-		 
-		 int   setTime;
-		 int resetTime;
 		 
 public:
     WLIOPut (QString _comment="",bool input=false) 
 	                        {							
 							setTypeElement(input ? typeEInput : typeEOutput);
-						    comment=_comment; 
+                            setComment(_comment);
 							Flags.reset();
-							Flags.set(IOPF_input,input);
-                            setTime=resetTime=0;
+							Flags.set(IOPF_input,input);                            
                             setObjectName("IO");
                             }
 	
 void setInv(bool _inv=true);
 void togInv()  {setInv(!Flags.get(IOPF_inv));}
 
-   void setComment(QString _comment) {comment=_comment;} 
-   void addComment(QString _comment);
-   void removeComment(QString _comment); 
-
-QString getComment() {return comment;}
-
-QString getBasicComment() {return (comment.split(".")).last();}
-
 inline int  getCond(){return Flags.get(IOPF_now)!=Flags.get(IOPF_old) ? (Flags.get(IOPF_now) ? 2:3): Flags.get(IOPF_now);}
 inline bool getNow() {return Flags.get(IOPF_now);}
 inline bool getOld() {return Flags.get(IOPF_old);}
 
-void setTimes(int setT,int resT) {if(setT>=0&&resT>=0) {setTime=setT;resetTime=resT;}}
-
-//bool isBusy(void) {return busy;}
-bool isInv(void)  {return Flags.get(IOPF_inv);}
-bool isEnable()   {return Flags.get(IOPF_enable);}
+bool isInv(void)      {return Flags.get(IOPF_inv);}
+bool isEnable()       {return Flags.get(IOPF_enable);}
+bool isInvalid(void)  {return Flags.get(IOPF_invalid);}
 
 void setData(quint8 _flags);
 
 QString toString() {
-	                QString ret=QString::number(getIndex());
-					if(setTime!=0||resetTime!=0)
-					 {
-				     ret+=","+QString::number(setTime);
-					 ret+=","+QString::number(resetTime);
-					 }
+                    QString ret=QString::number(getIndex());
+
 					return ret;
                    }
 void fromString(QString data) 
@@ -119,16 +107,12 @@ void fromString(QString data)
 	                QStringList List=data.split(",");
 					if(List.size()==1||List.size()==3)
 					{
-					setIndex(List[0].toInt());
-					if(List.size()==3)
-					  {
-					  setTimes(List[1].toInt(),List[2].toInt());
-					  }
+					setIndex(List[0].toInt());					
 					}					
                     }
 
 private:
- void sendChanged() {emit changedState(getIndex(),getNow()); emit changed(getIndex(),getNow()); emit changed(getNow());};
+ void sendChanged() {emit changedState(getIndex(),getNow()); emit changed(getNow());}
 
 private slots:
 
@@ -138,10 +122,13 @@ private slots:
 public slots:
 
 void setNow(bool _now)     {
-	                       Flags.set(IOPF_old,getNow());
-						   Flags.set(IOPF_now,_now);
+                           if(isEnable())
+                             {
+                             Flags.set(IOPF_old,getNow());
+                             Flags.set(IOPF_now,_now);
 
-						   if(getCond()>1) sendChanged();
+                             if(getCond()>1) sendChanged();
+                             }
                            }
 
 void setOut(bool now);
@@ -150,11 +137,12 @@ void setOutPulse(bool _now,quint32 time_ms);
 void setTogPulse(quint32 time_ms) {setOutPulse(!getNow(),time_ms);}
 void setTog()  {setOut(!getNow());}
 
-signals:		    
-  void changed(bool);
-  void changed(int,bool);
+signals:
 
-  void changedState(int ,bool);
+  void changed(bool);
+  void changedState(int,bool);
+
+  void invChanged(bool);
 
 public:
 static WLIOPut In0;
@@ -173,7 +161,7 @@ WLIOPut *IOput;
 public:
    WLIOData(WLIOPut *_IOput,bool _state=0) {IOput=_IOput;state=_state;}
    WLIOData() {IOput=&(WLIOPut::In0); state=0;}
-   QString toString()   {return QString::number(IOput->getIndex())+","+QString::number(state);}     
+   QString toString()   {return QString::number(IOput->getIndex())+","+QString::number(state);}
    bool  isTry() {return IOput==NULL ? true : IOput->getNow()==state;}
 };
 
@@ -182,22 +170,22 @@ public:
 
 unsigned char getByteFrom(WLIOPut *B0
 	                       ,WLIOPut *B1
-						   ,WLIOPut *B2=NULL
-						   ,WLIOPut *B3=NULL
-						   ,WLIOPut *B4=NULL
-						   ,WLIOPut *B5=NULL
-						   ,WLIOPut *B6=NULL
-						   ,WLIOPut *B7=NULL);
+                           ,WLIOPut *B2=nullptr
+                           ,WLIOPut *B3=nullptr
+                           ,WLIOPut *B4=nullptr
+                           ,WLIOPut *B5=nullptr
+                           ,WLIOPut *B6=nullptr
+                           ,WLIOPut *B7=nullptr);
 
 void setByteTo(unsigned char byte
 	              ,WLIOPut *B0
 	              ,WLIOPut *B1
-				  ,WLIOPut *B2=NULL
-				  ,WLIOPut *B3=NULL
-				  ,WLIOPut *B4=NULL
-				  ,WLIOPut *B5=NULL
-				  ,WLIOPut *B6=NULL
-				  ,WLIOPut *B7=NULL);
+                  ,WLIOPut *B2=nullptr
+                  ,WLIOPut *B3=nullptr
+                  ,WLIOPut *B4=nullptr
+                  ,WLIOPut *B5=nullptr
+                  ,WLIOPut *B6=nullptr
+                  ,WLIOPut *B7=nullptr);
 
 
 #endif //WLIOPut_H

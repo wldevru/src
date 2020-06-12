@@ -14,12 +14,14 @@ WLModule *WLMotion::createModule(QString name)
 {
 WLModule *Module=WLDevice::createModule(name);
 
-if(Module==NULL)
+if(Module==nullptr)
 {
 if(name=="WLModuleDCan")    Module=new WLModuleDCan;
 else								 
 if(name=="WLModuleIOPut")   Module=new WLModuleIOPut;
 else								 
+if(name=="WLModuleAIOPut")  Module=new WLModuleAIOPut;
+else
 if(name=="WLModuleEncoder") Module=new WLModuleEncoder;
 else
 if(name=="WLModuleWhell")   Module=new WLModuleWhell;
@@ -48,6 +50,8 @@ case typeMDCan:   Module=new WLModuleDCan;
 	              break;
 case typeMIOPut:  Module=new WLModuleIOPut;
 	              break;
+case typeMAIOPut:  Module=new WLModuleAIOPut;
+                  break;
 case typeMWhell:  Module=new WLModuleWhell;
 	              break;
 case typeMEncoder:Module=new WLModuleEncoder;

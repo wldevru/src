@@ -50,7 +50,7 @@ public:
 
 public:
 
-	QByteArray getBufFW() {return FWBuf;};
+    QByteArray getBufFW() {return FWBuf;}
 
 private:	
 	QMutex InputDataMutex;
@@ -86,15 +86,15 @@ public slots:
 signals:
 	void sendMessage(QString,QString,int); 
 
-	void ChangedConnect(bool);
-	void ChangedProp(QString);
-	void ChangedActiv(bool);
-	void ChangedEndReadPage();
+    void changedConnect(bool);
+    void changedProp(QString);
+    void changedActiv(bool);
+    void changedEndReadPage();
 
-	void ChangedEndReadFW();
-	void ChangedEndWriteFW();
+    void endReadFW();
+    void endWriteFW();
 
-	void ChangedProgress(int);
+    void changedProgress(int);
 
 
 public:

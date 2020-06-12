@@ -1,16 +1,12 @@
 #include "WLPWM.h"
 
-WLPWM WLPWM::outPWM;
-
 WLPWM::WLPWM(QObject *parent)
 	: WLElement(parent)
 {
 setTypeElement(typeEOutPWM);
-Power=0;
-Freq=0;
-flag=0;
+m_Power=0;
+m_Freq=0;
 error=0;
-indexPWM=0;
 }
 
 WLPWM::~WLPWM()
@@ -18,18 +14,30 @@ WLPWM::~WLPWM()
 
 }
 
+void WLPWM::setData(quint8 _flag, float P, float F)
+{
+Flags.m_Data=_flag;
+
+if(m_Power!=P)
+  {
+  emit changedPower(m_Power=P);
+  }
+
+m_Freq=F;
+}
+
 
 bool WLPWM::setOut(float P)
 {
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
+    QByteArray data;
+    QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 qDebug()<<data.size();
 
-Stream<<(quint8)comPWM_setOut<<(quint8)indexPWM<<P;
+Stream<<(quint8)comPWM_setOut<<getIndex()<<P;
 
 qDebug()<<"send setOutPWM"<<data.size();
 
@@ -47,7 +55,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comPWM_setInvOut<<(quint8)indexPWM<<(quint8)inv;
+Stream<<(quint8)comPWM_setInvOut<<getIndex()<<(quint8)inv;
 
 emit sendCommand(data);
 
@@ -65,7 +73,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 qDebug()<<data.size();
 
-Stream<<(quint8)comPWM_setEnableOut<<(quint8)indexPWM<<enable;
+Stream<<(quint8)comPWM_setEnableOut<<getIndex()<<enable;
 
 emit sendCommand(data);
 return true;
@@ -79,7 +87,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comPWM_setPmaxOut<<(quint8)indexPWM<<Pmax;
+Stream<<(quint8)comPWM_setPmaxOut<<getIndex()<<Pmax;
 
 emit sendCommand(data);
 return true;
@@ -93,7 +101,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comPWM_getDataOut<<(quint8)indexPWM;
+Stream<<(quint8)comPWM_getDataOut<<getIndex();
 
 emit sendCommand(data);
 
@@ -102,6 +110,10 @@ return true;
 
 bool WLPWM::setKOut(float k)
 {
+if(k<0.0) return false;
+
+m_Kout=k;
+
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 
@@ -110,7 +122,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 qDebug()<<data.size();
 
-Stream<<(quint8)comPWM_setKOut<<(quint8)indexPWM<<k;
+Stream<<(quint8)comPWM_setKOut<<getIndex()<<k;
 
 emit sendCommand(data);
 return true;
@@ -120,7 +132,7 @@ bool WLPWM::setFreq(float F)
 {
 if(F<=0) return false;
 
-Freq=F;
+m_Freq=F;
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -128,15 +140,30 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comPWM_setFOut<<(quint8)indexPWM<<Freq;
+Stream<<(quint8)comPWM_setFOut<<getIndex()<<m_Freq;
 
 emit sendCommand(data);
 return true;
 }
 
+void WLPWM::setData(QDataStream &Stream)
+{
+quint8 ui1;
+
+Stream>>ui1;
+
+switch(ui1)
+{
+case dataPWM_Kpwm: Stream>>m_Kout; break;
+case dataPWM_Fpwm: Stream>>m_Freq; emit changedFreq(m_Freq); break;
+default: break;
+}
+
+}
+
 void WLPWM::writeXMLData(QXmlStreamWriter &stream)
 {
-stream.writeAttribute("Freq",QString::number(getFreq()));
+stream.writeAttribute("Freq",QString::number(freq()));
 stream.writeAttribute("inv", QString::number(isInv()));
 
 }

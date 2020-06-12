@@ -17,46 +17,6 @@ Flags.m_Data|=_flags;
 if(getCond()>1) sendChanged();	
 }
 
-void WLIOPut::addComment(QString _comment)
-{
-if((Flags.get(IOPF_input)&&(getIndex()>=2))
-||(!Flags.get(IOPF_input)&&(getIndex()>=1)))
- {
- if(!comment.isEmpty()) comment+=",";
-
- comment+=_comment;
- }
-} 
-
-void WLIOPut::removeComment(QString remcomment)
-{
-if(!comment.isEmpty()) 
- {
- QStringList List=comment.split(",");
-
- for(int i=0;i<List.size();i++)
-   {
-   if(List[i]==remcomment) List.removeAt(i--);
-   }
-
- switch(List.size())
- {
- case 0: comment.clear();break;
- case 1: comment=List.takeFirst();break;
- default:
-	     comment.clear();
-	     for(int i=0;i<List.size();i++)
-		    {
-		    if(i!=0) comment+=",";
-			comment+=List[i];
-		    }
-		 break;
- } 
- }
-
-}
-
- 
 
 
 
@@ -149,7 +109,7 @@ void WLIOPut::setInv(bool _inv)
 //if((Flags.get(IOPF_inv))^_inv)
  {
  Flags.set(IOPF_inv,_inv);
- 
+
  QByteArray data;
  QDataStream Stream(&data,QIODevice::WriteOnly);
  
@@ -162,6 +122,7 @@ void WLIOPut::setInv(bool _inv)
   Stream<<(quint8)comIOPut_setOutputInv<<getIndex()<<(quint8)_inv;
 
  emit sendCommand(data);
+ emit invChanged(_inv);
  }
 }
 

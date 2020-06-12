@@ -9,7 +9,8 @@ Init(1);
 
 WLModuleFreq::~WLModuleFreq()
 {
-//if(outFreq!=NULL) delete []outFreq;
+while(outFreq.isEmpty())
+       delete outFreq.takeLast();
 }
 
 bool WLModuleFreq::Init(int sizeOutFreq)
@@ -37,17 +38,23 @@ else
 return true;
 }
 
+WLFreq *WLModuleFreq::getOutFreq(int index)
+{
+Q_ASSERT((index<getSizeOutFreq())&&(index<255));
+
+return index<getSizeOutFreq() ? outFreq[index]:nullptr;
+}
+
 void WLModuleFreq::update()
 {
-foreach(WLFreq *freq,outFreq)
-    freq->sendGetData();
+    foreach(WLFreq *freq,outFreq)
+        freq->sendGetData();
 }
 
 void  WLModuleFreq::readCommand(QByteArray Data)
 {
-quint8 index,ui1,ui2,ui3,ui4;
-quint32 ui32;
-float f1,f2;
+quint8 index,ui1;
+float f1;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
 

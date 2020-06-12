@@ -28,6 +28,10 @@ const QString errorElementPlanner("0,no error\
 
 #define sigMCon_heart 100 //heart connect
 
+#define MCF_timeout    1<<0
+#define MCF_outBufFull 1<<1
+#define MCF_enbheart   1<<2
+
 class WLModuleConnect : public WLModule
 {
 	Q_OBJECT
@@ -38,6 +42,7 @@ public:
 
 private:
 
+WLFlags Flags;
 bool conOk;
 
 quint16 sizeInBuf;
@@ -47,6 +52,7 @@ quint16 timeoutConnect_ms;
 quint16 timeHeart_ms;
 
 QTimer *timerHeart;
+QTimer *timerConnect;
 public:
 	bool isConnect() {return conOk;}
 
@@ -62,9 +68,11 @@ public slots:
 	void restartHeart();
 
 private slots:
-	void setTimeoutConnect();
+    void setTimeoutHeart();
+    void setTimeoutConnect();
 
 signals:
+    void timeoutHeart();
     void timeoutConnect();
     void backupConnect();
 

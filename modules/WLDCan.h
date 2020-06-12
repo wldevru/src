@@ -110,11 +110,11 @@ public:
     bool setAdrCan(quint16 _adrCan);
 
 	
-	void setError(quint8 _error) {emit ChangedError(error=_error);}
+    void setError(quint8 _error) {emit changedError(error=_error);}
 
 signals:
 
- void ChangedError(quint8);
+ void changedError(quint8);
 
 public:
 

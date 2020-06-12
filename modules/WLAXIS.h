@@ -144,7 +144,7 @@ enum typeActIOPutAxis{AXIS_actNo,AXIS_actSdStop,AXIS_actEmgStop};
 enum typeInputAxis{AXIS_inORG,AXIS_inALM,AXIS_inPEL,AXIS_inMEL};//_inEMG
 enum typeOutputAxis{AXIS_outENB,AXIS_outRALM};//
 
-enum statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec};
+enum statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec,AXIS_wait};
 enum   modeAxis{AXIS_standby,AXIS_pos,AXIS_slave,AXIS_vel,AXIS_traxis} ;
 
 enum   typeMParAxis{AXIS_MParAll
@@ -213,25 +213,29 @@ typeActIOPutAxis actIn[4];
 
 
 public:
- void init(WLModuleIOPut *_ModuleIOPut,quint8 index);
+
+enum modeAxis   getMode()   {return mode;}
+enum statusAxis getStatus() {return status;}
+
+ void init(WLModuleIOPut *_ModuleIOPut,quint8 _index);
 
  bool isEnable() {return Flags.get(AF_enable);}
  //void setIOPut(int index);
- void setInORG(int index);
- void setInPEL(int index);
- void setInMEL(int index);
- void setInALM(int index);
+ void setInORG(int getIndex);
+ void setInPEL(int getIndex);
+ void setInMEL(int getIndex);
+ void setInALM(int getIndex);
   
- void setOutENB(int index);
- void setOutRALM(int index);
+ void setOutENB(int m_index);
+ void setOutRALM(int m_index);
 
- void setLatch2(qint32 pos) {emit ChangedLatch2(latchPos2=pos);}
- void setLatch3(qint32 pos) {emit ChangedLatch3(latchPos3=pos);}
+ void setLatch2(qint32 pos) {emit changedLatch2(latchPos2=pos);}
+ void setLatch3(qint32 pos) {emit changedLatch3(latchPos3=pos);}
 
  long getLatch2() {return latchPos2;}
  long getLatch3() {return latchPos3;}
 
- void setError(quint8 err)  {emit ChangedError(error=err);}
+ void setError(quint8 err)  {emit changedError(error=err);}
 
  int getTypePulse(){return typePulse;}
  int getOutSDInv() {return outSDinv;}
@@ -260,14 +264,17 @@ bool setHomePos(qint32 pos) {if(minPosition<=pos&&pos<=maxPosition) {homePositio
 
 signals:
 
- void ChangedLatch2(qint32);
- void ChangedLatch3(qint32);
- void ChangedError(quint8);
- void ChangedPos(qint32);
- void ChangedStatus(statusAxis);
- void ChangedMode(modeAxis);
- void ChangedFreq(float);
- void ChangedInALM(bool);
+ void changedLatch2(qint32);
+ void changedLatch3(qint32);
+ void changedError(quint8);
+ void changedPosition(qint32);
+ void changedStatus(statusAxis);
+ void changedMode(modeAxis);
+ void changedFreq(float);
+ void changedInALM(bool);
+
+ void finished();
+ void started();
 
 private:
     bool setInput(typeInputAxis type,quint8 num);

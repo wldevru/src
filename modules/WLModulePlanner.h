@@ -29,8 +29,13 @@
 #define comPlanner_enableSOut      18
 #define comPlanner_resetSOutPWMOut   19
 #define comPlanner_resetSOutFreqOut  20
+#define comPlanner_setHPause         21 //set offset z detectpause;
 
-#define comPlanner_getData    101
+#define comPlanner_getDataPlanner    101
+
+//#define comPlanner_setData 128
+//#define comPlanner_getData 129
+
 #define comPlanner_getProp    102
 
 #define sendPlanner_signal 200
@@ -77,21 +82,24 @@ const QString errorElementPlanner("0,no error\
 ,5,error Line calc\
 ,6,wrong Line count");
 
-#define PLF_enable   1<<0
-#define PLF_empty    1<<2
-#define PLF_moving   1<<3
-#define PLF_chgdata  1<<4 
+#define PLF_enable    (1<<0)
+#define PLF_empty     (1<<2)
+#define PLF_moving    (1<<3)
+#define PLF_chgdata   (1<<4)
+#define PLF_usehpause (1<<5)
 
 class WLModulePlanner : public WLModule
 {
 	Q_OBJECT
 
 public:
-enum statusPlanner{stop
-                  ,run
-                  ,pause
-                  ,paused
-                  ,stopped}; //остановлен,работает,останавливается
+enum statusPlanner{MPLANNER_stop
+                  ,MPLANNER_run
+                  ,MPLANNER_pause
+                  ,MPLANNER_paused
+                  ,MPLANNER_stopped
+                  ,MPLANNER_hpause
+                  ,MPLANNER_continue};
 
 
 public:
@@ -102,26 +110,31 @@ public:
 private:
 
 QMutex Mutex;
-
 statusPlanner status;
-      int flags;
-      int sizeBuf;
-      int free;
+WLFlags Flags;
+int m_sizeBuf;
+int m_free;
 
 quint8  lastIndexElementBuf;
 quint32 curIdElementBuf;
 
-float smoothAng;
+float m_smoothAng;
+
+qint32  m_hPause;
 
 public:
 
-	 float getSmoothAng() {return smoothAng;} 
+     int getSizeBuf() {return m_sizeBuf;}
+     int getCountBuf() {return m_sizeBuf-m_free;}
+
+     float getSmoothAng() {return m_smoothAng;}
 
 quint32 getCurIdElement() {return curIdElementBuf;}
 
     bool setIAxisSlave(quint8 *indexsAxis,quint8 size);
-	//void sendGetDataBuf();
-	
+  //void sendGetDataBuf();
+    bool setHPause(quint8 enable,qint32 hPause);
+
 	bool setSOutPWMOut(quint8 i);
     bool setSOutFreqOut(quint8 i);
 
@@ -147,10 +160,10 @@ quint32 getCurIdElement() {return curIdElementBuf;}
 
 	bool setEnableSOut(quint8 enable);
 		
-    int getFree()   {return free;};
+    int getFree()   {return m_free;};
 statusPlanner getStatus() {return status;}
-   bool isEmpty()  {return flags&PLF_empty;}
-   bool isMoving() {return flags&PLF_moving;}
+   bool isEmpty()  {return Flags.get(PLF_empty);}
+   bool isMoving() {return Flags.get(PLF_moving);}
 
 public slots:
 	void sendGetDataBuf();
@@ -159,17 +172,20 @@ public slots:
     virtual void update();
 
 signals:
-	void ChangedFree(int);
-	void ChangedStatus(int);
-	void ChangedReset();
-	void ChangedSOut(float);
+    void changedFree(int);
+    void changedStatus(int);
+
+    void changedSOut(float);
+
+    void reset();
 
 public:
 virtual void getProp() {};	
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 virtual void readCommand(QByteArray data); 
-};
+                                      void setSizeBuf(int value);
+                                  };
 
-#endif // WLModulePLANNER_H
+                           #endif // WLModulePLANNER_H
 

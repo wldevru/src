@@ -45,12 +45,12 @@ private:
 public:
    void setData(long pos) {posNow=pos;};  
 
-   void setError(quint8 err)  {emit ChangedError(error=err);}
+   void setError(quint8 err)  {emit changedError(error=err);}
 
 signals:
  
- void ChangedError(quint8);
- void ChangedCnt(long);
+ void changedError(quint8);
+ void changedCnt(long);
 
 public:
 

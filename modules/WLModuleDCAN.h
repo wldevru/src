@@ -25,7 +25,7 @@ public:
 	
 	int getSizeDCan() {return DCan.size();}
 
-	WLDCan* getDCan(int index) {if(index>=getSizeDCan()) index=0; return DCan[index];}
+    WLDCan* getDCan(int m_index);
 
 public slots:
 virtual void update();
