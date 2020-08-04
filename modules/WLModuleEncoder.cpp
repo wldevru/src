@@ -3,7 +3,7 @@
 WLModuleEncoder::WLModuleEncoder(QObject *parent)
 	: WLModule(parent)
 {
-setTypeModule(typeMEncoder);
+setType(typeMEncoder);
 Init(1);
 }
 

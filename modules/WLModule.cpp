@@ -3,7 +3,7 @@
 WLModule::WLModule(QObject *parent)
 	:WLElement(parent)
 {
-typeM=typeDevice;
+m_type=typeDevice;
 }
 
 
@@ -28,7 +28,7 @@ return ret;
 
 void WLModule::setCommand(QByteArray data)
 {
-data.prepend(typeM);
+data.prepend(m_type);
 
 emit sendCommand(data); 
 }

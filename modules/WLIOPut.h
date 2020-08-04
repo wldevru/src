@@ -94,6 +94,8 @@ inline bool getOld() {return Flags.get(IOPF_old);}
 bool isInv(void)      {return Flags.get(IOPF_inv);}
 bool isEnable()       {return Flags.get(IOPF_enable);}
 bool isInvalid(void)  {return Flags.get(IOPF_invalid);}
+bool isInput(void)    {return Flags.get(IOPF_input);}
+bool isOutput(void)   {return !isInput();}
 
 void setData(quint8 _flags);
 

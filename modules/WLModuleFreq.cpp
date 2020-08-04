@@ -3,7 +3,7 @@
 WLModuleFreq::WLModuleFreq(QObject *parent)
 	: WLModule(parent)
 {
-setTypeModule(typeMFreq);
+setType(typeMFreq);
 Init(1);
 }
 

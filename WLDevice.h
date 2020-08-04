@@ -28,6 +28,7 @@
 #define comDev_getStatus   6 //call status
 
 #define comDev_setStatus   10 //set status
+#define comDev_reboot      11 //rebooting
 
 #define sendDev_prop     100
 #define sendDev_UID      102
@@ -38,6 +39,7 @@
 
 
 #define errorDevice_nomodule 20
+
 
 const QString errorDevice("0,no error\
 ,20,no module");
@@ -62,20 +64,23 @@ public:
 
     enum flag{fl_openconnect = 1<<0
              ,fl_connect = 1<<1
-             ,fl_ready   = 1<<2};
+             ,fl_ready   = 1<<2
+             ,fl_waitack = 1<<3};
 
 	 WLDevice();
 	~WLDevice();
 
 	 void off();
 
-QList <WLModule*> Modules;
 
 private:
 
-    WLDeviceInfo deviceInfo;
-    QString  UID96;
-    quint32 version;
+    QList <WLModule*> m_modules;
+
+    WLDeviceInfo m_deviceInfo;
+
+    QString  m_UID96;
+    quint32  m_version;
 
     QMutex InputDataMutex;
     QMutex OutDataMutex;
@@ -84,22 +89,26 @@ private:
 
     enum statusDevice status;
 
-    QByteArray outData;
-
+    QByteArray outBuf;
     QByteArray inBuf;
 
     QString m_nameDevice;
 
     QSerialPort m_serialPort;
 
-    QHostAddress   m_HA;
+    QHostAddress  m_HA;
     QUdpSocket   m_udpSocket;
 
     WLFlags Flags;
 
-    QString prop;
+    QString m_prop;
 
     quint32 error;
+
+    QByteArray m_bufEth;
+    QTimer    *m_timerEth;
+    quint8    m_countTxPacket;
+    quint8    m_countRxPacket;
 
 public:
 
@@ -110,6 +119,8 @@ bool  openConnect();
 
 WLModule* getModule(typeModule type);
      void addModule(WLModule *module);
+
+QList<WLModule *> getModules() const;
 
 WLModuleConnect* getModuleConnect() {return static_cast<WLModuleConnect*>(getModule(typeMConnect));}
 
@@ -127,8 +138,8 @@ bool isConnect() {return Flags.get(fl_connect);}
 
 statusDevice getStatus() {return status;}
 
-quint32 getVersion() {return version;}
-void    setVersion(quint32 _ver) {version=_ver; emit changedVersion(version);}
+quint32 getVersion() {return m_version;}
+void    setVersion(quint32 _ver) {m_version=_ver; emit changedVersion(m_version);}
 
 protected:
 virtual WLModule *createModule(QString name);
@@ -141,13 +152,14 @@ virtual void reset();
 
 public:
 
-private slots:	
-void updateModules() {qDebug()<<"updaet Modules";foreach(WLModule *Module,Modules)     Module->update();}
-//void setStandby() {if(status!=DEVICE_empty) emit ChangedStatus(status=DEVICE_empty);}
 
+
+private slots:	
+void updateModules() {qDebug()<<"updaet Modules";foreach(WLModule *Module,m_modules)     Module->update();}
+void sendEthData();
 virtual	void readSlot();
 
-void onErrorSerialPort(QSerialPort::SerialPortError serialPortError);
+    void onErrorSerialPort(QSerialPort::SerialPortError serialPortError);
 
    void sendData();
    void startSend(QByteArray data);
@@ -180,21 +192,24 @@ signals:
 private:
 
 void init(QXmlStreamReader &stream);
-
+void decodeInputData();
 public:
 
 static QList<WLDeviceInfo> availableDevices();
 
+void reboot(uint8_t type);
+
 WLDeviceInfo getInfo();
+
 void setInfo(WLDeviceInfo info);
 
 QHostAddress getHA() {return m_HA;}
 
 QString getPortName()  {return m_serialPort.portName();}
-QString getProp()  {return prop;}
-QString getUID96() {return UID96;}
+QString getProp()  {return m_prop;}
+QString getUID96() {return m_UID96;}
    void setUID96(QString);
-void 	setStatus(enum statusDevice);
+   void setStatus(enum statusDevice);
 
 private slots:
 
@@ -205,6 +220,7 @@ public:
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual  void readXMLData(QXmlStreamReader &stream);
 
-};
+
+    };
 
 #endif //WLDEVICE_H

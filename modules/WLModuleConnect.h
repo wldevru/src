@@ -8,20 +8,7 @@
 #include <QStringList>
 #include <QMutex>
 #include "WLModule.h"
-/*
-const QString errorPlanner("0,no error\
-,1,emg stop\
-,2,buf is full\
-,3,wrong set data");
 
-const QString errorElementPlanner("0,no error\
-,1,wrong ULine position\
-,2,wrong ULine mov distance\
-,3,wrong Circ position\
-,4,wrong Circ radius\
-,5,error Line calc\
-,6,wrong Line count");
-*/
 
 #define comMCon_setTimers 1
 #define comMCon_setEnableHeart 2
@@ -32,12 +19,14 @@ const QString errorElementPlanner("0,no error\
 #define MCF_outBufFull 1<<1
 #define MCF_enbheart   1<<2
 
+
+
 class WLModuleConnect : public WLModule
 {
 	Q_OBJECT
 
 public:
-	WLModuleConnect(QObject *parent=0);
+    WLModuleConnect(QObject *parent=nullptr);
 	~WLModuleConnect();
 
 private:

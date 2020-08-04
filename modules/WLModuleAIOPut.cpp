@@ -3,7 +3,7 @@
 WLModuleAIOPut::WLModuleAIOPut(QObject *parent)
 	: WLModule(parent)
 {
-setTypeModule(typeMAIOPut);
+setType(typeMAIOPut);
 Init(1);
 }
 

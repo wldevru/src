@@ -7,6 +7,10 @@ setTypeElement(typeEOutPWM);
 m_Power=0;
 m_Freq=0;
 error=0;
+
+connect(this,SIGNAL(changedPower(float)),SIGNAL(changed()));
+connect(this,SIGNAL(changedK(float)),SIGNAL(changed()));
+connect(this,SIGNAL(changedFreq(float)),SIGNAL(changed()));
 }
 
 WLPWM::~WLPWM()
@@ -154,7 +158,7 @@ Stream>>ui1;
 
 switch(ui1)
 {
-case dataPWM_Kpwm: Stream>>m_Kout; break;
+case dataPWM_Kpwm: Stream>>m_Kout; emit changedK(m_Kout); break;
 case dataPWM_Fpwm: Stream>>m_Freq; emit changedFreq(m_Freq); break;
 default: break;
 }

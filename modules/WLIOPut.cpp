@@ -6,15 +6,18 @@ WLIOPut WLIOPut::Out("Out.-1",0);
 
 void WLIOPut::setData(quint8 _flags)
 {
-Flags.m_Data&= //IOPF_inv
-              // IOPF_enable
-               IOPF_input
-              |IOPF_asend
-              |IOPF_pulse;
+ const auto last=Flags.m_Data;
 
-Flags.m_Data|=_flags;
+ Flags.m_Data&= //IOPF_inv
+               // IOPF_enable
+                 IOPF_input
+                |IOPF_asend
+                |IOPF_pulse;
 
-if(getCond()>1) sendChanged();	
+
+ Flags.m_Data|=_flags;
+
+ if(last!=Flags.m_Data)  sendChanged();
 }
 
 

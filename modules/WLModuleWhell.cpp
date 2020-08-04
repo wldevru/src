@@ -3,7 +3,7 @@
 WLModuleWhell::WLModuleWhell(QObject *parent)
 	: WLModule(parent)
 {
-setTypeModule(typeMWhell);
+setType(typeMWhell);
 Init(1);
 }
 

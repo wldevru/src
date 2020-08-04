@@ -72,11 +72,14 @@ public:
    bool isUnlock()            {return Flags.get(PWMF_unlock);}
 
    float power() {return m_Power;}
+
 signals:
  
  void changedError(quint8);
  void changedFreq(float);
  void changedPower(float);
+ void changedK(float);
+ void changed();
 
 public:
 

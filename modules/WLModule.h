@@ -59,11 +59,11 @@ public:
     WLModule(QObject *parent=nullptr);
   ~WLModule();
 
-typeModule getTypeModule() {return typeM;}
-      void setTypeModule(typeModule _type) {typeM=_type;}
+typeModule getType() {return m_type;}
+      void setType(typeModule _type) {m_type=_type;}
 
 private:
- typeModule typeM;
+ typeModule m_type;
 
 public slots:
 virtual void reset();	

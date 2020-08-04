@@ -3,7 +3,7 @@
 WLModuleAxis::WLModuleAxis(WLModuleIOPut *_ModuleIOPut,QObject *parent)
 	:WLModule(parent)
 {
-setTypeModule(typeMAxis);
+setType(typeMAxis);
 ModuleIOPut=_ModuleIOPut;
 
 Fmax=0;

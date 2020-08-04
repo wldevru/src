@@ -27,7 +27,7 @@ latchPos3=0;
 
 error=0;
 
-typePulse=AXIS_pulse_empty;
+typePulse=AXIS_pulse_SD;
 
 homePosition=0;
 orgSize=100;
@@ -337,7 +337,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)comAxis_setParMov<<getIndex()<<Aac<<Ade<<Fst<<Fma<<(static_cast<quint8>(type));
 
-qDebug()<<"typeMPar"<<(static_cast<quint8>(type));
+qDebug()<<"typeMPar"<<(static_cast<quint8>(type))<<Aac<<Ade<<Fst<<Fma;
 
 emit sendCommand(data);
 return true;

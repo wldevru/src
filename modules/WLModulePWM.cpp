@@ -3,7 +3,7 @@
 WLModulePWM::WLModulePWM(QObject *parent)
 	: WLModule(parent)
 {
-setTypeModule(typeMPWM);
+setType(typeMPWM);
 
 Init(1);
 
@@ -43,6 +43,7 @@ if(sizeOutPWM>outPWM.size())
   pwm = new WLPWM;
   pwm->setIndex(i);
   connect(pwm,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
+  connect(pwm,SIGNAL(changed()),SLOT(updatePWM()));
   outPWM+=pwm;
   }
 else
@@ -50,6 +51,7 @@ else
 	  {	  
 	  pwm=outPWM.takeLast();
 	  disconnect(pwm,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
+      disconnect(pwm,SIGNAL(changed()),this,SLOT(updatePWM()));
 	  delete pwm;  
       }
 
@@ -69,7 +71,14 @@ void WLModulePWM::update()
 foreach(WLPWM *pwm,outPWM)
   {
   pwm->sendGetData();
-  }
+}
+}
+
+void WLModulePWM::updatePWM()
+{
+WLPWM *PWM=static_cast<WLPWM*>(sender());
+
+emit changedOutPWM(PWM->getIndex());
 }
 
 void  WLModulePWM::readCommand(QByteArray Data)

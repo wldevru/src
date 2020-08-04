@@ -110,13 +110,14 @@ public:
 private:
 
 QMutex Mutex;
-statusPlanner status;
+statusPlanner m_status;
 WLFlags Flags;
 int m_sizeBuf;
 int m_free;
 
-quint8  lastIndexElementBuf;
-quint32 curIdElementBuf;
+quint8  m_lastIndexElementBuf;
+quint32 m_curIdElementBuf;
+quint32 m_countAddElement;
 
 float m_smoothAng;
 
@@ -129,7 +130,7 @@ public:
 
      float getSmoothAng() {return m_smoothAng;}
 
-quint32 getCurIdElement() {return curIdElementBuf;}
+quint32 getCurIdElement() {return m_curIdElementBuf;}
 
     bool setIAxisSlave(quint8 *indexsAxis,quint8 size);
   //void sendGetDataBuf();
@@ -160,8 +161,13 @@ quint32 getCurIdElement() {return curIdElementBuf;}
 
 	bool setEnableSOut(quint8 enable);
 		
-    int getFree()   {return m_free;};
-statusPlanner getStatus() {return status;}
+     int getFree()   {return m_free;}
+    void setSizeBuf(int value);
+
+ quint32 getCountAddElement() const;
+
+statusPlanner getStatus()  const {return m_status;}
+
    bool isEmpty()  {return Flags.get(PLF_empty);}
    bool isMoving() {return Flags.get(PLF_moving);}
 
@@ -180,12 +186,13 @@ signals:
     void reset();
 
 public:
-virtual void getProp() {};	
+virtual void getProp() {}
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 virtual void readCommand(QByteArray data); 
-                                      void setSizeBuf(int value);
-                                  };
 
-                           #endif // WLModulePLANNER_H
+
+ };
+
+  #endif // WLModulePLANNER_H
 

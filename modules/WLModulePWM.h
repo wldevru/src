@@ -14,7 +14,7 @@ class WLModulePWM : public WLModule
 	Q_OBJECT
 
 public:
-	WLModulePWM(QObject *parent=0);
+    WLModulePWM(QObject *parent=nullptr);
    ~WLModulePWM();
 
     bool Init(int _sizeOutPWM);
@@ -30,6 +30,12 @@ public:
 
 public slots:
 virtual void update();
+
+private slots:
+void updatePWM();
+
+signals:
+void changedOutPWM(int n);
 
 public:
 

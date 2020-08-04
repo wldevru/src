@@ -12,18 +12,16 @@
 
 WLDevice::WLDevice()
 {
-setTypeModule(typeDevice);
+setType(typeDevice);
 
 m_HA.clear();
 
 m_nameDevice.clear();
 
-//m_serialPort=nullptr;
- //m_udpSocket=nullptr;
 
 status=DEVICE_empty;
 
-version=0;
+m_version=0;
 
 QTimer *timer=new QTimer;
 
@@ -37,20 +35,30 @@ connect(&m_serialPort,SIGNAL(error(QSerialPort::SerialPortError)),this,SLOT(onEr
 
 connect(&m_udpSocket,&QUdpSocket::readyRead,this,&WLDevice::readSlot);
 
+m_timerEth = new QTimer;
+m_timerEth->setSingleShot(true);
+
+connect(m_timerEth,&QTimer::timeout,this,&WLDevice::sendEthData);
+
+m_countTxPacket=0;
+m_countRxPacket=255;
 }
  
 WLDevice::~WLDevice()
 {
+closeConnect();
+
 blockSignals(true);
 
-closeConnect();;
 removeModules();
 }
 
 void WLDevice::callPropModules()
 {
-for(int i=0;i<Modules.size();i++) 	
-    Modules[i]->callProp();
+quint16 sizeOutBuf;
+
+for(int i=0;i<m_modules.size();i++)
+    m_modules[i]->callProp();
 }
 
 void WLDevice::callProp()
@@ -79,21 +87,37 @@ Stream<<static_cast<quint8>(comDev_resetAll);
 setCommand(data);
 }
 
+void WLDevice::sendEthData()
+{
+m_udpSocket.writeDatagram(m_bufEth,m_HA,2020);
+/*
+for(int i=0;i<m_bufEth.size();i++)
+    qDebug()<<(quint8)m_bufEth[i];
+*/
+ //qDebug()<<"sendEth"<<m_bufEth.size();
+if(status==DEVICE_connect)
+  {
+  Flags.set(fl_waitack);
+   m_timerEth->start(100);
+  }
+}
+
 void WLDevice::removeModules()
 {
-while(!Modules.isEmpty())
-  delete (Modules.takeLast());
+while(!m_modules.isEmpty())
+  delete (m_modules.takeLast());
 
-emit changedModules(Modules.size());
+emit changedModules(m_modules.size());
 emit changedReady(Flags.reset(fl_ready));
 }
 
 void WLDevice::reconnectSerialPort()
 {    
-qDebug()<<"if reconnect"<<getStatus();
+//qDebug()<<"if reconnect"<<getStatus();
 QMutexLocker locker(&connectMutex);
 
 if(isOpenConnect()
+ &&!m_serialPort.portName().isEmpty()
  //&&getStatus()==DEVICE_connect)
   )
  {
@@ -153,30 +177,31 @@ QUdpSocket udpSocket;
 QHostAddress HA;
 quint16 port;
 int n;
-char buf[]={3,0,5};
+char buf[]={0,3,0,5};
 char dataBuf[512];
 QList <QHostAddress> HADList;
-QByteArray BA(buf,3);
+QByteArray BA(buf,4);
 
 udpSocket.bind(2021);
 udpSocket.writeDatagram(BA,QHostAddress::Broadcast,2020);
-udpSocket.waitForReadyRead(1000);
+QThread::msleep (250);
+udpSocket.waitForReadyRead(500);
 
 n=udpSocket.readDatagram(dataBuf,512,&HA,&port);
 
 while(n>0)
 {
-if(port==2020) HADList+=HA;
-n=udpSocket.readDatagram(buf,1024,&HA,&port);
+if(port==2020)
+   {
+   if(HADList.indexOf(HA)==-1)    HADList+=HA;
+    }
+n=udpSocket.readDatagram(buf,4,&HA,&port);
 }
 
 udpSocket.close();
 
-//HADList+=QHostAddress("192.168.1.10");
 foreach(QHostAddress HAD,HADList)
  {
- qDebug()<<"recv"<<HAD.toString();
-
  WLDevice  DeviceEth;
 
  DeviceEth.initUdpSocket(HAD);
@@ -188,6 +213,21 @@ foreach(QHostAddress HAD,HADList)
 
 
 return retDevicesInfo;
+}
+
+void WLDevice::reboot(uint8_t type)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<static_cast<quint8>(comDev_reboot)<<type;
+
+setCommand(data);
+
+QTimer::singleShot(100,this,SLOT(closeConnect()));
 }
 
 void WLDevice::setInfo(WLDeviceInfo info)
@@ -216,8 +256,8 @@ return info;
 
 void WLDevice::setUID96(QString _UID96)
 {
-UID96=_UID96;
-emit changedUID96(UID96);
+m_UID96=_UID96;
+emit changedUID96(m_UID96);
 }
 
 void WLDevice::setStatus(enum statusDevice _status)
@@ -268,83 +308,76 @@ if(m_serialPort.isOpen())
  {
  reset();
  //wait send
- while(!outData.isEmpty()); //ждём отправки
+ while(!outBuf.isEmpty()); //ждём отправки
  }
+}
+
+QList<WLModule *> WLDevice::getModules() const
+{
+    return m_modules;
 }
 
 void WLDevice::startSend(QByteArray data)
 {
-QMutexLocker locker(&OutDataMutex); 
-//data.prepend(data.size()+1);
-//write(data);
-//if(isOpenConnect())
+    QMutexLocker locker(&OutDataMutex);
+
 if(!data.isEmpty())
     {
-    outData+=data.size()+1;
-    outData+=data;
+    outBuf+=data.size()+1;
+    outBuf+=data;
     }
-
-
-//QTimer::singleShot(0,this,SLOT(sendData()));
 }
 
 
 void WLDevice::sendData()
 {
-//QMutexLocker locker(&connectMutex);
-
 QMutexLocker locker0(&SendOutMutex);
 QMutexLocker locker1(&OutDataMutex);
 
 int n;
 
-if(!outData.isEmpty())
+
+if(!outBuf.isEmpty())
 {
  if(m_serialPort.isOpen())
-    {
-    if(outData.size()>256)
-      {
-       n=outData[0];
-
-       while(n<256)  //only full packets
-        {
-        n+=outData[n];
-        }
-
-      m_serialPort.write(outData.mid(0,n));
-      outData=outData.mid(n);
-      }
-     else
-      {
-      m_serialPort.write(outData);
-      outData.clear();
-      }
-     }
-
-    //if(m_serialPort.write(outData)) outData.clear();
+    {    
+    m_serialPort.write(outBuf);
+    outBuf.clear();
+    }
 
  else
-   {
-   if(m_udpSocket.isOpen())
-        {
-        if(outData.size()>256)
-         {
-          n=outData[0];
+   {              
+  // qDebug()<<"isOpen"<<m_udpSocket.isOpen()<<Flags.get(DEVF_ethwaitack);
+   if(m_udpSocket.isOpen()
+   &&!Flags.get(fl_waitack))
+       {
+       m_bufEth.clear();
+       m_bufEth+=(++m_countTxPacket);
 
-          while(n<256)  //only full packets
+        if(outBuf.size()>256)
+         {
+          n=outBuf[0];
+
+          while((n+outBuf[n])<256)  //only full packets
            {
-           n+=outData[n];
+           n+=outBuf[n];
            }
 
-          m_udpSocket.writeDatagram(outData.mid(0,n),m_HA,2020);
-          outData=outData.mid(n);
+         m_bufEth+=outBuf.mid(0,n);
+
+         //m_udpSocket.writeDatagram(m_outData.mid(0,n),m_HA,2020);
+         outBuf=outBuf.mid(n);
          }
         else
          {
-         m_udpSocket.writeDatagram(outData,m_HA,2020);
-         outData.clear();
+         m_bufEth+=outBuf;
+         //m_udpSocket.writeDatagram(outData,m_HA,2020);
+         outBuf.clear();
          }
+        sendEthData();
         }
+    //  else
+       // qDebug()<<"Busy Eth"<<m_udpSocket.isOpen()<<Flags.get(DEVF_ethwaitack);;
     }
 
 }
@@ -375,6 +408,8 @@ bool WLDevice::openConnect()
 {
 QMutexLocker locker(&connectMutex);
 
+Flags.reset(fl_waitack);
+
 if(!m_serialPort.portName().isEmpty())
 {
 m_serialPort.close();
@@ -396,11 +431,10 @@ if(!m_HA.isNull())
    {
    qDebug()<<"no init udp WLDevice";
    return false;
-   }  
+   }
+  m_bufEth.clear();
   }
 }
-
-inBuf.clear();
 
 Flags.set(fl_openconnect);
 
@@ -412,6 +446,9 @@ callUID();
 callModules();
 
 sendData();
+
+m_serialPort.flush();
+QThread::msleep (50);
 
 if(!m_serialPort.portName().isEmpty())
  {
@@ -432,19 +469,16 @@ return true;
 
 void WLDevice::closeConnect()
 {
-
-
 if(isOpenConnect())
 {
- if(getModuleConnect())
+
+if(getModuleConnect())
   {
   getModuleConnect()->setEnableHeart(false);
   }
 
  setStatus(DEVICE_init);
  sendData();
-
- //QMutexLocker locker0(&SendOutMutex);
 
  Flags.reset(fl_openconnect);
 
@@ -453,19 +487,21 @@ if(isOpenConnect())
  if(m_serialPort.isOpen())
   {
   qDebug()<<"Close Serial Port";
- //m_serialPort.flush();
-  m_serialPort.waitForBytesWritten(1000);//улетаетс ним
+  m_serialPort.flush();
+  QThread::msleep (50);
   m_serialPort.close();
   }
-  else
-  if(m_udpSocket.isOpen())
-  {
-  qDebug()<<"Close udpSocket";
-//m_udpSocket.flush();
-  m_udpSocket.waitForBytesWritten(1000);
-  m_udpSocket.close();
-  //ipAdress.clear();
-  }
+  else if(m_udpSocket.isOpen())
+         {
+         sendEthData();
+         m_udpSocket.flush();
+         QThread::msleep(150);
+         m_timerEth->stop();
+
+         m_udpSocket.close();
+         m_bufEth.clear();
+         Flags.reset(fl_waitack);
+         }
 
  connectMutex.unlock();
 
@@ -479,16 +515,16 @@ void WLDevice::addModule(WLModule *module)
 {
 if(module!=nullptr)
  {
- for(int i=0;i<Modules.size();i++)
-	 if(module->getTypeModule()==Modules[i]->getTypeModule()) return;
+ for(int i=0;i<m_modules.size();i++)
+     if(module->getType()==m_modules[i]->getType()) return;
 
- Modules+=module;
+ m_modules+=module;
  connect(module,SIGNAL(sendCommand(QByteArray)),SLOT(startSend(QByteArray)),Qt::DirectConnection);
  connect(module,SIGNAL(sendMessage(QString,QString,int)),SIGNAL(sendMessage(QString,QString,int)));
 
  module->callProp();
 
- emit changedModules(Modules.size());
+ emit changedModules(m_modules.size());
  }
 }
 
@@ -497,10 +533,10 @@ WLModule* WLDevice::getModule(typeModule type)
 {
 WLModule *ret=nullptr;
 
-for(int i=0;i<Modules.size();i++)
-	if(Modules[i]->getTypeModule()==type) 
+for(int i=0;i<m_modules.size();i++)
+    if(m_modules[i]->getType()==type)
 	    {
-		ret=Modules[i];
+        ret=m_modules[i];
 		break;
 	    }
 
@@ -513,7 +549,10 @@ void WLDevice::readSlot()
 QMutexLocker locker(&InputDataMutex);
 
 if(m_serialPort.isOpen())
-   inBuf+=m_serialPort.readAll();
+ {
+ inBuf+=m_serialPort.readAll();
+ decodeInputData();
+ }
 else
  {
  //if(m_udpSocket.isOpen())
@@ -527,10 +566,37 @@ else
    if(HA==m_HA&&port==2020)
      {
      QByteArray byteArray(bufData,n);
-     inBuf+=byteArray;
+
+     if(byteArray.size()==1)
+     {
+     //qDebug()<<"Ack"<<(quint8)byteArray[0]<<m_countTxPacket;
+     if(Flags.get(fl_waitack)
+      &&m_countTxPacket==(quint8)byteArray[0])
+         {
+         Flags.reset(fl_waitack);
+         m_timerEth->stop();
+         //qDebug()<<"Ack ok";
+         }
+     }
+     else
+        {
+        m_udpSocket.writeDatagram(byteArray.data(),1,m_HA,2020);
+
+        if(m_countRxPacket!=(quint8)byteArray[0])
+          {
+          m_countRxPacket=(quint8)byteArray[0];
+
+          inBuf+=byteArray.mid(1);          
+          }
+        }
+     decodeInputData();
      }
    }
  }
+}
+
+void WLDevice::decodeInputData()
+{
 
 quint8 ui1,ui2,ui3;
 //quint16 ui16[10];
@@ -562,6 +628,7 @@ inBuf=inBuf.mid(size);
 
 emit readDataDevice();
 
+
 if(!Data.isEmpty())
 {
 QDataStream Stream(&Data,QIODevice::ReadOnly);
@@ -586,11 +653,11 @@ switch(ui1)
 									   
 									   if(ui1==errorDevice_nomodule)
                                         {
-									    for(int i=0;i<Modules.size();i++)
-										   if(Modules[i]->getTypeModule()==index)  
+                                        for(int i=0;i<m_modules.size();i++)
+                                           if(m_modules[i]->getType()==index)
 										     {
-                                             Q_ASSERT(Modules[i]->getTypeModule()==index);
-											 delete (Modules.takeAt(i));
+                                             Q_ASSERT(m_modules[i]->getType()==index);
+                                             delete (m_modules.takeAt(i));
 											 break;
 										     }
                                          }
@@ -607,11 +674,11 @@ switch(ui1)
 
                                       if(!bufStr.isEmpty())
                                        {
-                                       prop=bufStr;
+                                       m_prop=bufStr;
 
-                                       setNameDevice(prop.split(".").first());
+                                       setNameDevice(m_prop.split(".").first());
 
-                                       emit changedProp(prop);
+                                       emit changedProp(m_prop);
                                        emit changedConnect(Flags.set(fl_connect));
 
                                        setStatus(DEVICE_connect);
@@ -632,7 +699,7 @@ switch(ui1)
 									   buf[i]=ui1;
 									   }
 									  
-                                      emit changedProp(prop);
+                                      emit changedProp(m_prop);
                                       emit changedReady(true);
                     			      break;
 
@@ -661,16 +728,16 @@ switch(ui1)
 									     createModule((typeModule)ui1);										 
 									     };
 
-                                    emit changedProp(prop);
+                                    emit changedProp(m_prop);
                                     emit changedReady(Flags.set(fl_ready));
 
 						            break;
 				   }
 				   break;
- default: for(int i=0;i<Modules.size();i++)
-			   if(Modules[i]->getTypeModule()==ui1)
+ default: for(int i=0;i<m_modules.size();i++)
+               if(m_modules[i]->getType()==ui1)
 			     {
-				 Modules[i]->readCommand(Data.mid(1));
+                 m_modules[i]->readCommand(Data.mid(1));
 				 break;
 			     }
 			  break;
@@ -809,16 +876,16 @@ if(stream.name()=="Modules")
 		if(stream.name()=="Modules") break;
 		if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
 		
-		for(i=0;i<Modules.size();i++)
-			if(stream.name()==Modules[i]->metaObject()->className()) 
+        for(i=0;i<m_modules.size();i++)
+            if(stream.name()==m_modules[i]->metaObject()->className())
 			    {
-				Modules[i]->readXMLData(stream);
+                m_modules[i]->readXMLData(stream);
 				break;
 			    }
 
         Module=nullptr;
 
-        if(i==Modules.size()&&add)
+        if(i==m_modules.size()&&add)
 		  {
           Module=createModule(stream.name().toString());
 
@@ -847,10 +914,10 @@ else
 stream.writeAttribute("UID96",getUID96());
 
 stream.writeStartElement("Modules");
-for(int i=0;i<Modules.size();i++)
+for(int i=0;i<m_modules.size();i++)
  {
- stream.writeStartElement(Modules[i]->metaObject()->className());
-   Modules[i]->writeXMLData(stream);  
+ stream.writeStartElement(m_modules[i]->metaObject()->className());
+   m_modules[i]->writeXMLData(stream);
  stream.writeEndElement();
  }
 stream.writeEndElement();

@@ -157,8 +157,7 @@ enum   typePulseAxis{AXIS_pulse_SD
                     ,AXIS_pulse_ABx2
                     ,AXIS_pulse_ABx4
                     ,AXIS_pulse_SDx2
-                    ,AXIS_pulse_CWCCWx2
-                    ,AXIS_pulse_empty};
+                    ,AXIS_pulse_CWCCWx2};
 
 enum   typeFindAxis{AXIS_findNO
                    ,AXIS_findPEL

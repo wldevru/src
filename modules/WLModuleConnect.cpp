@@ -3,7 +3,7 @@
 WLModuleConnect::WLModuleConnect(QObject *parent)
 	: WLModule(parent)
 {
-setTypeModule(typeMConnect);
+setType(typeMConnect);
 
 timeoutConnect_ms=1000;
 timeHeart_ms=250;
@@ -111,7 +111,6 @@ if(Flags.get(MCF_enbheart))
 
 timerConnect->start(timeoutConnect_ms);
 
-//sendHeart();
 conOk=true;
 }
 

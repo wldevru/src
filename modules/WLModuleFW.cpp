@@ -5,7 +5,7 @@
 
 WLModuleFW::WLModuleFW()
 {
-setTypeModule(typeMFW);
+setType(typeMFW);
 
 status=MFW_standby;
 sizeFW=0;

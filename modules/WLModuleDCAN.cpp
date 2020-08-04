@@ -3,7 +3,7 @@
 WLModuleDCan::WLModuleDCan(QObject *parent)
 	: WLModule(parent)
 {
-setTypeModule(typeMDCan);
+setType(typeMDCan);
 Init(1);
 }
 

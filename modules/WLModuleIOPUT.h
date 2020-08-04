@@ -17,7 +17,7 @@ class WLModuleIOPut: public WLModule
 Q_OBJECT
 	
 public:
-    WLModuleIOPut(QObject *parent=0);
+    WLModuleIOPut(QObject *parent=nullptr);
    ~WLModuleIOPut();
    
 public:
@@ -56,7 +56,7 @@ Q_INVOKABLE   quint8 byte(int in7,int in6,int in5,int in4,int in3,int in2,int in
 								     |(input(in0)? 1<<0:0);}
 
 
-Q_INVOKABLE void otputPulse(int index, bool out,int time) {getOutputV(index)->setOutPulse(out,time);}
+Q_INVOKABLE void otputPulse(int index, bool out,quint32 time) {getOutputV(index)->setOutPulse(out,time);}
 Q_INVOKABLE bool output(int index)   {return getOutputV(index)->getNow();}
 
 public slots:
@@ -78,9 +78,17 @@ private slots:
     void updateAllOutputData();
 
 	void sendSetOData(bool all=true);
- 
+
+    void updateIOPut();
+
 public slots:
 virtual void update();
+
+
+signals:
+
+  void changedInput(int);
+  void changedOutput(int);
 
 public:
 
