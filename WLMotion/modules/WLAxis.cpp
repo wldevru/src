@@ -32,7 +32,7 @@ typePulse=AXIS_pulse_SD;
 homePosition=0;
 orgSize=100;
 
-ModuleIOPut=nullptr;
+m_ModuleIOPut=nullptr;
 
 inORG=&WLIOPut::In0;
 inPEL=&WLIOPut::In0;
@@ -82,7 +82,7 @@ return ret;
 
 void WLAxis::init(WLModuleIOPut *_ModuleIOPut,quint8 index)
 {
-ModuleIOPut=_ModuleIOPut;
+m_ModuleIOPut=_ModuleIOPut;
 setIndex(index);
 }
 
@@ -90,7 +90,7 @@ void  WLAxis::setInALM(int index)
 {
 inALM->removeComment("inALM"+QString::number(getIndex()));
 disconnect(inALM,&WLIOPut::changed,this,&WLAxis::changedInALM);
-inALM=ModuleIOPut->getInputV(index);
+inALM=m_ModuleIOPut->getInputV(index);
 inALM->addComment("inALM"+QString::number(getIndex()));
 
 setInput(AXIS_inALM,index);
@@ -101,7 +101,7 @@ connect(inALM,&WLIOPut::changed,this,&WLAxis::changedInALM,Qt::QueuedConnection)
 void  WLAxis::setInORG(int index)
 {
 inORG->removeComment("inORG"+QString::number(getIndex()));
-inORG=ModuleIOPut->getInputV(index);
+inORG=m_ModuleIOPut->getInputV(index);
 inORG->addComment("inORG"+QString::number(getIndex()));
 
 setInput(AXIS_inORG,index);
@@ -111,7 +111,7 @@ setInput(AXIS_inORG,index);
 void  WLAxis::setInPEL(int index)
 {
 inPEL->removeComment("inPEL"+QString::number(getIndex()));
-inPEL=ModuleIOPut->getInputV(index);
+inPEL=m_ModuleIOPut->getInputV(index);
 inPEL->addComment("inPEL"+QString::number(getIndex()));
 
 setInput(AXIS_inPEL,index);
@@ -120,7 +120,7 @@ setInput(AXIS_inPEL,index);
 void  WLAxis::setInMEL(int index)
 {
 inMEL->removeComment("inMEL"+QString::number(getIndex()));
-inMEL=ModuleIOPut->getInputV(index);
+inMEL=m_ModuleIOPut->getInputV(index);
 inMEL->addComment("inMEL"+QString::number(getIndex()));
 
 setInput(AXIS_inMEL,index);
@@ -130,7 +130,7 @@ setInput(AXIS_inMEL,index);
 void  WLAxis::setOutRALM(int index)
 {
 outRALM->removeComment("outRALM"+QString::number(getIndex()));
-outRALM=ModuleIOPut->getOutputV(index);
+outRALM=m_ModuleIOPut->getOutputV(index);
 outRALM->addComment("outRALM"+QString::number(getIndex()));
 }
 
@@ -138,7 +138,7 @@ outRALM->addComment("outRALM"+QString::number(getIndex()));
 void  WLAxis::setOutENB(int index)
 {
 outENB->removeComment("outENB"+QString::number(getIndex()));
-outENB=ModuleIOPut->getOutputV(index);
+outENB=m_ModuleIOPut->getOutputV(index);
 outENB->addComment("outENB"+QString::number(getIndex()));
 
 setOutput(AXIS_outENB,index);

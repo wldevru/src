@@ -206,7 +206,7 @@ WLIOPut *inALM;
 WLIOPut *outENB;
 WLIOPut *outRALM;
 
-WLModuleIOPut *ModuleIOPut;
+WLModuleIOPut *m_ModuleIOPut;
 
 typeActIOPutAxis actIn[4];
 
@@ -245,7 +245,7 @@ float getKSTCurve() {return kSTCurve;}
 typeActIOPutAxis getActIn(quint8 typeIn) {return actIn[typeIn];}
            float getKGear() {return kGear;}
 
-WLModuleIOPut* getModuleIOPut() {return ModuleIOPut;}
+WLModuleIOPut* getModuleIOPut() {return m_ModuleIOPut;}
 
 WLIOPut*  getInput(typeInputAxis);
 WLIOPut*  getOutput(typeOutputAxis);

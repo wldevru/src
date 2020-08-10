@@ -5,7 +5,7 @@ WLEditIOPutWidget::WLEditIOPutWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WLEditIOPutWidget)
 {
-    ModuleIOPut=nullptr;
+    m_ModuleIOPut=nullptr;
 
     ui->setupUi(this);
 
@@ -25,11 +25,11 @@ delete ui;
 
 void WLEditIOPutWidget::setModuleIOPut(WLModuleIOPut *_ModuleIOPut,bool _input)
 {
-ModuleIOPut=_ModuleIOPut;
+m_ModuleIOPut=_ModuleIOPut;
 
 m_input=_input;
 
-ui->spinBox->setRange(0,(m_input? ModuleIOPut->getSizeInputs():ModuleIOPut->getSizeOutputs())
+ui->spinBox->setRange(0,(m_input? m_ModuleIOPut->getSizeInputs():m_ModuleIOPut->getSizeOutputs())
                          -1);
 ui->spinBox->setEnabled(true);
 }
@@ -53,9 +53,9 @@ void WLEditIOPutWidget::update()
 {
 QPalette pal;
 
-if(ModuleIOPut)
+if(m_ModuleIOPut)
 {
-pal.setColor(QPalette::Base,ModuleIOPut->getInputV(ui->spinBox->value())->getNow() ?
+pal.setColor(QPalette::Base,m_ModuleIOPut->getInputV(ui->spinBox->value())->getNow() ?
                             QColor(255,150,150)
                             :
                             Qt::white);
@@ -63,3 +63,15 @@ pal.setColor(QPalette::Base,ModuleIOPut->getInputV(ui->spinBox->value())->getNow
 ui->spinBox->setPalette(pal);
 }
 }
+
+void WLEditIOPutWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+if(QMessageBox::question(this,tr("Question")
+                        ,m_input ? tr("invert input"):tr("invert output")
+                        ,QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
+             {
+             togInvers();
+             }
+}
+
+
