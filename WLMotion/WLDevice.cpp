@@ -567,7 +567,7 @@ else
      {
      QByteArray byteArray(bufData,n);
 
-     if(byteArray.size()==1)
+     if(n==1)
      {
      //qDebug()<<"Ack"<<(quint8)byteArray[0]<<m_countTxPacket;
      if(Flags.get(fl_waitack)
@@ -578,7 +578,7 @@ else
          //qDebug()<<"Ack ok";
          }
      }
-     else
+     else if(n>1)
         {
         m_udpSocket.writeDatagram(byteArray.data(),1,m_HA,2020);
 
@@ -586,10 +586,32 @@ else
           {
           m_countRxPacket=(quint8)byteArray[0];
 
-          inBuf+=byteArray.mid(1);          
+          byteArray=byteArray.mid(1);
+
+          quint8 i=0;
+
+          while(1)
+          {
+          if((i>byteArray.size())||((quint8)byteArray[i]==0))
+            {
+            qDebug()<<"error pack";
+            break;
+            }
+
+          i+=(quint8)byteArray[i];
+
+          if(i==byteArray.size())
+            {
+            inBuf+=byteArray;
+            decodeInputData();
+            break;
+            }
+          }
+
+
           }
         }
-     decodeInputData();
+
      }
    }
  }
@@ -618,8 +640,20 @@ while(!inBuf.isEmpty())
 {
 size=(quint8)inBuf[0];
 
-if(inBuf.size()<size) break;
-if(size==0) {inBuf.clear(); break;}
+if(inBuf.size()<size)
+{
+qDebug()<<"size<"<<inBuf.size()<<size;
+for(int i=0;i<10&&i<inBuf.size();i++)
+      qDebug()<<(quint8)inBuf[i];
+break;
+}
+
+if(size==0)
+{
+qDebug()<<"size==0 !!!";
+inBuf.clear();
+break;
+}
 
 curi++;
 

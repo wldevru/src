@@ -107,14 +107,16 @@ return index<Outputs.size()?  Outputs[index]:nullptr;
 
 void WLModuleIOPut::readCommand(QByteArray Data)
 {
-    quint8 index,ui1,ui2;
+quint8 index,ui1,ui2;
 
-    QDataStream Stream(&Data,QIODevice::ReadOnly);
+QDataStream Stream(&Data,QIODevice::ReadOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream>>ui1;
+
+//qDebug()<<"read MIOPut";
 
 switch(ui1)
  {
@@ -138,7 +140,7 @@ switch(ui1)
                        break;
 
 case sendIOPut_ioputData: 
-                      qDebug()<<"start sendIOData";
+
                        Stream>>index;		
 					   Stream>>ui1;
 

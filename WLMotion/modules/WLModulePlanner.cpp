@@ -440,7 +440,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Mutex.lock();
 
- qDebug()<<"readCommand MPlanner"<<Data.size();
+qDebug()<<"readCommand MPlanner"<<Data.size();
 
 Stream>>ui1;
 
@@ -455,9 +455,8 @@ switch(ui1)
 						 Stream>>f1;//Sout
 						//Stream>>f2;//Ftar
 
-                         qDebug()<<"sendMBSize"<<m_lastIndexElementBuf<<ui32<<ui1<<ui2;
-			                  
-						//if(flagsBuf&MBF_reset) emit ChangedResetBuf();
+                        qDebug()<<"sendMBSize"<<m_lastIndexElementBuf<<ui32<<ui1<<ui2;
+
                         emit changedSOut(f1);
 
                         if(m_lastIndexElementBuf==ui2)
@@ -465,15 +464,13 @@ switch(ui1)
                              m_curIdElementBuf=ui32;
 
                              Flags.m_Data=ui4;
-                             qDebug()<<"sendMBSize0";
+
                              if(m_status!=(statusPlanner)(ui3))
                                  {
-                                 qDebug()<<"sendMBSize1";
                                  emit changedStatus(m_status=(statusPlanner)(ui3));
                                  }
-                            //if(freeBuf!=ui1)
-                             emit changedFree(m_free=ui1);
-                             qDebug()<<"sendMBSize2";
+
+                             emit changedFree(m_free=ui1);                            
                              }
                            break;
 								

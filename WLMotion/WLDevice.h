@@ -155,7 +155,13 @@ public:
 
 
 private slots:	
-void updateModules() {qDebug()<<"updaet Modules";foreach(WLModule *Module,m_modules)     Module->update();}
+void updateModules() {qDebug()<<"update Modules";
+                      foreach(WLModule *Module,m_modules)
+                           {
+                           qDebug()<<Module->metaObject()->className();
+                           Module->update();
+                           }
+                     }
 void sendEthData();
 virtual	void readSlot();
 
