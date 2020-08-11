@@ -23,9 +23,9 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 
 	WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->m_motDevice->getModule(typeMAxis));
 
-    ui.editInEMG->  setModuleIOPut(ModuleAxis->getModuleIOPut());
-    ui.editInSD->   setModuleIOPut(ModuleAxis->getModuleIOPut());
-    ui.editInProbe->setModuleIOPut(ModuleAxis->getModuleIOPut());
+    ui.editInEMG->  setModule(ModuleAxis->getModuleIOPut());
+    ui.editInSD->   setModule(ModuleAxis->getModuleIOPut());
+    ui.editInProbe->setModule(ModuleAxis->getModuleIOPut());
 
     ui.editInEMG->  setLabel("InEMG");
     ui.editInSD->   setLabel("InSD");

@@ -5,7 +5,12 @@
 #include <QMessageBox>
 #include "WLDrive.h"
 #include "WLPamListWidget.h"
+
 #include "ui_WLDriveWidget.h"
+
+namespace Ui {
+class WLDriveWidget;
+}
 
 class WLDriveWidget : public QDialog
 {

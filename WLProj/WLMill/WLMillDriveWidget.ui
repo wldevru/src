@@ -44,7 +44,14 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QDoubleSpinBox" name="sbBacklash"/>
+       <widget class="QDoubleSpinBox" name="sbBacklash">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="maximum">
+         <double>20.000000000000000</double>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

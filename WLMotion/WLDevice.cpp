@@ -516,7 +516,7 @@ void WLDevice::addModule(WLModule *module)
 if(module!=nullptr)
  {
  for(int i=0;i<m_modules.size();i++)
-     if(module->getType()==m_modules[i]->getType()) return;
+     if(module->type()==m_modules[i]->type()) return;
 
  m_modules+=module;
  connect(module,SIGNAL(sendCommand(QByteArray)),SLOT(startSend(QByteArray)),Qt::DirectConnection);
@@ -534,7 +534,7 @@ WLModule* WLDevice::getModule(typeModule type)
 WLModule *ret=nullptr;
 
 for(int i=0;i<m_modules.size();i++)
-    if(m_modules[i]->getType()==type)
+    if(m_modules[i]->type()==type)
 	    {
         ret=m_modules[i];
 		break;
@@ -688,9 +688,9 @@ switch(ui1)
 									   if(ui1==errorDevice_nomodule)
                                         {
                                         for(int i=0;i<m_modules.size();i++)
-                                           if(m_modules[i]->getType()==index)
+                                           if(m_modules[i]->type()==index)
 										     {
-                                             Q_ASSERT(m_modules[i]->getType()==index);
+                                             Q_ASSERT(m_modules[i]->type()==index);
                                              delete (m_modules.takeAt(i));
 											 break;
 										     }
@@ -769,7 +769,7 @@ switch(ui1)
 				   }
 				   break;
  default: for(int i=0;i<m_modules.size();i++)
-               if(m_modules[i]->getType()==ui1)
+               if(m_modules[i]->type()==ui1)
 			     {
                  m_modules[i]->readCommand(Data.mid(1));
 				 break;

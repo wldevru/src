@@ -98,13 +98,13 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="0" column="0">
-       <widget class="WLEditIOPutWidget" name="editInEMG" native="true"/>
+       <widget class="WLEditIOWidget" name="editInEMG" native="true"/>
       </item>
       <item row="2" column="0">
-       <widget class="WLEditIOPutWidget" name="editInProbe" native="true"/>
+       <widget class="WLEditIOWidget" name="editInProbe" native="true"/>
       </item>
       <item row="1" column="0">
-       <widget class="WLEditIOPutWidget" name="editInSD" native="true"/>
+       <widget class="WLEditIOWidget" name="editInSD" native="true"/>
       </item>
      </layout>
     </widget>
@@ -468,9 +468,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>WLEditIOPutWidget</class>
+   <class>WLEditIOWidget</class>
    <extends>QWidget</extends>
-   <header>WLEditIOPutWidget.h</header>
+   <header>WLEditIOWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

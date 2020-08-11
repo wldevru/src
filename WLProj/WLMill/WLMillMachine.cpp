@@ -1217,8 +1217,8 @@ switch(iOperation)
 
  case 2: if(ModuleAxis->isLatchProbe2())
 		  {
-          driveProbe->startMovPos(ModuleAxis->getLatchProbe2(driveProbe->axis()->getIndex())*driveProbe->dimension()
-                                 +(driveProbe->rot()? -getDrive(driveProbe->nameDrive())->getHalfBacklash():getDrive(driveProbe->nameDrive())->getHalfBacklash())
+          driveProbe->startMovPos(ModuleAxis->getLatchProbe2(driveProbe->getAxis()->getIndex())*driveProbe->dimension()
+                                 +(driveProbe->rot()? -getDrive(driveProbe->getName())->getHalfBacklash():getDrive(driveProbe->getName())->getHalfBacklash())
                                   ,m_VProbe/60);
 
 		  iOperation=4;
@@ -1234,8 +1234,8 @@ switch(iOperation)
 
  case 3: if(ModuleAxis->isLatchProbe3())
 		  {
-          driveProbe->startMovPos(ModuleAxis->getLatchProbe3(driveProbe->axis()->getIndex())*driveProbe->dimension()
-                                 +(driveProbe->rot()? -getDrive(driveProbe->nameDrive())->getHalfBacklash():getDrive(driveProbe->nameDrive())->getHalfBacklash())
+          driveProbe->startMovPos(ModuleAxis->getLatchProbe3(driveProbe->getAxis()->getIndex())*driveProbe->dimension()
+                                 +(driveProbe->rot()? -getDrive(driveProbe->getName())->getHalfBacklash():getDrive(driveProbe->getName())->getHalfBacklash())
                                   ,m_VProbe/60);
 		  iOperation=4;
           }
@@ -1346,7 +1346,7 @@ switch(iOperation)
  case 2: if(ModuleAxis->isLatchProbe2())
 		  {
           qDebug()<<"go Back 2";
-          driveProbe->startMovPos(ModuleAxis->getLatchProbe2(driveProbe->axis()->getIndex())*driveProbe->dimension()
+          driveProbe->startMovPos(ModuleAxis->getLatchProbe2(driveProbe->getAxis()->getIndex())*driveProbe->dimension()
                                   +hProbeData.zPos-hProbeData.hTablet
                                   ,0);
 
@@ -1364,7 +1364,7 @@ switch(iOperation)
  case 3: if(ModuleAxis->isLatchProbe3())
 		  {
           qDebug()<<"go Back 3";
-         driveProbe->startMovPos(ModuleAxis->getLatchProbe3(driveProbe->axis()->getIndex())*driveProbe->dimension()
+         driveProbe->startMovPos(ModuleAxis->getLatchProbe3(driveProbe->getAxis()->getIndex())*driveProbe->dimension()
                                  +hProbeData.zPos-hProbeData.hTablet
                                  ,0);
 
@@ -1379,7 +1379,7 @@ switch(iOperation)
 		 break;	
 
  case 4: setAuto(false);
-         setCurPositionSC(driveProbe->nameDrive(),hProbeData.zPos);
+         setCurPositionSC(driveProbe->getName(),hProbeData.zPos);
 	     QTimer::singleShot(10,this,SLOT(setFinished()));
 	     break;
  }
@@ -1480,7 +1480,7 @@ if(ModuleWhell)
 {
  if(nameDrive.isEmpty()
   ||Drive==nullptr
-  ||Drive->nameDrive().isEmpty())
+  ||Drive->getName().isEmpty())
  {
  ModuleWhell->getWhell(0)->setManualIndexAxis(0);
  }
@@ -1493,7 +1493,7 @@ if(ModuleWhell)
    Drive->setVmov(0);
 
    ModuleWhell->getWhell(0)->setManualVmode(vmode);
-   ModuleWhell->getWhell(0)->setManualIndexAxis(Drive->axis()->getIndex()+1);
+   ModuleWhell->getWhell(0)->setManualIndexAxis(Drive->getAxis()->getIndex()+1);
    ModuleWhell->getWhell(0)->setManualIndexX(X1);
   }
 
@@ -1567,7 +1567,7 @@ void WLMillMachine::goDriveFind(QString nameDrive)
 if(!isOn()) {sendMessage(metaObject()->className(),tr("is off!"),0); return;}
 
 WLMillDrive *Drive=static_cast<WLMillDrive*> (getDrive(nameDrive));
-if(Drive->nameDrive().isEmpty())
+if(Drive->getName().isEmpty())
 {
 
 }
@@ -2300,14 +2300,14 @@ foreach(WLMillDrive *mD,millDrives)
 
 foreach(WLMillDrive *mD,millDrives)
 {
-sPos+=ME.startPoint.get(mD->nameDrive())/mD->dimension();
-mPos+=ME.midPoint.get(mD->nameDrive())/mD->dimension();
+sPos+=ME.startPoint.get(mD->getName())/mD->dimension();
+mPos+=ME.midPoint.get(mD->getName())/mD->dimension();
 
-ePos+=ME.endPoint.get(mD->nameDrive())/mD->dimension();
+ePos+=ME.endPoint.get(mD->getName())/mD->dimension();
 
 distPos+=ePos.last()-sPos.last();
 
-cPos+=ME.centerPoint.get(mD->nameDrive())/mD->dimension();
+cPos+=ME.centerPoint.get(mD->getName())/mD->dimension();
 
 indexs+=i;
 i++;
@@ -2322,14 +2322,14 @@ case WLElementTraj::line:
 
                            foreach(WLMillDrive *mD,millDrives)
                             {
-                            dL=(ME.endPoint.get(mD->nameDrive())-ME.startPoint.get(mD->nameDrive()))/mD->dimension();
+                            dL=(ME.endPoint.get(mD->getName())-ME.startPoint.get(mD->getName()))/mD->dimension();
                             dL*=dL;
 
                             dF+=dL;
 
-                            if(mD->nameDrive()=="X"
-                             ||mD->nameDrive()=="Y"
-                             ||mD->nameDrive()=="Z") dFxyz+=dL;
+                            if(mD->getName()=="X"
+                             ||mD->getName()=="Y"
+                             ||mD->getName()=="Z") dFxyz+=dL;
                             }
 
 

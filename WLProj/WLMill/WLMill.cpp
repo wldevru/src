@@ -474,14 +474,14 @@ DockIOPut=new QDockWidget(this);
 DockIOPut->setWindowTitle("In/Out");
 DockIOPut->setObjectName("DIOPut");
 
-IOPutWidget =new WLIOPutWidget();
+IOWidget =new WLIOWidget();
 
-IOPutWidget->setModuleIOPut(MillMachine->m_motDevice->getModuleIOPut());
-IOPutWidget->setModulePWM(MillMachine->m_motDevice->getModulePWM());
+IOWidget->setModuleIOPut(MillMachine->m_motDevice->getModuleIOPut());
+IOWidget->setModulePWM(MillMachine->m_motDevice->getModulePWM());
 
-IOPutWidget->Init();
+IOWidget->Init();
 
-DockIOPut->setWidget(IOPutWidget);
+DockIOPut->setWidget(IOWidget);
 DockIOPut->setFeatures(QDockWidget::DockWidgetFloatable
                       |QDockWidget::DockWidgetMovable
                       |QDockWidget::DockWidgetClosable);

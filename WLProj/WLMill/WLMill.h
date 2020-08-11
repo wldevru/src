@@ -22,7 +22,7 @@
 #include "WLGProgram.h"
 #include "WLLabel.h"
 #include "WLMillMachine.h"
-#include "WLIOPutWidget.h"
+#include "WLIOWidget.h"
 #include "WLFrame.h"
 #include "WLEvScript.h"
 #include "WLMessManager.h"
@@ -107,7 +107,7 @@ class WLMill : public QMainWindow
 	Q_OBJECT
 
 public:
-    WLMill(QWidget *parent = 0);
+    WLMill(QWidget *parent = nullptr);
     ~WLMill();
 
 private:
@@ -227,7 +227,7 @@ WLMessManager *MessManager;
 WLPositionWidget *PositionWidget;
 WLVisualWidget *VisualWidget;
 
-WLIOPutWidget *IOPutWidget;
+WLIOWidget *IOWidget;
 
 QToolButton *TButtonGo;
 QToolButton *TButtonStop;

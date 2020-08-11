@@ -52,7 +52,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="WLEditIOPutWidget" name="editInV" native="true"/>
+       <widget class="WLEditIOWidget" name="editInV" native="true"/>
       </item>
      </layout>
     </widget>
@@ -108,7 +108,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <item row="0" column="0">
-       <widget class="WLEditIOPutWidget" name="editOutENB" native="true"/>
+       <widget class="WLEditIOWidget" name="editOutENB" native="true"/>
       </item>
      </layout>
     </widget>
@@ -130,9 +130,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WLEditIOPutWidget</class>
+   <class>WLEditIOWidget</class>
    <extends>QWidget</extends>
-   <header>WLEditIOPutWidget.h</header>
+   <header>WLEditIOWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

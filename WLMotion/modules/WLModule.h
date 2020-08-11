@@ -59,7 +59,7 @@ public:
     WLModule(QObject *parent=nullptr);
   ~WLModule();
 
-typeModule getType() {return m_type;}
+typeModule type() {return m_type;}
       void setType(typeModule _type) {m_type=_type;}
 
 private:

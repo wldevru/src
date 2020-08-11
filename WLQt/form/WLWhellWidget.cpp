@@ -15,11 +15,11 @@ WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *_ModuleIOPut,QWidget
     ui->cbInAbianry->setChecked(Whell->getFlag()&WHF_inAbinary);
     ui->cbInXbianry->setChecked(Whell->getFlag()&WHF_inXbinary);
 
-    ui->editOutENB->setModuleIOPut(ModuleIOPut,false);
+    ui->editOutENB->setModule(ModuleIOPut,false);
     ui->editOutENB->setLabel("outENB");
     ui->editOutENB->setValue(Whell->getOutENB());
 
-    ui->editInV->setModuleIOPut(ModuleIOPut);
+    ui->editInV->setModule(ModuleIOPut);
     ui->editInV->setLabel("inV");
     ui->editInV->setValue(Whell->getInVmode());
 
@@ -33,7 +33,7 @@ WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *_ModuleIOPut,QWidget
     ui->gbInX->setTitle(ui->gbInX->title()+" (X1,X..)");
     ui->gbInV->setTitle(ui->gbInV->title()+" (Vmode)");
 
-    setWindowTitle(windowTitle()+" : "+QString::number(Whell->getIndex()));
+    setWindowTitle(tr("Edit Whell: ") +QString::number(Whell->getIndex()));
 }
 
 WLWhellWidget::~WLWhellWidget()
@@ -71,15 +71,15 @@ Whell->setFlag((ui->cbInAbianry->isChecked() ? WHF_inAbinary:0)
 
 void WLWhellWidget::createInputs()
 {
-WLEditIOPutWidget *EIW;
+WLEditIOWidget *EIW;
 
 quint8 *iInA=Whell->getIndexInAxis();
 quint8 *iInX=Whell->getIndexInX();
 
 for(int i=0;i<sizeInAxis;i++)
   {
-  EIW= new WLEditIOPutWidget(this);
-  EIW->setModuleIOPut(ModuleIOPut);
+  EIW= new WLEditIOWidget(this);
+  EIW->setModule(ModuleIOPut);
   EIW->setLabel("in"+QString::number(i));
   EIW->setValue(iInA[i]);
   ListEIWAxis+=EIW;
@@ -90,8 +90,8 @@ for(int i=0;i<sizeInAxis;i++)
 
 for(int i=0;i<sizeInX;i++)
   {
-  EIW= new WLEditIOPutWidget(this);
-  EIW->setModuleIOPut(ModuleIOPut);
+  EIW= new WLEditIOWidget(this);
+  EIW->setModule(ModuleIOPut);
   EIW->setLabel("in"+QString::number(i));;
   EIW->setValue(iInX[i]);
    ListEIWX+=EIW;

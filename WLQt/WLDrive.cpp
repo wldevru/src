@@ -5,7 +5,7 @@ QList<WLDrive*> WLDrive::driveList;
 
 WLDrive::WLDrive(QString _nameDrive)
 {
-m_nameDrive = _nameDrive;
+m_name = _nameDrive;
 
 setModuleAxis(nullptr);
 
@@ -48,7 +48,7 @@ int WLDrive::setPosition(double pos)
 QMutexLocker locker1(&MutexDrivePosition);
 
 if(isMotion())
-     {sendMessage(Name(),tr("error setting axis position"),-34);return -1;}
+     {sendMessage(getFullName(),tr("error setting axis position"),-34);return -1;}
 
 long lastPosStep=m_nowPosition.step;
 
@@ -62,7 +62,7 @@ setTruPosition(false);
 
 if((long) m_nowPosition.step!=lastPosStep)
 {
-if(axis()->setPos(m_nowPosition.step))   Flag.set(fl_setpos,true);
+if(getAxis()->setPos(m_nowPosition.step))   Flag.set(fl_setpos,true);
 
 return 1;
 }
@@ -76,9 +76,9 @@ const double lastPosition=position();
 
 if(dim.set(_type,A,B))
 {
-if(axis())
+if(getAxis())
  {
- axis()->setMinMaxPos(minPosition()/dim.value
+ getAxis()->setMinMaxPos(minPosition()/dim.value
                         ,maxPosition()/dim.value);
 
  setPosition(lastPosition);
@@ -91,7 +91,7 @@ return false;
 
 bool WLDrive::setPad(dataPad pad,typeMParAxis type)
 {
-return axis()->setParMov(pad.Aac/dim.value
+return getAxis()->setParMov(pad.Aac/dim.value
                         ,pad.Ade/dim.value
                         ,pad.Vst/dim.value
                         ,pad.Vma/dim.value,type);
@@ -124,7 +124,7 @@ QMutexLocker locker(&MutexDrivePosition);
 
 int WLDrive::startMotion(float _Vmov)
 {
-qDebug()<<"startMotionDrive"<<nameDrive()
+qDebug()<<"startMotionDrive"<<getName()
                            <<minPosition()
                            <<maxPosition()
                            <<position()<<">>"
@@ -136,23 +136,23 @@ QMutexLocker locker1(&MutexDrivePosition);
 
 if(!Flag.get(fl_activ)
   ||isMotion()
-  ||!axis()) {return -1;}
+  ||!getAxis()) {return -1;}
 
 Flag.set(fl_latch2
 	    |fl_latch3,0);
 
-if(isAlarm()) {sendMessage(Name(),tr("drive controller has an error."),-31);return -31;}
+if(isAlarm()) {sendMessage(getFullName(),tr("drive controller has an error."),-31);return -31;}
 
 if(_Vmov>=0.0f)   m_Vmov= _Vmov;
 
 if(!isDone())
  {
- if(waitForStartMotion()<0) {sendMessage(Name(),tr("error when preparing for movement"),-32);return -1;}
+ if(waitForStartMotion()<0) {sendMessage(getFullName(),tr("error when preparing for movement"),-32);return -1;}
  //if(!Flag.get(fl_enmov))    {sendMessage(Name(),tr("no permission for movement"),-15);return -1;}
 
  m_startPosition=position();
 
- if(axis()->movPos(MASK_abs,nextPositionDrive().step,m_Vmov/dim.value))
+ if(getAxis()->movPos(MASK_abs,nextPositionDrive().step,m_Vmov/dim.value))
    { 
    qDebug()<<"+"<<positionDrive().step<<">>"<<nextPositionDrive().step;
    m_nowPosition.offset=m_nextPosition.offset;
@@ -164,7 +164,7 @@ if(!isDone())
 else
  if(isInfinity())
  {
- if(axis()->movVel(Flag.get(fl_rot) ? MASK_dir:0,m_Vmov/dim.value))
+ if(getAxis()->movVel(Flag.get(fl_rot) ? MASK_dir:0,m_Vmov/dim.value))
    {
    setMotion();
    waitAfterStartMotion();
@@ -173,7 +173,7 @@ else
  else
  {
 
- qDebug()<<"Error Drive start noActiv"<<m_nameDrive;
+ qDebug()<<"Error Drive start noActiv"<<m_name;
  emit finished();
  }
 
@@ -204,10 +204,10 @@ updatePosition();
 
 m_nextPosition=m_nowPosition;
 
-if(axis())
+if(getAxis())
   {
-  axis()->reset();
-  axis()->setKF(1.0);
+  getAxis()->reset();
+  getAxis()->setKF(1.0);
   }
 }
 
@@ -221,7 +221,7 @@ int WLDrive::Mot(double pos)
 {
 if(isMotion())
  { 
- emit sendMessage(Name(),tr("unfinished previous move"),-1);
+ emit sendMessage(getFullName(),tr("unfinished previous move"),-1);
  return -1;
  }
 
@@ -229,7 +229,7 @@ if(isTruPosition()
  &&(pos<minPosition()||maxPosition()<pos)
  &&!isInfinity())
  {
- emit sendMessage(Name(),tr("task out limit axis"),-1);
+ emit sendMessage(getFullName(),tr("task out limit axis"),-1);
  return -1;
  }
 
@@ -262,13 +262,13 @@ int WLDrive::Vel(bool dir)
 {
 if(isMotion())
  {
- emit sendMessage(Name(),tr("unfinished previous move"),-1);
+ emit sendMessage(getFullName(),tr("unfinished previous move"),-1);
  return -1;
  }
 
 if(!isInfinity())
  {
- emit sendMessage(Name(),tr("err vellocity mode axis"),-1);
+ emit sendMessage(getFullName(),tr("err vellocity mode axis"),-1);
  return -1;
  }
 
@@ -312,14 +312,14 @@ if(minPos<maxPos)
 m_minPosition=minPos;
 m_maxPosition=maxPos;
 
-if(axis())
+if(getAxis())
  {
  WLDrivePosition minDPos,maxDPos;
 
  minDPos.set(m_minPosition,dim);
  maxDPos.set(m_maxPosition,dim);
 
- axis()->setMinMaxPos(minDPos.step,maxDPos.step);
+ getAxis()->setMinMaxPos(minDPos.step,maxDPos.step);
 
  emit changedMaxPosition(maxPos);
  emit changedMinPosition(minPos);
@@ -337,13 +337,13 @@ int WLDrive::setHomePosition(double pos)
 {
     m_homePosition=pos;
 
-    if(axis())
+    if(getAxis())
     {
  WLDrivePosition homeDPos;
 
  homeDPos.set(m_homePosition,dim);
 
- axis()->setHomePos(homeDPos.step);
+ getAxis()->setHomePos(homeDPos.step);
  }
 
 return 1;
@@ -379,12 +379,12 @@ if(isDone())
   {
   Flag.set(fl_activ
 	      |fl_interp,0);
-  qDebug()<<"Finshed drive"<<nameDrive()<<m_nowPosition.step;
+  qDebug()<<"Finshed drive"<<getName()<<m_nowPosition.step;
   emit finished();
   }
 else
   {
-  qDebug()<<"Paused drive"<<nameDrive()<<m_nowPosition.step<<m_nextPosition.step;
+  qDebug()<<"Paused drive"<<getName()<<m_nowPosition.step<<m_nextPosition.step;
   emit paused();
   }
 }
@@ -393,7 +393,7 @@ else
 
 void WLDrive::startMovManual(bool _rot,double dist)
 {
-qDebug()<<"Start Manual"<<nameDrive()<<_rot;
+qDebug()<<"Start Manual"<<getName()<<_rot;
 
 if(isMotion()) 
    {
@@ -451,14 +451,14 @@ startMotion();
 
 void WLDrive::resetAlarm()
 {
-axis()->getOutput(AXIS_outRALM)->setOutPulse(1,100);
+getAxis()->getOutput(AXIS_outRALM)->setOutPulse(1,100);
 }
 
 void WLDrive::updateInALM()
 {
-if(axis()->getInput(AXIS_inALM)->getNow())
+if(getAxis()->getInput(AXIS_inALM)->getNow())
  {
- sendMessage(Name(),tr("controller error (inALM)"),33);
+ sendMessage(getFullName(),tr("controller error (inALM)"),33);
  setTruPosition(false);
  }
 }
@@ -492,7 +492,7 @@ const double lastPosition=position();
 
 if(dim.setKGear(k))
 {
-if(axis())
+if(getAxis())
  {
  m_Axis->setKGear(k);
 
@@ -516,10 +516,26 @@ interPad=pad()->getData();
 }
 
 
-void WLDrive::addInResolutionMov(WLIOPut *_setInEnableMov,bool state)
+void WLDrive::addInResolutionMov(WLIOPut *_inEnableMov,bool state)
 {
-resolutMovIOData+=WLIOData(_setInEnableMov,state);
-connect(_setInEnableMov,SIGNAL(changed(bool)),SLOT(updateInResolutionMov()),Qt::QueuedConnection);
+resolutMovIOData+=WLIOData(_inEnableMov,state);
+
+connect(_inEnableMov,SIGNAL(changed(bool)),SLOT(updateInResolutionMov()),Qt::QueuedConnection);
+}
+
+void WLDrive::removeInResolutionMov(WLIOPut *_inEnableMov)
+{
+for(int i=0;i<resolutMovIOData.size();i++)
+{
+WLIOData data=resolutMovIOData.at(i);
+
+if(data.IOput==_inEnableMov)
+  {
+  resolutMovIOData.removeAt(i);
+  disconnect(_inEnableMov,SIGNAL(changed(bool)),this,SLOT(updateInResolutionMov()));
+  break;
+  }
+}
 }
 
 double WLDrive::calcRotaryInfEndPosition(double startPos, double endPos)
@@ -548,7 +564,10 @@ for(int i=0;i<resolutMovIOData.size();i++)
  if(isMotion())  
    {
    startStop();
-   sendMessage(Name(),tr("lost permission to move"),-15);  
+   sendMessage(getFullName(),tr("wrong resolution:")
+              +(resolutMovIOData[i].IOput->isInput() ? "input:":"output:")
+              +QString::number(resolutMovIOData[i].IOput->getIndex())
+              +" ("+resolutMovIOData[i].IOput->getComment()+")",-15);
    }
  return;
  }
@@ -556,7 +575,7 @@ for(int i=0;i<resolutMovIOData.size();i++)
 
 void WLDrive::writeXMLData(QXmlStreamWriter &stream)
 {
-stream.writeAttribute("name",         nameDrive());
+stream.writeAttribute("name",         getName());
 stream.writeAttribute("indexMAxis",   QString::number(indexMAxis()));
 
 stream.writeAttribute("type", QString::number(typeDrive()));
@@ -592,7 +611,7 @@ stream.writeAttribute("Pad",     m_Pad.toString());
 void WLDrive::readXMLData(QXmlStreamReader &stream)
 {
 if(!stream.attributes().value("name").isEmpty())
-  setNameDrive(stream.attributes().value("name").toString());
+  setName(stream.attributes().value("name").toString());
 
 setIndexModuleAxis(stream.attributes().value("indexMAxis").toString().toInt());
 
@@ -725,7 +744,7 @@ return true;
 
 void WLDrive::toStartAccel()
 {
-axis()->acc();
+getAxis()->acc();
 }
 
 void WLDrive::setKSpeed(float k)
@@ -758,17 +777,17 @@ if((0.0f<per)&&(per<=100.0f))
 
 void WLDrive::toSetKSpeed(float k)
 {
-    axis()->setKF(k);
+    getAxis()->setKF(k);
 }
 
 void WLDrive::toStartDecel()   
 {
-    axis()->dec();
+    getAxis()->dec();
 }
 
 void WLDrive::toStartStop()   
 {
-  axis()->sdStop();
+  getAxis()->sdStop();
 }
 
  void WLDrive::startAccel()   
@@ -827,7 +846,7 @@ else
 void WLDrive::toStartEMGStop()    
 {
 resetAuto(); 
-axis()->emgStop();
+getAxis()->emgStop();
 }
 
 void WLDrive::updateInputs()
@@ -852,7 +871,7 @@ WLDrive *ret=nullptr;
 name=name.toLower();
 
 for(int i=0;i<driveList.size();i++)
- if(driveList[i]->nameDrive().toLower()==name)
+ if(driveList[i]->getName().toLower()==name)
   {
   ret=driveList[i];
   break;
@@ -877,15 +896,15 @@ bool WLDrive::Init()
 {
 if(m_Axis)
 {
-connect(axis(),&WLAxis::changedLatch2,this,&WLDrive::setLatch2);
-connect(axis(),&WLAxis::changedLatch3,this,&WLDrive::setLatch3);
-connect(axis(),&WLAxis::changedError,this,&WLDrive::setError);
+connect(getAxis(),&WLAxis::changedLatch2,this,&WLDrive::setLatch2);
+connect(getAxis(),&WLAxis::changedLatch3,this,&WLDrive::setLatch3);
+connect(getAxis(),&WLAxis::changedError,this,&WLDrive::setError);
 
-connect(axis(),&WLAxis::changedPosition,this,&WLDrive::updatePos,Qt::DirectConnection);
+connect(getAxis(),&WLAxis::changedPosition,this,&WLDrive::updatePos,Qt::DirectConnection);
 
-connect(axis(),&WLAxis::finished,this,&WLDrive::setFinished,Qt::QueuedConnection);
+connect(getAxis(),&WLAxis::finished,this,&WLDrive::setFinished,Qt::QueuedConnection);
 
-connect(axis(),&WLAxis::changedFreq,this,&WLDrive::updateFreq);
+connect(getAxis(),&WLAxis::changedFreq,this,&WLDrive::updateFreq);
 
 setEnable(true);
 setTruPosition(false);
@@ -973,7 +992,7 @@ WLDrivePosition drivePos;
 
 drivePos.set(pos,dim);
 
-axis()->addSyhData(drivePos.step);
+getAxis()->addSyhData(drivePos.step);
 }
 
 
@@ -989,7 +1008,7 @@ if(setAuto())
    return 1;
    }
   else
-	sendMessage(Name(),tr("movement setup error"),-10);
+    sendMessage(getFullName(),tr("movement setup error"),-10);
 
 return 0;
 }; 
@@ -1006,7 +1025,7 @@ if(setAuto())
    return 1;
    }
    else
-   sendMessage(Name(),tr("movement setup error"),-10);
+   sendMessage(getFullName(),tr("movement setup error"),-10);
 
 return 1;
 }; 
@@ -1027,13 +1046,13 @@ if(isAuto()&&autoTypeDrive!=autoNo)
  case onlyORG:   //if(!isMotion())
 	             switch(autoOperation)
                    {
-                    case 0: if(axis()->getInput(AXIS_inORG)->getNow())
+                    case 0: if(getAxis()->getInput(AXIS_inORG)->getNow())
     					    {
 							setTruPosition(false);
 
     						autoOperation=1;
-                            axis()->setLatchSrc(axis()->getInput(AXIS_inORG)->getIndex());
-                            axis()->setActIn(AXIS_inORG,AXIS_actSdStop);
+                            getAxis()->setLatchSrc(getAxis()->getInput(AXIS_inORG)->getIndex());
+                            getAxis()->setActIn(AXIS_inORG,AXIS_actSdStop);
 
                             setMainPad();
                             setVmov();
@@ -1048,7 +1067,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					    {
 							qDebug()<<"wrong starting position";
     						reset();							
-      	            		emit sendMessage(Name(),tr("wrong starting position")+"(inORG=1)",-8);
+                            emit sendMessage(getFullName(),tr("wrong starting position")+"(inORG=1)",-8);
     					    }
     						break;
     
@@ -1056,7 +1075,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
                            {
                            if(isLatch2()||isLatch3())
     						{
-                            axis()->setLatchSrc(axis()->getInput(AXIS_inORG)->getIndex());
+                            getAxis()->setLatchSrc(getAxis()->getInput(AXIS_inORG)->getIndex());
 				
     						setMov(getORGSize()*3);
 
@@ -1066,7 +1085,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					   else
     						{
                             reset();
-      	            		emit sendMessage(Name(),tr("no sensor signal")+"(inORG)",-212);
+                            emit sendMessage(getFullName(),tr("no sensor signal")+"(inORG)",-212);
                             }
                            }
       	            	   break; 
@@ -1085,7 +1104,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
                              else
                               {
                               reset();
-                              emit sendMessage(Name(),tr("no sensor signal")+"(inORG)",-212);
+                              emit sendMessage(getFullName(),tr("no sensor signal")+"(inORG)",-212);
                               }
 							 break;
 
@@ -1096,7 +1115,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
                              m_posCount+=getLatch2Pos();
                              m_posCount+=getLatch3Pos();
 
-                             axis()->setLatchSrc(axis()->getInput(AXIS_inORG)->getIndex());
+                             getAxis()->setLatchSrc(getAxis()->getInput(AXIS_inORG)->getIndex());
     						 
     						 setMov(getORGSize()*-3);
                              startMotion(m_feedVFind);
@@ -1105,7 +1124,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					   else
 				  		     {
     						 reset();
-      	            		 emit sendMessage(Name(),tr("no sensor signal")+"(inORG)",-213);
+                             emit sendMessage(getFullName(),tr("no sensor signal")+"(inORG)",-213);
     						 }
                            }
       	            	   break; 
@@ -1121,7 +1140,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
                              else
                               {
                               reset();
-                              emit sendMessage(Name(),tr("no sensor signal")+"(inORG)",-212);
+                              emit sendMessage(getFullName(),tr("no sensor signal")+"(inORG)",-212);
                               }
 							 break;
 
@@ -1157,7 +1176,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					   else
     						  {			
 							  reset();
-      	            		  emit sendMessage(Name(),tr("no sensor signal")+"(inORG)",-214);    						  
+                              emit sendMessage(getFullName(),tr("no sensor signal")+"(inORG)",-214);
       	            	      }
 						   }
       	              	   break;
@@ -1168,12 +1187,12 @@ if(isAuto()&&autoTypeDrive!=autoNo)
  case onlyPEL:  if(!isMotion())
 	      switch(autoOperation)
                    {
-                    case 0: if(!axis()->getInput(AXIS_inPEL)->getNow())
+                    case 0: if(!getAxis()->getInput(AXIS_inPEL)->getNow())
     					    {
 							setTruPosition(false);
 
     						autoOperation=1;
-                            axis()->setLatchSrc(axis()->getInput(AXIS_inPEL)->getIndex());
+                            getAxis()->setLatchSrc(getAxis()->getInput(AXIS_inPEL)->getIndex());
     
                             setMainPad();
                             setVmov();
@@ -1186,7 +1205,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					   else
     					    {
     						reset();
-                            emit sendMessage(Name(),tr("wrong starting position")+"(inPEL=0)",-8);
+                            emit sendMessage(getFullName(),tr("wrong starting position")+"(inPEL=0)",-8);
     					    }
     						break;
 
@@ -1216,7 +1235,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					     else
     						  {	
 							  reset();
-      	            		  emit sendMessage(Name(),tr("no sensor signal")+"(inPEL)",-214);
+                              emit sendMessage(getFullName(),tr("no sensor signal")+"(inPEL)",-214);
     						  }
       	              	     break;
                     }
@@ -1226,12 +1245,12 @@ if(isAuto()&&autoTypeDrive!=autoNo)
  case onlyMEL:  if(!isMotion())
 	      switch(autoOperation)
                    {
-                    case 0: if(!axis()->getInput(AXIS_inMEL)->getNow())
+                    case 0: if(!getAxis()->getInput(AXIS_inMEL)->getNow())
     					    {
     						autoOperation=1;
 
 							setTruPosition(false);
-                            axis()->setLatchSrc(axis()->getInput(AXIS_inMEL)->getIndex());
+                            getAxis()->setLatchSrc(getAxis()->getInput(AXIS_inMEL)->getIndex());
 							    
                             setMainPad();
                             setVmov();
@@ -1244,11 +1263,11 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					    else
     					    {
     						reset();
-      	            		emit sendMessage(Name(),tr("wrong starting position")+"(inMEL=0)",-8);
+                            emit sendMessage(getFullName(),tr("wrong starting position")+"(inMEL=0)",-8);
     					    }
     						break;
 
-                   case 1:  axis()->setDisableLimit(false);
+                   case 1:  getAxis()->setDisableLimit(false);
 					        //setActIn(AXIS_inMEL,2);					 
                             
 
@@ -1279,7 +1298,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     					     else
     						  {
                               reset();
-      	            		  emit sendMessage(Name(),tr("no sensor signal")+"(inMEL)",-214);
+                              emit sendMessage(getFullName(),tr("no sensor signal")+"(inMEL)",-214);
       	            	      }
       	              	   break;
                     }

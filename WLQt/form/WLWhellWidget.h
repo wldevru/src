@@ -6,7 +6,7 @@
 #include <QSpinBox>
 #include "WLWhell.h"
 #include "WLModuleIOPut.h"
-#include "WLEditIOPutWidget.h"
+#include "WLEditIOWidget.h"
 
 namespace Ui {
 class WLWhellWidget;
@@ -27,8 +27,8 @@ private:
     WLModuleIOPut *ModuleIOPut;
     WLWhell       *Whell;
 
-    QList <WLEditIOPutWidget*> ListEIWAxis;
-    QList <WLEditIOPutWidget*> ListEIWX;
+    QList <WLEditIOWidget*> ListEIWAxis;
+    QList <WLEditIOWidget*> ListEIWX;
 
 private:
 

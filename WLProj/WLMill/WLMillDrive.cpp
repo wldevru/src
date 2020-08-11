@@ -49,7 +49,7 @@ qDebug()<<(pos>(getAxisPosition()+getHalfBacklash()))<<((getAxisPosition()-getHa
 if((pos-0.001f)>(getAxisPosition()+getHalfBacklash())
 	 ||(getAxisPosition()-getHalfBacklash())>(pos+0.001f))	
   {
-  sendMessage(Name(),("error real position"),-1);
+  sendMessage(getName(),("error real position"),-1);
   return 0;
   }
 else
@@ -159,9 +159,9 @@ switch(autoOperation)
                        m_Pad.setSpeed(m_Ftouch/60);
 
 					   if(autoTypeMDrive==autoTouchSD)
-						 axis()->setActIn(AXIS_inORG,AXIS_actSdStop);
+                         getAxis()->setActIn(AXIS_inORG,AXIS_actSdStop);
 					   else
-					     axis()->setActIn(AXIS_inORG,AXIS_actEmgStop);
+                         getAxis()->setActIn(AXIS_inORG,AXIS_actEmgStop);
 
                        setMot(autoOperation==1 ? maxPosition():minPosition());
 
@@ -180,7 +180,7 @@ switch(autoOperation)
 						     {
 							 qDebug()<<"no ch2/ch3";
                              reset();
-  	            		     emit sendMessage(Name(),tr("no sensor signal (inORG)"),-212);
+                             emit sendMessage(getName(),tr("no sensor signal (inORG)"),-212);
 							 }
   	            	   break; 
 			   
@@ -208,7 +208,7 @@ if(setAuto())
 	 autoTypeMDrive=autoTouchEMG;
    }
    else
-    sendMessage(Name(),tr("movement setup error"),-10);
+    sendMessage(getName(),tr("movement setup error"),-10);
 }
 
 

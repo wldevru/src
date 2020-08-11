@@ -18,7 +18,7 @@ WLPamListWidget::WLPamListWidget(WLDrive *_drive,QWidget *parent) :
     connect(ui->tableWidget,SIGNAL(cellDoubleClicked(int,int)),SLOT(edit(int,int)));
 
     updateTable();
-    setWindowTitle(windowTitle()+" : "+m_Drive->nameDrive());
+    setWindowTitle(windowTitle()+" : "+m_Drive->getName());
 }
 
 WLPamListWidget::~WLPamListWidget()

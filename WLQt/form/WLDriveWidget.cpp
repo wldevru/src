@@ -5,7 +5,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 {	
     m_Drive=_Drive;
 
-    WLAxis *Axis=m_Drive->axis();
+    WLAxis *Axis=m_Drive->getAxis();
 
     m_ddim=m_Drive->getDriveDim();
 
@@ -26,10 +26,10 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     ui.sbPLIM->setValue(m_Drive->maxPosition());
     ui.sbMLIM->setValue(m_Drive->minPosition());
 	
-    ui.editInALM->setModuleIOPut(Axis->getModuleIOPut());
-    ui.editInORG->setModuleIOPut(Axis->getModuleIOPut());
-    ui.editInPEL->setModuleIOPut(Axis->getModuleIOPut());
-    ui.editInMEL->setModuleIOPut(Axis->getModuleIOPut());
+    ui.editInALM->setModule(Axis->getModuleIOPut());
+    ui.editInORG->setModule(Axis->getModuleIOPut());
+    ui.editInPEL->setModule(Axis->getModuleIOPut());
+    ui.editInMEL->setModule(Axis->getModuleIOPut());
 
     ui.editInALM->setLabel("inALM");
     ui.editInORG->setLabel("inORG");
@@ -41,8 +41,8 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     ui.editInPEL->setValue(Axis->getInput(AXIS_inPEL)->getIndex());
     ui.editInMEL->setValue(Axis->getInput(AXIS_inMEL)->getIndex());
 
-    ui.editOutRALM->setModuleIOPut(Axis->getModuleIOPut(),false);
-    ui.editOutENB ->setModuleIOPut(Axis->getModuleIOPut(),false);
+    ui.editOutRALM->setModule(Axis->getModuleIOPut(),false);
+    ui.editOutENB ->setModule(Axis->getModuleIOPut(),false);
 
     ui.editOutRALM->setValue(Axis->getOutput(AXIS_outRALM)->getIndex());
     ui.editOutENB ->setValue(Axis->getOutput(AXIS_outENB)->getIndex());
@@ -90,7 +90,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 
     setModal(true);
 
-    setWindowTitle(windowTitle()+" "+m_Drive->Name());
+    setWindowTitle(windowTitle()+" "+m_Drive->getName());
 
     ui.gbInput->setToolTip(
                  tr(
@@ -121,7 +121,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 
      ui.gbDynamic->setToolTip("<img src='/image/scurve.png'/> Book");
 
-     setWindowTitle(windowTitle()+" : "+QString::number(Axis->getIndex()));
+     setWindowTitle(tr("Edit Drive: ")+m_Drive->getName());
 }
 
 WLDriveWidget::~WLDriveWidget()
@@ -273,7 +273,7 @@ case 6:  ui.labelOrgPosition->setText("inMEL "+tr("position"));break;
 
 void WLDriveWidget::saveDataDrive()
 {
-WLAxis *Axis=m_Drive->axis();
+WLAxis *Axis=m_Drive->getAxis();
 
 m_Drive->setKGear(1);
 

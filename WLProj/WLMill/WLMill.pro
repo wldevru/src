@@ -74,13 +74,13 @@ SOURCES += \
     ../../WLQt/WLPad.cpp \
     ../../WLQt/form/WLDeviceWidget.cpp \
     ../../WLQt/form/WLDriveWidget.cpp \
-    ../../WLQt/form/WLEditIOPutWidget.cpp \
+    ../../WLQt/form/WLEditIOWidget.cpp \
     ../../WLQt/form/WLEditText.cpp \
     ../../WLQt/form/WLEnterNum.cpp \
     ../../WLQt/form/WLEnterString.cpp \
     ../../WLQt/form/WLGModelWidget.cpp \
     ../../WLQt/form/WLGProgramWidget.cpp \
-    ../../WLQt/form/WLIOPutWidget.cpp \
+    ../../WLQt/form/WLIOWidget.cpp \
     ../../WLQt/form/WLMessManager.cpp \
     ../../WLQt/form/WLPamListWidget.cpp \
     ../../WLQt/form/WLPamWidget.cpp \
@@ -142,13 +142,13 @@ HEADERS += \
     ../../WLQt/WLOpenGL.h \
     ../../WLQt/WLPad.h \
     ../../WLQt/form/WLDeviceWidget.h \
-    ../../WLQt/form/WLEditIOPutWidget.h \
+    ../../WLQt/form/WLEditIOWidget.h \
     ../../WLQt/form/WLEditText.h \
     ../../WLQt/form/WLEnterNum.h \
     ../../WLQt/form/WLEnterString.h \
     ../../WLQt/form/WLGModelWidgett.h \
     ../../WLQt/form/WLGProgramWidget.h \
-    ../../WLQt/form/WLIOPutWidget.h \
+    ../../WLQt/form/WLIOWidget.h \
     ../../WLQt/form/WLMessManager.h \
     ../../WLQt/form/WLMillDriveWidget.h \
     ../../WLQt/form/WLPamListWidget.h \
@@ -173,7 +173,7 @@ HEADERS += \
 FORMS += \
     ../../WLQt/form/WLDeviceWidget.ui \
     ../../WLQt/form/WLDriveWidget.ui \
-    ../../WLQt/form/WLEditIOPutWidget.ui \
+    ../../WLQt/form/WLEditIOWidget.ui \
     ../../WLQt/form/WLEnterNum.ui \
     ../../WLQt/form/WLEnterString.ui \
     ../../WLQt/form/WLGModelWidget.ui \
@@ -181,7 +181,7 @@ FORMS += \
     ../../WLQt/form/WLMessManager.ui \
     ../../WLQt/form/WLPamWidget.ui \
     ../../WLQt/form/WLEditText.ui \
-    ../../WLQt/form/WLIOPutWidget.ui \
+    ../../WLQt/form/WLIOWidget.ui \
     ../../WLQt/form/WLPamListWidget.ui \
     ../../WLQt/form/WLWhellWidget.ui \
     WLEditMillWidget.ui \
