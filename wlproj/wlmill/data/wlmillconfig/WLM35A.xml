@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<WLDevice>
+    <WLM35A VCP="COM5">
+        <Modules>
+            <WLModuleIOPut>
+                <inputs size="7" inv="3,4,5"/>
+                <outputs size="13" inv="5,6,8,9,10"/>
+            </WLModuleIOPut>
+            <WLModuleAxis size="4" inEMGStop="0" inSDStop="0" inProbe="2" Fmax="150000">
+                <Axis index="0" kSTCurve="0" delaySCurve="0" typePulse="0" outSDinv="1" inORG="0" inPEL="0" actInPEL="0" inMEL="3" actInMEL="2" inALM="0" actInALM="0" outRALM="0" outENB="0"/>
+                <Axis index="1" kSTCurve="0" delaySCurve="0" typePulse="0" outSDinv="0" inORG="0" inPEL="0" actInPEL="0" inMEL="4" actInMEL="1" inALM="0" actInALM="0" outRALM="0" outENB="0"/>
+                <Axis index="2" kSTCurve="0" delaySCurve="0" typePulse="0" outSDinv="0" inORG="0" inPEL="5" actInPEL="1" inMEL="0" actInMEL="0" inALM="0" actInALM="0" outRALM="0" outENB="0"/>
+                <Axis index="3" kSTCurve="0" delaySCurve="0" typePulse="0" outSDinv="0" inORG="0" inPEL="0" actInPEL="0" inMEL="0" actInMEL="0" inALM="0" actInALM="0" outRALM="0" outENB="0"/>
+            </WLModuleAxis>
+            <WLModulePlanner SmoothAngGr="15"/>
+            <WLModulePWM>
+                <outputs size="1">
+                    <PWM index="0" Freq="2222.08" inv="1"/>
+                </outputs>
+            </WLModulePWM>
+            <WLModuleConnect timeoutConnect_ms="5000" timeHeart_ms="0"/>
+        </Modules>
+    </WLM35A>
+</WLDevice>

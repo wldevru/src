@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/">
+        <file alias="data/wlmillconfig/config.xml">../wlmill/data/wlmillconfig/config.xml</file>
+        <file alias="data/wlmillconfig/mmconfig.xml">../wlmill/data/wlmillconfig/mmconfig.xml</file>
+        <file alias="data/wlmillconfig/WLM35A.xml">../wlmill/data/wlmillconfig/WLM35A.xml</file>
+    </qresource>
+</RCC>
