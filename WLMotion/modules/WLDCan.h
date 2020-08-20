@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QStringList>
-#include "WLModule.h"
+#include "wlmodule.h"
 
 #define comDCan_empty 0
 

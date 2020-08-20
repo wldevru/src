@@ -1,4 +1,4 @@
-#include "WLEditText.h"
+#include "wledittext.h"
 
 WLEditText::WLEditText(QWidget *parent)
 	: QDialog(parent)

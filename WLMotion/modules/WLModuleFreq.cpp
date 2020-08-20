@@ -1,4 +1,4 @@
-#include "WLModuleFreq.h"
+#include "wlmodulefreq.h"
 
 WLModuleFreq::WLModuleFreq(QObject *parent)
 	: WLModule(parent)
@@ -24,6 +24,7 @@ if(sizeOutFreq>outFreq.size())
   {
   freq = new WLFreq;
   freq->setIndex(i);
+  freq->setParent(this);
   connect(freq,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
   outFreq+=freq;
   }

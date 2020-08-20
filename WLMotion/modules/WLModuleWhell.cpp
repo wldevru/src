@@ -1,4 +1,4 @@
-#include "WLModuleWhell.h"
+#include "wlmodulewhell.h"
 
 WLModuleWhell::WLModuleWhell(QObject *parent)
 	: WLModule(parent)
@@ -24,6 +24,7 @@ if(sizeWhell>Whell.size())
   {
   whell = new WLWhell;
   whell->setIndex(i);
+  whell->setParent(this);
   connect(whell,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
   Whell+=whell;
   }

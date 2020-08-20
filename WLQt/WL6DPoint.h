@@ -6,8 +6,8 @@
 #include <QVector4D>
 #include <QMatrix4x4>
 
-#include "WL3DPoint.h"
-#include "WLCalc.h"
+#include "wl3dpoint.h"
+#include "wlcalc.h"
 
 #ifndef M_PI
   #define M_PI 3.14159265358979323846

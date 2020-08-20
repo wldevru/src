@@ -1,4 +1,4 @@
-#include "WLFileAccess.h"
+#include "wlfileaccess.h"
 
 WLFileAccess::WLFileAccess(QObject *parent)
 	: QObject(parent)

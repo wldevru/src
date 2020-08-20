@@ -3,11 +3,11 @@
 
 #include <QWidget>
 #include <QFileInfo>
-#include "ui_WLGProgramWidget.h"
+#include "ui_wlgprogramwidget.h"
 
 
-#include "WLGProgram.h"
-#include "WLGCodeSH.h"
+#include "wlgprogram.h"
+#include "wlgcodesh.h"
 
 
 class WLGProgramWidget : public QWidget

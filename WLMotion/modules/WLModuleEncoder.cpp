@@ -1,4 +1,4 @@
-#include "WLModuleEncoder.h"
+#include "wlmoduleencoder.h"
 
 WLModuleEncoder::WLModuleEncoder(QObject *parent)
 	: WLModule(parent)
@@ -24,6 +24,7 @@ if(sizeEncoder>Encoder.size())
   {
   enc = new WLEncoder;
   enc->setIndex(i);
+  enc->setParent(this);
   connect(enc,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
   Encoder+=enc;
   }

@@ -1,4 +1,4 @@
-#include "WLEncoder.h"
+#include "wlencoder.h"
 
 WLEncoder::WLEncoder(QObject *parent)
 	: WLElement(parent)

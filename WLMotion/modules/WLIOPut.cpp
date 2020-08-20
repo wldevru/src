@@ -1,4 +1,4 @@
-#include "WLIOPut.h"
+#include "wlioput.h"
 
 WLIOPut WLIOPut::In0("In_0.-1",0);
 WLIOPut WLIOPut::In1("In_1.-1",1);

@@ -1,4 +1,4 @@
-#include "WLDeviceWidget.h"
+#include "wldevicewidget.h"
 
 
 WLDeviceWidget::WLDeviceWidget(QWidget *parent) :

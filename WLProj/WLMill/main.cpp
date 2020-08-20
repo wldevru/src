@@ -5,8 +5,7 @@
 #include <QDebug>
 #include <QTranslator>
 
-//#include "wlfileaccess.h"
-#include "WLMill.h"
+#include "wlmill.h"
 
 
 int main(int argc, char *argv[])
@@ -25,14 +24,9 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // DPI support
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps); //HiDPI pixmaps
 
-
-    qputenv("QT_SCALE_FACTOR", "5");
-
-  
-   qDebug()<<"Ok update";
     WLMill w;
-    //w.showMaximized();
-	w.show();
+    w.show();
+
 	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
    
 	return a.exec();	

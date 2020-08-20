@@ -5,11 +5,11 @@
 
 #include <QtGui>
 
-#include "WL3DPoint.h"
-#include "WLGCode.h"
-#include "WLGModel.h"
-#include "WLFrame.h"
-#include "WLFlags.h"
+#include "wl3dpoint.h"
+#include "wlgcode.h"
+#include "wlgmodel.h"
+#include "wlframe.h"
+#include "wlflags.h"
 
 struct WLElementTraj 
 {

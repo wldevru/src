@@ -1,4 +1,4 @@
-#include "WLModuleIOPut.h"
+#include "wlmoduleioput.h"
 
 WLModuleIOPut::WLModuleIOPut(QObject *parent)
 	:WLModule(parent)
@@ -36,8 +36,9 @@ WLIOPut *input;
 if(Inputs.size()<sizeInputs)
  for(int i=Inputs.size();i<sizeInputs;i++) 
 	  {
-	  input = new WLIOPut("",true);
+      input = new WLIOPut("",true);
 	  input->setIndex(i);	  
+      input->setParent(this);
 	  connect(input,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
       connect(input,SIGNAL(changed(bool)),SLOT(updateIOPut()));
 	  Inputs+=input;  
@@ -70,7 +71,8 @@ if(Outputs.size()<sizeOutputs)
  for(quint8 i=Outputs.size();i<sizeOutputs;i++)
   {
   output = new WLIOPut;
-  output->setIndex(i);  
+  output->setIndex(i);
+  output->setParent(this);
   Outputs+=output;
   connect(output,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
   connect(output,SIGNAL(changed(bool)),SLOT(updateIOPut()));

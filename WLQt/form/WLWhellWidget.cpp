@@ -1,5 +1,5 @@
-#include "WLWhellWidget.h"
-#include "ui_WLWhellWidget.h"
+#include "wlwhellwidget.h"
+#include "ui_wlwhellwidget.h"
 
 WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *_ModuleIOPut,QWidget *parent) :
     QDialog(parent),

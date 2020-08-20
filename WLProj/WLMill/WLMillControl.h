@@ -2,13 +2,13 @@
 #define WLMILLCONTROL_H
 
 #include <QWidget>
-#include "ui_WLMillControl.h"
+#include "ui_wlmillcontrol.h"
 
-#include "WLMillMachine.h"
-#include "WLGProgram.h"
-#include "WLEditText.h"
-#include "WLEnterNum.h"
-#include "WLMCodeSH.h"
+#include "wlmillmachine.h"
+#include "wlgprogram.h"
+#include "wledittext.h"
+#include "wlenternum.h"
+#include "wlmcodesh.h"
 
 
 class WLMillControl : public QWidget

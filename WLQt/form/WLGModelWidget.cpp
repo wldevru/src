@@ -1,5 +1,5 @@
-#include "WLGModelWidgett.h"
-#include "ui_WLGModelWidget.h"
+#include "wlgmodelwidget.h"
+#include "ui_wlgmodelwidget.h"
 
 WLGModelWidget::WLGModelWidget(QWidget *parent) :
     QWidget(parent),

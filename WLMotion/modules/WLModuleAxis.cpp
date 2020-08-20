@@ -1,4 +1,4 @@
-#include "WLModuleAxis.h"
+#include "wlmoduleaxis.h"
 
 WLModuleAxis::WLModuleAxis(WLModuleIOPut *_ModuleIOPut,QObject *parent)
 	:WLModule(parent)
@@ -39,6 +39,8 @@ if(sizeAxis>Axis.size())
   { 
   axis = new WLAxis;
   axis->init(ModuleIOPut,i);
+  axis->setParent(this);
+
   connect(axis,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
   Axis+=axis;
 

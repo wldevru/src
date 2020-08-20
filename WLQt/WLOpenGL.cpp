@@ -1,4 +1,4 @@
-#include "WLOpenGL.h"
+#include "wlopengl.h"
 
 
 WLOpenGL::WLOpenGL()

@@ -1,12 +1,12 @@
-#include "WLModuleConnect.h"
+#include "wlmoduleconnect.h"
 
 WLModuleConnect::WLModuleConnect(QObject *parent)
 	: WLModule(parent)
 {
 setType(typeMConnect);
 
-timeoutConnect_ms=1000;
-timeHeart_ms=250;
+timeoutConnect_ms=5000;
+timeHeart_ms=0;
 
 conOk=false;
 

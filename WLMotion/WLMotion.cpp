@@ -1,4 +1,4 @@
-#include "WLMotion.h"
+#include "wlmotion.h"
 
 WLMotion::WLMotion()
 {

@@ -5,8 +5,8 @@
 #include <QTimer>
 #include <QMutex>
 #include <QString>
-#include <QSerialPort>
-#include <QSerialPortInfo>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include <QUdpSocket>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
@@ -15,9 +15,9 @@
 #include <QTimer>
 #include <QFile>
 #include <QTextCodec>
-#include "modules/WLModule.h"
-#include "modules/WLModuleConnect.h"
-#include "WLFlags.h"
+#include "modules/wlmodule.h"
+#include "modules/wlmoduleconnect.h"
+#include "wlflags.h"
 
 //WLDevice
 #define comDev_resetAll    1 //reset all
@@ -141,6 +141,8 @@ statusDevice getStatus() {return status;}
 quint32 getVersion() {return m_version;}
 void    setVersion(quint32 _ver) {m_version=_ver; emit changedVersion(m_version);}
 
+void readData(int wait);
+
 protected:
 virtual WLModule *createModule(QString name);
 virtual WLModule *createModule(typeModule type);
@@ -151,8 +153,6 @@ virtual void callProp();
 virtual void reset();
 
 public:
-
-
 
 private slots:	
 void updateModules() {qDebug()<<"update Modules";

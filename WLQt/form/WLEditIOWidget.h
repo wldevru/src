@@ -4,8 +4,8 @@
 #include <QWidget>
 #include <QIcon>
 #include <QMessageBox>
-#include "WLModuleIOPut.h"
-#include "WLModulePWM.h"
+#include "wlmoduleioput.h"
+#include "wlmodulepwm.h"
 
 namespace Ui {
 class WLEditIOWidget;
@@ -39,6 +39,7 @@ private:
     Ui::WLEditIOWidget *ui;
 
     bool m_input;
+    bool m_enLatchInput;
 
 WLModule *m_Module;
 
@@ -47,9 +48,13 @@ private slots:
 
    void togInvers() {if(m_Module->type()==typeMIOPut) getIOPut()->togInv();}
 
+   void onActTogInvers();
+   void onActLatchInput();
+
+   void setLatchInput(int);
    // QWidget interface
 protected:
-   void mouseDoubleClickEvent(QMouseEvent *event);
+   void contextMenuEvent(QContextMenuEvent *event);
 };
 
 #endif // WLEDITIOPUTWIDGETT_H

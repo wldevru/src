@@ -110,8 +110,8 @@ class WLPad: public QObject
 
 private:
 
-dataPad nowPad;
-dataPad nowPadBase;
+dataPad m_nowPad;
+dataPad m_nowPadBase;
 
 QList <dataPad> Data;
 double Vmov;
@@ -133,11 +133,9 @@ bool Save(dataPad pad);
 
 QString getName();
 
-dataPad getData();
-
 QList <dataPad> getPads();
 
-dataPad getData(QString name,bool *ok=nullptr);
+dataPad getData(QString name="",bool *ok=nullptr);
 bool findData(QString name);
 
 QString toString();

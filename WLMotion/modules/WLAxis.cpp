@@ -1,4 +1,4 @@
-#include "WLAxis.h"
+#include "wlaxis.h"
 
 #include <limits>
 
@@ -337,7 +337,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)comAxis_setParMov<<getIndex()<<Aac<<Ade<<Fst<<Fma<<(static_cast<quint8>(type));
 
-qDebug()<<"typeMPar"<<(static_cast<quint8>(type))<<Aac<<Ade<<Fst<<Fma;
+qDebug()<<"typeMPar"<<getIndex()<<(static_cast<quint8>(type))<<Aac<<Ade<<Fst<<Fma;
 
 emit sendCommand(data);
 return true;

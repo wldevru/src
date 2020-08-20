@@ -1,4 +1,4 @@
-#include "WLVisualWidget.h"
+#include "wlvisualwidget.h"
 
 #include <QtGui>
 #include <QMessageBox>

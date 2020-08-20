@@ -6,9 +6,9 @@
 #include <QTimer>
 #include <QDebug>
 #include <qstringlist.h>
-#include "WLModule.h"
-#include "WLIOPut.h"
-#include "WLDCan.h"
+#include "wlmodule.h"
+#include "wlioput.h"
+#include "wldcan.h"
 
 
 

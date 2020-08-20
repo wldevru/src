@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QDebug>
 
-#include "WLModule.h"
+#include "wlmodule.h"
 
 
 //Encoder

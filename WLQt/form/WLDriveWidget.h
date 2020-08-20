@@ -3,10 +3,10 @@
 
 #include <QDialog>
 #include <QMessageBox>
-#include "WLDrive.h"
-#include "WLPamListWidget.h"
+#include "wldrive.h"
+#include "wlpamlistwidget.h"
 
-#include "ui_WLDriveWidget.h"
+#include "ui_wldrivewidget.h"
 
 namespace Ui {
 class WLDriveWidget;

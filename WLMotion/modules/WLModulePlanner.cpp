@@ -1,4 +1,4 @@
-#include "WLModulePlanner.h"
+#include "wlmoduleplanner.h"
 
 WLModulePlanner::WLModulePlanner(QObject *parent)
 	: WLModule(parent)

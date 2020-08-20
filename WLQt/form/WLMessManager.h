@@ -9,7 +9,7 @@
 #include <QDebug>
 #include <QTextStream>
 #include <QTimer>
-#include "ui_WLMessManager.h"
+#include "ui_wlmessmanager.h"
 
 struct errData
 {

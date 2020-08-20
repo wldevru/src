@@ -1,4 +1,5 @@
-#include "WLFW.h"
+#include "wlfw.h"
+
 #include <QSerialPortInfo>
 #include <QDebug>
 #include <QMessageBox>
@@ -86,7 +87,9 @@ if(!List.isEmpty())
 
     if(List.size()>2)
         if(List[0]=="WLM55J"
-         ||List[2]=="WLM55J") ui.pbReboot->setEnabled(enable);
+         ||List[2]=="WLM55J"
+         ||List[0]=="WLM100S"
+         ||List[2]=="WLM100S") ui.pbReboot->setEnabled(enable);
     }
 
  connect(DFW->getModuleFW(),SIGNAL(changedProgress(int)),ui.progressBar,SLOT(setValue(int)));;
@@ -138,7 +141,7 @@ setConnect(!DFW->isOpenConnect());
 
 void WLFW::onPBReboot()
 {
-    DFW->reboot(ui.pbFileDevice->isEnabled() ? 1:0);
+DFW->reboot(ui.pbFileDevice->isEnabled() ? 1:0);
 }
 
 void WLFW::onUpdateDevices()

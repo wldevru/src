@@ -1,4 +1,4 @@
-#include "WLWhell.h"
+#include "wlwhell.h"
 
 WLWhell::WLWhell(QObject *parent)
 	: WLElement(parent)

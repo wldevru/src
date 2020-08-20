@@ -1,4 +1,4 @@
-#include "WLGProgramWidget.h"
+#include "wlgprogramwidget.h"
 #include <QMessageBox>
 
 WLGProgramWidget::WLGProgramWidget(WLGProgram *_Program,QWidget *parent)

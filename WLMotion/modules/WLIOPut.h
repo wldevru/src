@@ -6,8 +6,8 @@
 #include <QTimer>
 #include <QDebug>
 #include <qstringlist.h>
-#include "WLModule.h"
-#include "WLFlags.h"
+#include "wlmodule.h"
+#include "wlflags.h"
 
 #define bit0 1<<0
 #define bit1 1<<1

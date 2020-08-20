@@ -1,4 +1,4 @@
-#include "WLDrive.h"
+#include "wldrive.h"
 #include <math.h>
 
 QList<WLDrive*> WLDrive::driveList;
@@ -35,6 +35,7 @@ driveList+=this;
 
 WLDrive::~WLDrive()
 {
+qDebug()<<"~WLDrive()";
 driveList.removeOne(this);
 /*
 quit();

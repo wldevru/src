@@ -2,9 +2,10 @@
 #define WLPAMLISTWIDGET_H
 
 #include <QDialog>
-#include "WLPamWidget.h"
-#include "WLDrive.h"
+#include "wlpamwidget.h"
+#include "wldrive.h"
 
+#include "ui_wlpamlistwidget.h"
 
 namespace Ui {
 class WLPamListWidget;

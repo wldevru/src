@@ -6,9 +6,9 @@
 #include <QTimer>
 #include <QDebug>
 
-#include "WLModule.h"
-#include "WLEncoder.h"
-#include "WLFlags.h"
+#include "wlmodule.h"
+#include "wlencoder.h"
+#include "wlflags.h"
 
 //Whell
 #define comWhell_setEnable        1 //enable whell

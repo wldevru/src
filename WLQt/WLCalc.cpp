@@ -1,4 +1,4 @@
-#include <WLCalc.h>
+#include <wlcalc.h>
 
 QQuaternion calcQuanternion(QMatrix3x3 M) 
 {

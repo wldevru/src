@@ -1,4 +1,4 @@
-#include "WLLog.h"
+#include "wllog.h"
 
 WLLog::WLLog(QObject *parent)
 	: QObject(parent)

@@ -1,5 +1,5 @@
-#include "WLIOWidget.h"
-#include "WLEnterNum.h"
+#include "wliowidget.h"
+#include "wlenternum.h"
 
 #include <qmessagebox.h>
 WLIOWidget::WLIOWidget(QWidget *parent)

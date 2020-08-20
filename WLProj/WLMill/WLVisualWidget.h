@@ -11,11 +11,11 @@
 #include <QToolButton>
 #include <QQuickWidget>
 
-#include "WLGProgram.h"
-#include "WLMillMachine.h"
-#include "WL3DPoint.h"
-#include "WL6DPoint.h"
-#include "WLOpenGL.h"
+#include "wlgprogram.h"
+#include "wlmillmachine.h"
+#include "wl3dpoint.h"
+#include "wl6dpoint.h"
+#include "wlopengl.h"
 
 #define BUFSIZE 128
 

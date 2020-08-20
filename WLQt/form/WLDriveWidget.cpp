@@ -1,4 +1,4 @@
-#include "WLDriveWidget.h"
+#include "wldrivewidget.h"
 
 WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 	: QDialog(parent)

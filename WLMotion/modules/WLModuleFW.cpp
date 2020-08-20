@@ -1,4 +1,4 @@
-#include "WLModuleFW.h"
+#include "wlmodulefw.h"
 //#include "wldefine.h"
 #include <QDebug>
 #include <QTime>

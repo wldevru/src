@@ -1,4 +1,4 @@
-#include "WL3DPoint.h"
+#include "wl3dpoint.h"
 
 double calcAngleRad(WL3DPoint A,WL3DPoint B)
 {

@@ -5,8 +5,8 @@
 #include <QDialog>
 #include <QList>
 
-#include "WLDevice.h"
-#include "ui_WLDeviceWidget.h"
+#include "wldevice.h"
+#include "ui_wldevicewidget.h"
 
 namespace Ui {
 class WLDeviceWidget;

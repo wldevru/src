@@ -6,8 +6,8 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStringList>
-#include "WLModule.h"
-#include "WLEncoder.h"
+#include "wlmodule.h"
+#include "wlencoder.h"
 
 //Encoder
 #define comEnc_setASendData   1 //set autosend data

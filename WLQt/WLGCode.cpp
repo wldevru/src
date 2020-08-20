@@ -1,8 +1,8 @@
 #include <QFile>
 #include <QTextStream>
-#include "WL3DPoint.h"
+#include "wl3dpoint.h"
 
-#include "WLGCode.h"
+#include "wlgcode.h"
 
 WLGCode::WLGCode()
 {

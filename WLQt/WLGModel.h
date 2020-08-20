@@ -8,9 +8,9 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
-#include "WL3DPoint.h"
-#include "WLFrame.h"
-#include "WLGCode.h"
+#include "wl3dpoint.h"
+#include "wlframe.h"
+#include "wlgcode.h"
 
 
 struct SAxisGModel  //linear mov x, rotary rot a

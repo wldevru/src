@@ -7,8 +7,7 @@
 #include <QDir>
 #include <QFileDialog>
 
-#include "WLDevFW.h"
-
+#include "wldevfw.h"
 
 class WLFW : public QWidget
 {

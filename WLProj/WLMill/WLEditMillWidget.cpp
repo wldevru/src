@@ -1,4 +1,4 @@
-#include "WLEditMillWidget.h"
+#include "wleditmillwidget.h"
 
 WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 	: QDialog(parent)

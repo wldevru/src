@@ -5,13 +5,13 @@
 #include <QMutex>
 #include <QString>
 #include <QStringList>
-#include <QSerialPort>
+#include <QtSerialPort/QSerialPort>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QDebug>
 #include <QThread>
 #include <QTimer>
-#include "modules/WLModule.h"
+#include "modules/wlmodule.h"
 
 #define _startReadFW   1
 #define _readFW        2

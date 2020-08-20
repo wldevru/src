@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QDebug>
 
-#include "WLModule.h"
+#include "wlmodule.h"
 
 #define comPWM_setOut        1 //set percent outPWM
 #define comPWM_setEnableOut  2 //enable outPWM

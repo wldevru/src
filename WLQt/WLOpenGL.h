@@ -12,8 +12,8 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 
-#include "WLFrame.h"
-#include "WLCalc.h"
+#include "wlframe.h"
+#include "wlcalc.h"
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D

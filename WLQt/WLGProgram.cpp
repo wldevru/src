@@ -1,4 +1,4 @@
-#include "WLGProgram.h"
+#include "wlgprogram.h"
 #include <math.h>
 #include <QTextStream>
 #include <QRegExp>
@@ -337,20 +337,20 @@ if(index<10) qDebug()<<"getTextElement"<<index<<ret;
 return ret;
 }
 
-QList <WLElementTraj> WLGProgram::buildListTraj(WLGCode GCode)
+QList <WLElementTraj> WLGProgram::buildListTraj(WLGCodeData GData)
 {	
 QMutexLocker locker(&MutexBuild);
 QList <WLElementTraj> ListTraj;
 QList <WLElementTraj> curListTraj;
-
+WLGCode GCode;
 QString com,str1;
 
 bool ok;
 WLFrame Fr;
 
-
 int i;
 
+GCode.setData(GData);
 
 emit ChangedTrajSize(0);
 

@@ -1,4 +1,4 @@
-#include "WLModuleDCan.h"
+#include "wlmoduledcan.h"
 
 WLModuleDCan::WLModuleDCan(QObject *parent)
 	: WLModule(parent)
@@ -24,6 +24,7 @@ if(sizeDCan>DCan.size())
   {
   dcan = new WLDCan;
   dcan->setIndex(i);
+  dcan->setParent(this);
   connect(dcan,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
   DCan+=dcan;
   }

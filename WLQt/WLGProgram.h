@@ -9,9 +9,9 @@
 #include <QFile>
 #include <QMutex>
 
-#include "WLGCode.h"
-#include "WLGModel.h"
-#include "WLElementTraj.h"
+#include "wlgcode.h"
+#include "wlgmodel.h"
+#include "wlelementtraj.h"
 
 #define DEF_maxShowPoints 1000000
 
@@ -124,7 +124,7 @@ void saveFile(QString file);
 
     void setShowGCode(WLGCode *GCode) {m_showGCode=GCode;}
 
-   QList <WLElementTraj> buildListTraj(WLGCode GCode);
+   QList <WLElementTraj> buildListTraj(WLGCodeData GData);
                    
   // void rebuildTraj() {build=0;QTimer::singleShot(0,this,SLOT(buildTraj()));};
 

@@ -5,10 +5,10 @@
 #include <QScriptEngine> 
 #include <QTimer> 
 #include <QDebug> 
-#include "WLDelay.h"
-#include "WLFileAccess.h"
-#include "WLDialog.h"
-#include "WLDialogObj.h"
+#include "wldelayscript.h"
+#include "wlfileaccess.h"
+#include "wldialogscript.h"
+#include "wldialogobscript.h"
 
 
 class WLEVScript : public QThread

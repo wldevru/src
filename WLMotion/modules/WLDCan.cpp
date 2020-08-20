@@ -1,4 +1,4 @@
-#include "WLDCan.h"
+#include "wldcan.h"
 
 WLDCan::WLDCan(QObject *parent)
 	: WLElement(parent)

@@ -1,4 +1,4 @@
-#include "WLLabel.h"
+#include "wllabel.h"
 
 WLLabel::WLLabel(QWidget *parent)
 	: QLabel(parent)

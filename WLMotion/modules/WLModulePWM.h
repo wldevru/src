@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QDebug>
 #include <QStringList>
-#include "WLDCan.h"
-#include "WLModule.h"
-#include "WLPWM.h"
+#include "wldcan.h"
+#include "wlmodule.h"
+#include "wlpwm.h"
 
 
 class WLModulePWM : public WLModule

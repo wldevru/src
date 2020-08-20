@@ -6,8 +6,8 @@
 #include <QTimer>
 #include <QDebug>
 #include <qstringlist.h>
-#include "WLModule.h"
-#include "WLFlags.h"
+#include "wlmodule.h"
+#include "wlflags.h"
 
 
 #define comAIOPut_setHist    4

@@ -11,8 +11,8 @@
 #include <QDebug>
 #include <QThread>
 #include <QTimer>
-#include "WLMotion.h"
-#include "modules/WLModuleFW.h"
+#include "wlmotion.h"
+#include "modules/wlmodulefw.h"
 
 //#define PAGESIZE 2048
 

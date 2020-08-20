@@ -11,9 +11,9 @@
 #include <QXmlStreamReader>
 #include <qmath.h>
 
-#include "WLModuleAxis.h"
-#include "WLPad.h"
-#include "WLFlags.h"
+#include "wlmoduleaxis.h"
+#include "wlpad.h"
+#include "wlflags.h"
 
 #define err_noerr  1 
 #define err_nomov  0
@@ -378,7 +378,7 @@ inline bool setDriveDim(WLDriveDim dd)     {return setDimension(dd.type,dd.A,dd.
 bool setDimension(WLDriveDim::typeDim _type,double A, double B=1);
 
 bool setPad(dataPad pad,typeMParAxis m_type=typeMParAxis::AXIS_MParAll);
-bool setCurPad() {return setPad(pad()->getData());}
+bool setCurPad() {qDebug()<<pad()->getData().name; return setPad(pad()->getData());}
 
 public:
 virtual bool setReady() {return true;}

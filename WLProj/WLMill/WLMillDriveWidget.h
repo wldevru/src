@@ -2,8 +2,8 @@
 #define WLMILLDRIVEDIALOG_H
 
 #include <QDialog>
-#include "WLMillDrive.h"
-#include "ui_WLMillDriveWidget.h"
+#include "wlmilldrive.h"
+#include "ui_wlmilldrivewidget.h"
 
 namespace Ui {
 class WLMillDriveWidget;

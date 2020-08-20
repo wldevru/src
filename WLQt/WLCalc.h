@@ -7,7 +7,7 @@
 #include <QMatrix4x4>
 #include <QtMath>
 
-#include "WL3DPoint.h"
+#include "wl3dpoint.h"
 
 QQuaternion calcQuanternion(QMatrix4x4 M);
 QQuaternion MatrixToQuaternion(QMatrix4x4 M);

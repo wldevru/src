@@ -1,4 +1,4 @@
-#include "WLPositionWidget.h"
+#include "wlpositionwidget.h"
 
 WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Program,QWidget *parent)
 	: QWidget(parent)

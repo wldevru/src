@@ -3,9 +3,9 @@
 # ------------------------------------------------------
 
 TEMPLATE = app
-TARGET = WLMill
+TARGET = wlmill
 
-
+QMAKE_LFLAGS = -no-pie
 #DEFINES += QT_NO_DEBUG_OUTPUT\
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
@@ -26,169 +26,170 @@ CONFIG += c++11
 #LIBS += -lOpengl32 -lglu32 -lcomdlg32
 
 INCLUDEPATH +=\
-           ../../WLMotion\
-           ../../WLMotion/modules\
-           ../../WLQt\
-           ../../WLQt/form
+           ../../wlmotion\
+           ../../wlmotion/modules\
+           ../../wlqt\
+           ../../wlqt/form
 
-TRANSLATIONS += WLMill_ru.ts
+TRANSLATIONS += wlmill_ru.ts
 
 SOURCES += \
-    ../../WLMotion/WLDevice.cpp \
-    ../../WLMotion/WLMotion.cpp \
-    ../../WLMotion/modules/WLAIOPut.cpp \
-    ../../WLMotion/modules/WLAxis.cpp \
-    ../../WLMotion/modules/WLDCan.cpp \
-    ../../WLMotion/modules/WLElement.cpp \
-    ../../WLMotion/modules/WLEncoder.cpp \
-    ../../WLMotion/modules/WLFreq.cpp \
-    ../../WLMotion/modules/WLIOPut.cpp \
-    ../../WLMotion/modules/WLModule.cpp \
-    ../../WLMotion/modules/WLModuleAIOPut.cpp \
-    ../../WLMotion/modules/WLModuleAxis.cpp \
-    ../../WLMotion/modules/WLModuleConnect.cpp \
-    ../../WLMotion/modules/WLModuleDCan.cpp \
-    ../../WLMotion/modules/WLModuleEncoder.cpp \
-    ../../WLMotion/modules/WLModuleFW.cpp \
-    ../../WLMotion/modules/WLModuleFreq.cpp \
-    ../../WLMotion/modules/WLModulePWM.cpp \
-    ../../WLMotion/modules/WLModulePlanner.cpp \
-    ../../WLMotion/modules/WLModuleWhell.cpp \
-    ../../WLMotion/modules/WLModuleIOPut.cpp \
-    ../../WLMotion/modules/WLPWM.cpp \
-    ../../WLMotion/modules/WLWhell.cpp \
-    ../../WLQt/WL3DPoint.cpp \
-    ../../WLQt/WLCalc.cpp \
-    ../../WLQt/WLDrive.cpp \
-    ../../WLQt/WLElementTraj.cpp \
-    ../../WLQt/WLFileAccess.cpp \
-    ../../WLQt/WLFlags.cpp \
-    ../../WLQt/WLGCode.cpp \
-    ../../WLQt/WLGCodeSH.cpp \
-    ../../WLQt/WLGModel.cpp \
-    ../../WLQt/WLGProgram.cpp \
-    ../../WLQt/WLLabel.cpp \
-    ../../WLQt/WLLog.cpp \
-    ../../WLQt/WLMCodeSH.cpp \
-    ../../WLQt/WLOpenGL.cpp \
-    ../../WLQt/WLPad.cpp \
-    ../../WLQt/form/WLDeviceWidget.cpp \
-    ../../WLQt/form/WLDriveWidget.cpp \
-    ../../WLQt/form/WLEditIOWidget.cpp \
-    ../../WLQt/form/WLEditText.cpp \
-    ../../WLQt/form/WLEnterNum.cpp \
-    ../../WLQt/form/WLEnterString.cpp \
-    ../../WLQt/form/WLGModelWidget.cpp \
-    ../../WLQt/form/WLGProgramWidget.cpp \
-    ../../WLQt/form/WLIOWidget.cpp \
-    ../../WLQt/form/WLMessManager.cpp \
-    ../../WLQt/form/WLPamListWidget.cpp \
-    ../../WLQt/form/WLPamWidget.cpp \
-    ../../WLQt/form/WLWhellWidget.cpp \
-    WLDelay.cpp \
-    WLDialog.cpp \
-    WLDialogObj.cpp \
-    WLEditMillWidget.cpp \
-    WLEditPoint.cpp \
-    WLEvScript.cpp \
-    WLMill.cpp \
-    WLMillControl.cpp \
-    WLMillDrive.cpp \
-    WLMillDriveWidget.cpp \
-    WLMillMachine.cpp \
-    WLPositionWidget.cpp \
-    WLVisualWidget.cpp \
-    main.cpp
+    ../../wlmotion/modules/wlaioput.cpp \
+    ../../wlmotion/modules/wlaxis.cpp \
+    ../../wlmotion/modules/wldcan.cpp \
+    ../../wlmotion/modules/wlelement.cpp \
+    ../../wlmotion/modules/wlencoder.cpp \
+    ../../wlmotion/modules/wlfreq.cpp \
+    ../../wlmotion/modules/wlioput.cpp \
+    ../../wlmotion/modules/wlmodule.cpp \
+    ../../wlmotion/modules/wlmoduleaioput.cpp \
+    ../../wlmotion/modules/wlmoduleaxis.cpp \
+    ../../wlmotion/modules/wlmoduleconnect.cpp \
+    ../../wlmotion/modules/wlmoduledcan.cpp \
+    ../../wlmotion/modules/wlmoduleencoder.cpp \
+    ../../wlmotion/modules/wlmodulefreq.cpp \
+    ../../wlmotion/modules/wlmodulefw.cpp \
+    ../../wlmotion/modules/wlmoduleioput.cpp \
+    ../../wlmotion/modules/wlmoduleplanner.cpp \
+    ../../wlmotion/modules/wlmodulepwm.cpp \
+    ../../wlmotion/modules/wlmodulewhell.cpp \
+    ../../wlmotion/modules/wlpwm.cpp \
+    ../../wlmotion/modules/wlwhell.cpp \
+    ../../wlmotion/wldevice.cpp \
+    ../../wlmotion/wlmotion.cpp \
+    ../../wlqt/form/wldevicewidget.cpp \
+    ../../wlqt/form/wldrivewidget.cpp \
+    ../../wlqt/form/wleditiowidget.cpp \
+    ../../wlqt/form/wledittext.cpp \
+    ../../wlqt/form/wlenternum.cpp \
+    ../../wlqt/form/wlenterstring.cpp \
+    ../../wlqt/form/wlgmodelwidget.cpp \
+    ../../wlqt/form/wlgprogramwidget.cpp \
+    ../../wlqt/form/wliowidget.cpp \
+    ../../wlqt/form/wlmessmanager.cpp \
+    ../../wlqt/form/wlpamlistwidget.cpp \
+    ../../wlqt/form/wlpamwidget.cpp \
+    ../../wlqt/form/wlwhellwidget.cpp \
+    ../../wlqt/wl3dpoint.cpp \
+    ../../wlqt/wlcalc.cpp \
+    ../../wlqt/wldrive.cpp \
+    ../../wlqt/wlelemettraj.cpp \
+    ../../wlqt/wlfileaccess.cpp \
+    ../../wlqt/wlflags.cpp \
+    ../../wlqt/wlgcode.cpp \
+    ../../wlqt/wlgcodesh.cpp \
+    ../../wlqt/wlgmodel.cpp \
+    ../../wlqt/wlgprogram.cpp \
+    ../../wlqt/wllabel.cpp \
+    ../../wlqt/wllog.cpp \
+    ../../wlqt/wlmcodesh.cpp \
+    ../../wlqt/wlopengl.cpp \
+    ../../wlqt/wlpad.cpp \
+    main.cpp \
+    wldelayscript.cpp \
+    wldialogobscript.cpp \
+    wldialogscript.cpp \
+    wleditmillwidget.cpp \
+    wleditpoint..cpp \
+    wlevscript.cpp \
+    wlmill.cpp \
+    wlmillcontrol.cpp \
+    wlmilldrive.cpp \
+    wlmilldrivewidget.cpp \
+    wlmillmachine.cpp \
+    wlpositionwidget.cpp \
+    wlvisualwidget.cpp
 
 
 HEADERS += \
-    ../../WLMotion/WLDevice.h \
-    ../../WLMotion/WLMotion.h \
-    ../../WLMotion/modules/WLAIOPut.h \
-    ../../WLMotion/modules/WLAxis.h \
-    ../../WLMotion/modules/WLDCan.h \
-    ../../WLMotion/modules/WLElement.h \
-    ../../WLMotion/modules/WLEncoder.h \
-    ../../WLMotion/modules/WLFreq.h \
-    ../../WLMotion/modules/WLIOPut.h \
-    ../../WLMotion/modules/WLModule.h \
-    ../../WLMotion/modules/WLModuleAIOPut.h \
-    ../../WLMotion/modules/WLModuleAxis.h \
-    ../../WLMotion/modules/WLModuleConnect.h \
-    ../../WLMotion/modules/WLModuleDCan.h \
-    ../../WLMotion/modules/WLModuleEncoder.h \
-    ../../WLMotion/modules/WLModuleFW.h \
-    ../../WLMotion/modules/WLModuleFreq.h \
-    ../../WLMotion/modules/WLModulePWM.h \
-    ../../WLMotion/modules/WLModulePlanner.h \
-    ../../WLMotion/modules/WLModuleWhell.h \
-    ../../WLMotion/modules/WLModuleIOPut.h \
-    ../../WLMotion/modules/WLPWM.h \
-    ../../WLMotion/modules/WLWhell.h \
-    ../../WLQt/WL3DPoint.h \
-    ../../WLQt/WLCalc.h \
-    ../../WLQt/WLDrive.h \
-    ../../WLQt/WLElementTraj.h \
-    ../../WLQt/WLFileAccess.h \
-    ../../WLQt/WLFlags.h \
-    ../../WLQt/WLFrame.h \
-    ../../WLQt/WLGCode.h \
-    ../../WLQt/WLGCodeSH.h \
-    ../../WLQt/WLGModel.h \
-    ../../WLQt/WLGProgram.h \
-    ../../WLQt/WLLabel.h \
-    ../../WLQt/WLLog.h \
-    ../../WLQt/WLMCodeSH.h \
-    ../../WLQt/WLOpenGL.h \
-    ../../WLQt/WLPad.h \
-    ../../WLQt/form/WLDeviceWidget.h \
-    ../../WLQt/form/WLEditIOWidget.h \
-    ../../WLQt/form/WLEditText.h \
-    ../../WLQt/form/WLEnterNum.h \
-    ../../WLQt/form/WLEnterString.h \
-    ../../WLQt/form/WLGModelWidgett.h \
-    ../../WLQt/form/WLGProgramWidget.h \
-    ../../WLQt/form/WLIOWidget.h \
-    ../../WLQt/form/WLMessManager.h \
-    ../../WLQt/form/WLMillDriveWidget.h \
-    ../../WLQt/form/WLPamListWidget.h \
-    ../../WLQt/form/WLPamWidget.h \
-    ../../WLQt/form/WLWhellWidget.h \
-    ../../WLQt/form/WLDriveWidget.h \
-    WLDelay.h \
-    WLDialog.h \
-    WLDialogObj.h \
-    WLEditMillWidget.h \
-    WLEditPoint.h \
-    WLEvScript.h \
-    WLMill.h \
-    WLMillControl.h \
-    WLMillDrive.h \
-    WLMillDriveWidget.h \
-    WLMillMachine.h \
-    WLPositionWidget.h \
-    WLVisualWidget.h
+    ../../wlmotion/modules/wlaioput.h \
+    ../../wlmotion/modules/wlaxis.h \
+    ../../wlmotion/modules/wldcan.h \
+    ../../wlmotion/modules/wlelement.h \
+    ../../wlmotion/modules/wlencoder.h \
+    ../../wlmotion/modules/wlfreq.h \
+    ../../wlmotion/modules/wlioput.h \
+    ../../wlmotion/modules/wlmodule.h \
+    ../../wlmotion/modules/wlmoduleaioput.h \
+    ../../wlmotion/modules/wlmoduleaxis.h \
+    ../../wlmotion/modules/wlmoduleconnect.h \
+    ../../wlmotion/modules/wlmoduledcan.h \
+    ../../wlmotion/modules/wlmoduleencoder.h \
+    ../../wlmotion/modules/wlmodulefreq.h \
+    ../../wlmotion/modules/wlmodulefw.h \
+    ../../wlmotion/modules/wlmoduleioput.h \
+    ../../wlmotion/modules/wlmoduleplanner.h \
+    ../../wlmotion/modules/wlmodulepwm.h \
+    ../../wlmotion/modules/wlmodulewhell.h \
+    ../../wlmotion/modules/wlpwm.h \
+    ../../wlmotion/modules/wlwhell.h \
+    ../../wlmotion/wldevice.h \
+    ../../wlmotion/wlmotion.h \
+    ../../wlqt/form/WLMillDriveWidget.h \
+    ../../wlqt/form/wldevicewidget.h \
+    ../../wlqt/form/wldrivewidget.h \
+    ../../wlqt/form/wleditiowidget.h \
+    ../../wlqt/form/wledittext.h \
+    ../../wlqt/form/wlenternum.h \
+    ../../wlqt/form/wlenterstring.h \
+    ../../wlqt/form/wlgmodelwidget.h \
+    ../../wlqt/form/wlgprogramwidget.h \
+    ../../wlqt/form/wliowidget.h \
+    ../../wlqt/form/wlmessmanager.h \
+    ../../wlqt/form/wlpamlistwidget.h \
+    ../../wlqt/form/wlpamwidget.h \
+    ../../wlqt/form/wlwhellwidget.h \
+    ../../wlqt/wl3dpoint.h \
+    ../../wlqt/wlcalc.h \
+    ../../wlqt/wldrive.h \
+    ../../wlqt/wlelementtraj.h \
+    ../../wlqt/wlfileaccess.h \
+    ../../wlqt/wlflags.h \
+    ../../wlqt/wlframe.h \
+    ../../wlqt/wlgcode.h \
+    ../../wlqt/wlgcodesh.h \
+    ../../wlqt/wlgmodel.h \
+    ../../wlqt/wlgprogram.h \
+    ../../wlqt/wllabel.h \
+    ../../wlqt/wllog.h \
+    ../../wlqt/wlmcodesh.h \
+    ../../wlqt/wlopengl.h \
+    ../../wlqt/wlpad.h \
+    1wlmill.h \
+    wldelayscript.h \
+    wldialogobscript.h \
+    wldialogscript.h \
+    wleditmillwidget.h \
+    wleditpoint.h \
+    wlevscript.h \
+    wlmill.h \
+    wlmillcontrol.h \
+    wlmilldrive.h \
+    wlmilldrivewidget.h \
+    wlmillmachine.h \
+    wlpositionwidget.h \
+    wlvisualwidget.h
 
 
 FORMS += \
-    ../../WLQt/form/WLDeviceWidget.ui \
-    ../../WLQt/form/WLDriveWidget.ui \
-    ../../WLQt/form/WLEditIOWidget.ui \
-    ../../WLQt/form/WLEnterNum.ui \
-    ../../WLQt/form/WLEnterString.ui \
-    ../../WLQt/form/WLGModelWidget.ui \
-    ../../WLQt/form/WLGProgramWidget.ui \
-    ../../WLQt/form/WLMessManager.ui \
-    ../../WLQt/form/WLPamWidget.ui \
-    ../../WLQt/form/WLEditText.ui \
-    ../../WLQt/form/WLIOWidget.ui \
-    ../../WLQt/form/WLPamListWidget.ui \
-    ../../WLQt/form/WLWhellWidget.ui \
-    WLEditMillWidget.ui \
-    WLMillDriveWidget.ui \
-    WLMillControl.ui \
-    WLPositionWidget.ui \
-    WLEditPoint.ui
+    ../../wlqt/form/wldevicewidget.ui \
+    ../../wlqt/form/wldrivewidget.ui \
+    ../../wlqt/form/wleditiowidget.ui \
+    ../../wlqt/form/wledittext.ui \
+    ../../wlqt/form/wlenternum.ui \
+    ../../wlqt/form/wlenterstring.ui \
+    ../../wlqt/form/wlgmodelwidget.ui \
+    ../../wlqt/form/wlgprogramwidget.ui \
+    ../../wlqt/form/wliowidget.ui \
+    ../../wlqt/form/wlmessmanager.ui \
+    ../../wlqt/form/wlpamlistwidget.ui \
+    ../../wlqt/form/wlpamwidget.ui \
+    ../../wlqt/form/wlwhellwidget.ui \
+    wleditmillwidget.ui \
+    wleditpoint.ui \
+    wlmillcontrol.ui \
+    wlmilldrivewidget.ui \
+    wlpositionwidget.ui
 
 
 RESOURCES += \

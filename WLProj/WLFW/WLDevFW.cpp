@@ -1,7 +1,7 @@
-#include "WLDevFW.h"
+#include "wldevfw.h""
 #include <QDebug>
 
-WLDevFW::WLDevFW()
+WLDevFW::WLDevFW():WLMotion()
 {
 //connect(this,SIGNAL(startSend(QByteArray)),SLOT(sendData(QByteArray)),Qt::QueuedConnection);
 setNameDevice("WLDevFW");

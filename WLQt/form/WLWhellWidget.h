@@ -4,9 +4,9 @@
 #include <QDialog>
 #include <QLabel>
 #include <QSpinBox>
-#include "WLWhell.h"
-#include "WLModuleIOPut.h"
-#include "WLEditIOWidget.h"
+#include "wlwhell.h"
+#include "wlmoduleioput.h"
+#include "wleditiowidget.h"
 
 namespace Ui {
 class WLWhellWidget;

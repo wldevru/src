@@ -1,5 +1,5 @@
 #include <QMessageBox>
-#include "WLMillControl.h"
+#include "wlmillcontrol.h"
 
 WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QWidget *parent)
 	: QWidget(parent)

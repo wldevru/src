@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QDataStream>
 #include <QTimer>
-#include "WLAxis.h"
-#include "WLModule.h"
-#include "WLModuleIOPut.h"
+#include "wlaxis.h"
+#include "wlmodule.h"
+#include "wlmoduleioput.h"
 
 enum typeInputMAXIS{MAXIS_inEMGStop,MAXIS_inSDStop,MAXIS_inProbe};
 

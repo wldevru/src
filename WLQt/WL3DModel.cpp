@@ -1,4 +1,4 @@
-#include "WL3DModel.h"
+#include "wl3dmodel.h"
 
 WL3DModel::WL3DModel()
 {

@@ -1,4 +1,4 @@
-#include "WLModulePWM.h"
+#include "wlmodulepwm.h"
 
 WLModulePWM::WLModulePWM(QObject *parent)
 	: WLModule(parent)
@@ -42,6 +42,7 @@ if(sizeOutPWM>outPWM.size())
   {
   pwm = new WLPWM;
   pwm->setIndex(i);
+  pwm->setParent(this);
   connect(pwm,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
   connect(pwm,SIGNAL(changed()),SLOT(updatePWM()));
   outPWM+=pwm;

@@ -1,4 +1,4 @@
-#include "WLPWM.h"
+#include "wlpwm.h"
 
 WLPWM::WLPWM(QObject *parent)
 	: WLElement(parent)

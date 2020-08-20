@@ -1,4 +1,4 @@
-#include "WLAIOPut.h"
+#include "wlaioput.h"
 
 WLAIOPut::WLAIOPut(QString _comment, bool input)
 {

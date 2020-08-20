@@ -1,4 +1,4 @@
-#include "WLDevice.h"
+#include "wldevice.h"
 //#include "wldefine.h"
 #include <QDebug>
 
@@ -46,6 +46,7 @@ m_countRxPacket=255;
  
 WLDevice::~WLDevice()
 {
+qDebug()<<"~WLDevice()";
 closeConnect();
 
 blockSignals(true);
@@ -161,17 +162,17 @@ QList<WLDeviceInfo> WLDevice::availableDevices()
 {
 QList<WLDeviceInfo>  retDevicesInfo;
 QList<QSerialPortInfo> portList=QSerialPortInfo::availablePorts();
+QList<WLDevice*> Devices;
 
 foreach(QSerialPortInfo portInfo,portList)
  {
- WLDevice  Device;
+ WLDevice *Device=new WLDevice;
 
- Device.initSerialPort(portInfo.portName());
- Device.openConnect();
- Device.closeConnect();
-
- if(!Device.getUID96().isEmpty())  retDevicesInfo+=Device.getInfo();
+ Device->initSerialPort(portInfo.portName());
+ Device->openConnect();
+ Devices+=Device;
  }
+
 
 QUdpSocket udpSocket;
 QHostAddress HA;
@@ -184,8 +185,9 @@ QByteArray BA(buf,4);
 
 udpSocket.bind(2021);
 udpSocket.writeDatagram(BA,QHostAddress::Broadcast,2020);
+
 QThread::msleep (250);
-udpSocket.waitForReadyRead(500);
+udpSocket.waitForReadyRead(350);
 
 n=udpSocket.readDatagram(dataBuf,512,&HA,&port);
 
@@ -202,15 +204,24 @@ udpSocket.close();
 
 foreach(QHostAddress HAD,HADList)
  {
- WLDevice  DeviceEth;
+ WLDevice  *Device = new WLDevice;
 
- DeviceEth.initUdpSocket(HAD);
- DeviceEth.openConnect();
- DeviceEth.closeConnect();
+ Device->initUdpSocket(HAD);
+ Device->openConnect();
 
- if(!DeviceEth.getUID96().isEmpty())  retDevicesInfo+=DeviceEth.getInfo();
+ Devices+=Device;
  }
 
+while(!Devices.isEmpty())
+ {
+ WLDevice  *Device=Devices.takeFirst();
+
+ Device->readData(250);
+
+ if(!Device->getUID96().isEmpty())  retDevicesInfo+=Device->getInfo();
+
+ delete Device;
+ }
 
 return retDevicesInfo;
 }
@@ -447,7 +458,9 @@ callModules();
 
 sendData();
 
+
 m_serialPort.flush();
+/*
 QThread::msleep (50);
 
 if(!m_serialPort.portName().isEmpty())
@@ -461,6 +474,7 @@ if(!m_HA.isNull())
  if(m_udpSocket.waitForReadyRead(100))
                           readSlot();
  }
+*/
 
 reset();
 
@@ -515,10 +529,13 @@ void WLDevice::addModule(WLModule *module)
 {
 if(module!=nullptr)
  {
+ module->setParent(this);
+
  for(int i=0;i<m_modules.size();i++)
      if(module->type()==m_modules[i]->type()) return;
 
  m_modules+=module;
+
  connect(module,SIGNAL(sendCommand(QByteArray)),SLOT(startSend(QByteArray)),Qt::DirectConnection);
  connect(module,SIGNAL(sendMessage(QString,QString,int)),SIGNAL(sendMessage(QString,QString,int)));
 
@@ -642,9 +659,6 @@ size=(quint8)inBuf[0];
 
 if(inBuf.size()<size)
 {
-qDebug()<<"size<"<<inBuf.size()<<size;
-for(int i=0;i<10&&i<inBuf.size();i++)
-      qDebug()<<(quint8)inBuf[i];
 break;
 }
 
@@ -988,6 +1002,20 @@ if(FileXML.open(QIODevice::WriteOnly))
  return true;
  }
 return false;
+}
+
+void WLDevice::readData(int wait)
+{
+if(!m_serialPort.portName().isEmpty())
+ {
+ if(m_serialPort.waitForReadyRead(wait))
+                          readSlot();
+ }
+else if(!m_HA.isNull())
+    {
+    if(m_udpSocket.waitForReadyRead(wait))
+                             readSlot();
+    }
 }
 
 bool WLDevice::initFromFile(QString nameFile)

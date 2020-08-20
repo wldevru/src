@@ -1,4 +1,4 @@
-#include "WLMillMachine.h"
+#include "wlmillmachine.h"
 
 //WLMillMachine::WLMillMachine(QObject *parent)
 

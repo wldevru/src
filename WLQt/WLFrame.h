@@ -3,9 +3,9 @@
 
 #include <qmath.h>
 #include <QMatrix4x4>
-#include "WLCalc.h"
-#include "WL6DPoint.h"
-#include "WLFlags.h"
+#include "wlcalc.h"
+#include "wl6dpoint.h"
+#include "wlflags.h"
 
 enum FRAME_TYPE_ABC{TYPE_ABC,TYPE_CBA};
 

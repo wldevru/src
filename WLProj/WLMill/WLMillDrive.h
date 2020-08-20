@@ -1,7 +1,7 @@
 #ifndef WLMILLDRIVE_H
 #define WLMILLDRIVE_H
 
-#include "WLDrive.h"
+#include "wldrive.h"
 
 class WLMillDrive : public WLDrive
 {

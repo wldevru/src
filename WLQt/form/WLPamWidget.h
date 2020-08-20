@@ -4,8 +4,8 @@
 #include <QDialog>
 #include <QPainter>
 #include <QLineEdit>
-#include "WLPad.h"
-#include "ui_WLPamWidget.h"
+#include "wlpad.h"
+#include "ui_wlpamwidget.h"
 
 
 class WLPamWidget : public QDialog

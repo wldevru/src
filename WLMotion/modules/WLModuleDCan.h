@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QDebug>
 #include <QStringList>
-#include "WLModule.h"
-#include "WLDCan.h"
+#include "wlmodule.h"
+#include "wldcan.h"
 
 
 class WLModuleDCan : public WLModule

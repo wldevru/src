@@ -1,4 +1,4 @@
-#include "WLFreq.h"
+#include "wlfreq.h"
 
 WLFreq::WLFreq(QObject *parent)
 	: WLElement(parent)

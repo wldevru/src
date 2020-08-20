@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QTextCodec>
-#include "ui_WLEditText.h"
+#include "ui_wledittext.h"
 
 class WLEditText : public QDialog
 {

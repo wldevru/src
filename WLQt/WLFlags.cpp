@@ -1,4 +1,4 @@
-#include "WLFlags.h"
+#include "wlflags.h"
 
 WLFlags::WLFlags()
 {

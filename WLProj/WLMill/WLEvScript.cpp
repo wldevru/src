@@ -1,4 +1,4 @@
-#include "WLEvScript.h"
+#include "wlevscript.h"
 
 WLEVScript::WLEVScript(QObject *parent)
 	: QThread(parent)

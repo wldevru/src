@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QDebug>
-#include "ui_WLEnterNum.h"
+#include "ui_wlenternum.h"
 
 class WLEnterNum : public QDialog
 {

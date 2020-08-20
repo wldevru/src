@@ -5,9 +5,9 @@
 #include <QString>
 #include <QStringList>
 #include <QDebug>
-#include "WL3DPoint.h"
-#include "WL6DPoint.h"
-#include "WLFrame.h"
+#include "wl3dpoint.h"
+#include "wl6dpoint.h"
+#include "wlframe.h"
 
 #define GNO_err  1
 #define GNO_use  0

@@ -1,5 +1,5 @@
-#include "WLPamListWidget.h"
-#include "ui_WLPamListWidget.h"
+#include "wlpamlistwidget.h"
+
 
 WLPamListWidget::WLPamListWidget(WLDrive *_drive,QWidget *parent) :
     QDialog(parent),

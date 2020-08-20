@@ -1,4 +1,4 @@
-#include "WLElement.h"
+#include "wlelement.h"
 
 WLElement::WLElement(QObject *parent)
 	:QObject(parent)

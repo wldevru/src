@@ -7,7 +7,7 @@
 #include <QXmlStreamReader>
 #include <QStringList>
 #include <QMutex>
-#include "WLModule.h"
+#include "wlmodule.h"
 
 //Planner connect
 #define comPlanner_addCirc       2 //

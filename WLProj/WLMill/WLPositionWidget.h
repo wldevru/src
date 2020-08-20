@@ -5,13 +5,13 @@
 #include <QMenu>
 #include <QtQuick>
 
-#include "ui_WLPositionWidget.h"
+#include "ui_wlpositionwidget.h"
 
-#include "WLLabel.h"
-#include "WL3DPoint.h"
-#include "WLEditPoint.h"
-#include "WLMillMachine.h"
-#include "WLGProgram.h"
+#include "wllabel.h"
+#include "wl3dpoint.h"
+#include "wleditpoint.h"
+#include "wlmillmachine.h"
+#include "wlgprogram.h"
 
 class WLPositionWidget : public QWidget
 {

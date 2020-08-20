@@ -6,8 +6,8 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStringList>
-#include "WLModule.h"
-#include "WLAIOPut.h"
+#include "wlmodule.h"
+#include "wlaioput.h"
 
 
 class WLModuleAIOPut : public WLModule

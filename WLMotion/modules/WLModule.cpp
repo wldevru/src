@@ -1,4 +1,4 @@
-#include "WLModule.h"
+#include "wlmodule.h"
 
 WLModule::WLModule(QObject *parent)
 	:WLElement(parent)

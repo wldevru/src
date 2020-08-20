@@ -1,4 +1,4 @@
-#include "WLMessManager.h"
+#include "wlmessmanager.h"
 
 WLMessManager::WLMessManager(QWidget *parent)
 	: QWidget(parent)

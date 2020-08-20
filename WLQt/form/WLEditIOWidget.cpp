@@ -1,11 +1,14 @@
-#include "WLEditIOWidget.h"
-#include "ui_WLEditIOWidget.h"
+#include "wleditiowidget.h"
+#include <QMenu>
+#include <QContextMenuEvent>
+#include "ui_wleditiowidget.h"
 
 WLEditIOWidget::WLEditIOWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WLEditIOWidget)
 {
     m_Module=nullptr;
+    m_enLatchInput=false;
 
     ui->setupUi(this);
 
@@ -40,8 +43,10 @@ switch(m_Module->type())
                    ui->spinBox->setRange(0,(m_input? ModuleIOPut->getSizeInputs():ModuleIOPut->getSizeOutputs())-1);
                    ui->spinBox->setEnabled(true);
 
-                  break;
-                  }
+                   connect(ModuleIOPut,&WLModuleIOPut::changedInput,this,&WLEditIOWidget::setLatchInput);
+
+                  break;;
+                   }
 
 case typeMPWM:  {
                   WLModulePWM *ModulePWM = static_cast<WLModulePWM*>(m_Module);
@@ -80,10 +85,11 @@ QPalette pal;
 
 if(m_Module->type()==typeMIOPut)
 {
-WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
-
-pal.setColor(QPalette::Base,getIOPut()->getNow() ?
-                            QColor(255,120,120)
+if(m_enLatchInput)
+    pal.setColor(QPalette::Base,QColor(110,255,110));
+ else
+    pal.setColor(QPalette::Base,getIOPut()->getNow() ?
+                            QColor(255,110,110)
                             :
                             Qt::white);
 
@@ -92,14 +98,56 @@ ui->spinBox->setPalette(pal);
 }
 }
 
-void WLEditIOWidget::mouseDoubleClickEvent(QMouseEvent *event)
+void WLEditIOWidget::onActTogInvers()
 {
 if(QMessageBox::question(this,tr("Question")
                         ,m_input ? tr("invert input"):tr("invert output")
                         ,QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
              {
              togInvers();
-             }
+}
+}
+
+void WLEditIOWidget::onActLatchInput()
+{
+m_enLatchInput=!m_enLatchInput;
+ui->spinBox->setDisabled(m_enLatchInput);
+}
+
+void WLEditIOWidget::setLatchInput(int index)
+{
+if(m_enLatchInput)
+  {
+  m_enLatchInput=false;
+  ui->spinBox->setValue(index);
+  ui->spinBox->setDisabled(m_enLatchInput);
+  }
+}
+
+void WLEditIOWidget::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+
+    QAction *actTog=menu.addAction(tr("invers"),this,SLOT(onActTogInvers()));
+
+    actTog->setCheckable(true);
+
+    if(m_Module->type()==typeMIOPut)
+      {
+      actTog->setChecked(getIOPut()->isInv());
+      }
+
+    if(m_Module->type()==typeMIOPut
+     &&m_input)
+      {
+      QAction *actLatchIn=menu.addAction(tr("latch input"),this,SLOT(onActLatchInput()));;
+
+      actLatchIn->setCheckable(true);
+      actLatchIn->setChecked(m_enLatchInput);
+      }
+
+    menu.exec(event->globalPos());
+
 }
 
 

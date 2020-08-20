@@ -7,7 +7,7 @@
 #include <QXmlStreamReader>
 #include <QStringList>
 #include <QMutex>
-#include "WLModule.h"
+#include "wlmodule.h"
 
 
 #define comMCon_setTimers 1

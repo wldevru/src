@@ -6,7 +6,7 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStringList>
-#include "WLWhell.h"
+#include "wlwhell.h"
 
 
 //Whell

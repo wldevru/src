@@ -1,4 +1,4 @@
-#include "WLMillDrive.h"
+#include "wlmilldrive.h"
 
 WLMillDrive::WLMillDrive(QString name)
     : WLDrive(name)

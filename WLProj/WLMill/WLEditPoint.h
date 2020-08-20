@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include <QDoubleSpinBox>
-#include "ui_WLEditPoint.h"
-#include "WLFrame.h"
+#include "ui_wleditpoint.h"
+#include "wlframe.h"
 
 typedef struct WLEditPointData
 {

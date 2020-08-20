@@ -1,16 +1,16 @@
 #ifndef WLMotion_H
 #define WLMotion_H
 
-#include "WLDevice.h"
+#include "wldevice.h"
 
-#include "modules/WLModuleDCan.h"
-#include "modules/WLModuleIOPut.h"
-#include "modules/WLModuleAIOPut.h"
-#include "modules/WLModuleEncoder.h"
-#include "modules/WLModuleAxis.h"
-#include "modules/WLModuleWhell.h"
-#include "modules/WLModulePlanner.h"
-#include "modules/WLModulePWM.h"
+#include "modules/wlmoduledcan.h"
+#include "modules/wlmoduleioput.h"
+#include "modules/wlmoduleaioput.h"
+#include "modules/wlmoduleencoder.h"
+#include "modules/wlmoduleaxis.h"
+#include "modules/wlmodulewhell.h"
+#include "modules/wlmoduleplanner.h"
+#include "modules/wlmodulepwm.h"
 
 class WLMotion: public WLDevice
 {

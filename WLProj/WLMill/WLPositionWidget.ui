@@ -414,7 +414,7 @@
   <customwidget>
    <class>WLLabel</class>
    <extends>QLabel</extends>
-   <header>WLLabel.h</header>
+   <header>wllabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

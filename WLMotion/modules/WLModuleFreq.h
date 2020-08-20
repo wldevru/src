@@ -6,8 +6,8 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStringList>
-#include "WLModule.h"
-#include "WLFreq.h"
+#include "wlmodule.h"
+#include "wlfreq.h"
 
 
 class WLModuleFreq : public WLModule

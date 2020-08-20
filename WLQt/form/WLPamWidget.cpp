@@ -1,4 +1,4 @@
-#include "WLPamWidget.h"
+#include "wlpamwidget.h"
 #include <QDebug>
 #include <QTimer>
 

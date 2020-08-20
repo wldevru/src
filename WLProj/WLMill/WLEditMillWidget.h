@@ -4,8 +4,8 @@
 #include <QWidget>
 #include <QSerialPortInfo>
 
-#include "WLMillMachine.h"
-#include "ui_WLEditMillWidget.h"
+#include "wlmillmachine.h"
+#include "ui_wleditmillwidget.h"
 
 
 class WLEditMillWidget : public QDialog

@@ -1,4 +1,4 @@
-#include "WLEnterString.h"
+#include "wlenterstring.h"
 
 WLEnterString::WLEnterString(QWidget *parent)
 	: QDialog(parent)

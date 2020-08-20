@@ -2,7 +2,7 @@
 #define WLENTERSTRING_H
 
 #include <QDialog>
-#include "ui_WLEnterString.h"
+#include "ui_wlenterstring.h"
 
 class WLEnterString : public QDialog
 {

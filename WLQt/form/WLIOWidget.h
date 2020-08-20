@@ -6,11 +6,11 @@
 #include <QAbstractTableModel>
 #include <QModelIndex>
 
-#include "ui_WLIOWidget.h"
+#include "ui_wliowidget.h"
 
-#include "WLModuleIOPut.h"
-#include "WLModuleAIOPut.h"
-#include "WLModulePWM.h"
+#include "wlmoduleioput.h"
+#include "wlmoduleaioput.h"
+#include "wlmodulepwm.h"
 
 #define Table_in  0
 #define Table_out 1

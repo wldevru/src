@@ -8,19 +8,17 @@
 #include <QMutex>
 #include <QTextCodec>
 
-#include "WLFlags.h"
-#include "WLElementTraj.h"
-#include "WLMillDrive.h"
-//#include "WLModuleAxis.h"
-//#include "WLWhell.h"
-#include "WLMotion.h"
-#include "WLEvScript.h"
-#include "WL3DPoint.h"
-#include "WL6DPoint.h"
-#include "WLEnterNum.h"
-#include "WLGProgram.h"
-#include "WLGCode.h"
-#include "WLGModel.h"
+#include "wlflags.h".h"
+#include "wlelementtraj.h"
+#include "wlmilldrive.h"
+#include "wlmotion.h"
+#include "wlevscript.h"
+#include "wl3dpoint.h"
+#include "wl6dpoint.h"
+#include "wlenternum.h"
+#include "wlgprogram.h"
+#include "wlgcode.h"
+#include "wlgmodel.h"
 
 //#define XDrive 0
 //#define YDrive 1

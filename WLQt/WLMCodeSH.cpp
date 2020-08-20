@@ -1,4 +1,4 @@
-#include "WLMCodeSH.h"
+#include "wlmcodesh.h"
 
 WLMCodeSH::WLMCodeSH(QTextDocument *parent)
 	: QSyntaxHighlighter(parent)

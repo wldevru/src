@@ -1,4 +1,4 @@
-#include "WLModuleAIOPut.h"
+#include "wlmoduleaioput.h"
 
 WLModuleAIOPut::WLModuleAIOPut(QObject *parent)
 	: WLModule(parent)
@@ -24,6 +24,7 @@ if(sizeInputs>Inputs.size())
   {
   ainput = new WLAIOPut;
   ainput->setIndex(i);
+  ainput->setParent(this);
   connect(ainput,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
   Inputs+=ainput;
   }

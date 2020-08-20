@@ -1,4 +1,4 @@
-#include "WLMill.h"
+#include "wlmill.h"
 #include <QTimer>
 #include <QToolBox>
 #include <QColor>
@@ -13,16 +13,16 @@
 #include <QDebug> 
 #include <QXmlStreamReader> 
 
-#include "WLWhellWidget.h"
-#include "WLEditMillWidget.h"
-#include "WLPamWidget.h"
-#include "WLDriveWidget.h"
-#include "WLEnterNum.h"
+#include "wlwhellwidget.h"
+#include "wleditmillwidget.h"
+#include "wlpamwidget.h"
+#include "wldrivewidget.h"
+#include "wlenternum.h"
 
-#include "WLEditPoint.h"
-#include "WLMillDriveWidget.h"
-#include "WLDeviceWidget.h"
-#include "WLDelay.h"
+#include "wleditpoint.h"
+#include "wlmilldrivewidget.h"
+#include "wldevicewidget.h"
+#include "wldelayscript.h"
 
 
 WLMill::WLMill(QWidget *parent)
@@ -31,38 +31,38 @@ WLMill::WLMill(QWidget *parent)
     m_bclose=false;
     m_lifeM=0;
 
-	QTimer *timerLifeM=new QTimer;
-	connect(timerLifeM,SIGNAL(timeout()),SLOT(addLifeM()));
-	timerLifeM->start(60*1000);
+    QTimer *timerLifeM=new QTimer;
+    connect(timerLifeM,SIGNAL(timeout()),SLOT(addLifeM()));
+    timerLifeM->start(60*1000);
 
     MessManager =new WLMessManager(this);
-	
-	connect(this,SIGNAL(sendMessage(QString)),MessManager,SLOT(setMessage(QString)),Qt::QueuedConnection);
-		
+
+    connect(this,SIGNAL(sendMessage(QString)),MessManager,SLOT(setMessage(QString)),Qt::QueuedConnection);
+
     Program = new WLGProgram(nullptr);
-	
-	connect(Program,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
+
+    connect(Program,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
     EVMScript=new WLEVScript(0);
     EVMScript->moveToThread(EVMScript);
 
-	Dialog= new WLDialog(this);
-	EVMScript->addDialogWidget(Dialog);
+    Dialog= new WLDialog(this);
+    EVMScript->addDialogWidget(Dialog);
     EVMScript->start();
 
     MillMachine = new WLMillMachine(Program,EVMScript);
 
     Program->setShowGCode(&MillMachine->m_GCode);
 
-	connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
+    connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
     connect(MillMachine,SIGNAL(changedSK()),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
 
-	connect(MillMachine,SIGNAL(ready()),SLOT(readyMachine()));
+    connect(MillMachine,SIGNAL(ready()),SLOT(readyMachine()));
     MillMachine->start();
 
     VisualWidget=new WLVisualWidget(Program,MillMachine);
 
-	setCentralWidget(VisualWidget);
+    setCentralWidget(VisualWidget);
 
     Log = new WLLog(this);
 
@@ -519,18 +519,9 @@ WLMill::~WLMill()
 {
 qDebug("DELETE WHITE");
 MillMachine->reset();
-/*
-saveDataState();
-saveLast();
-saveLife();
-*/
+
 EVMScript->quit();
 EVMScript->wait();
-
-//MillMachine->quit();
-//MillMachine->wait();
-//EVLScript->quit();
-//EVLScript->wait();
 
 saveConfig();
 

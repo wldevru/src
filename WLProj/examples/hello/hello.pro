@@ -4,6 +4,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport network
 
 CONFIG += c++11
 
+QMAKE_LFLAGS = -no-pie
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -16,61 +18,61 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH +=\
-           ../../../WLMotion\
-           ../../../WLMotion/modules
+           ../../../wlmotion\
+           ../../../wlmotion/modules
 SOURCES += \
-    ../../../WLMotion/WLDevice.cpp \
-    ../../../WLMotion/WLFlags.cpp \
-    ../../../WLMotion/WLMotion.cpp \
-    ../../../WLMotion/modules/WLAIOPut.cpp \
-    ../../../WLMotion/modules/WLAxis.cpp \
-    ../../../WLMotion/modules/WLDCan.cpp \
-    ../../../WLMotion/modules/WLElement.cpp \
-    ../../../WLMotion/modules/WLEncoder.cpp \
-    ../../../WLMotion/modules/WLFreq.cpp \
-    ../../../WLMotion/modules/WLIOPut.cpp \
-    ../../../WLMotion/modules/WLModule.cpp \
-    ../../../WLMotion/modules/WLModuleAIOPut.cpp \
-    ../../../WLMotion/modules/WLModuleAxis.cpp \
-    ../../../WLMotion/modules/WLModuleConnect.cpp \
-    ../../../WLMotion/modules/WLModuleDCan.cpp \
-    ../../../WLMotion/modules/WLModuleEncoder.cpp \
-    ../../../WLMotion/modules/WLModuleFW.cpp \
-    ../../../WLMotion/modules/WLModuleFreq.cpp \
-    ../../../WLMotion/modules/WLModuleIOPut.cpp \
-    ../../../WLMotion/modules/WLModulePWM.cpp \
-    ../../../WLMotion/modules/WLModulePlanner.cpp \
-    ../../../WLMotion/modules/WLModuleWhell.cpp \
-    ../../../WLMotion/modules/WLPWM.cpp \
-    ../../../WLMotion/modules/WLWhell.cpp \
+    ../../../wlmotion/modules/wlaioput.cpp \
+    ../../../wlmotion/modules/wlaxis.cpp \
+    ../../../wlmotion/modules/wldcan.cpp \
+    ../../../wlmotion/modules/wlelement.cpp \
+    ../../../wlmotion/modules/wlencoder.cpp \
+    ../../../wlmotion/modules/wlfreq.cpp \
+    ../../../wlmotion/modules/wlioput.cpp \
+    ../../../wlmotion/modules/wlmodule.cpp \
+    ../../../wlmotion/modules/wlmoduleaioput.cpp \
+    ../../../wlmotion/modules/wlmoduleaxis.cpp \
+    ../../../wlmotion/modules/wlmoduleconnect.cpp \
+    ../../../wlmotion/modules/wlmoduledcan.cpp \
+    ../../../wlmotion/modules/wlmoduleencoder.cpp \
+    ../../../wlmotion/modules/wlmodulefreq.cpp \
+    ../../../wlmotion/modules/wlmodulefw.cpp \
+    ../../../wlmotion/modules/wlmoduleioput.cpp \
+    ../../../wlmotion/modules/wlmoduleplanner.cpp \
+    ../../../wlmotion/modules/wlmodulepwm.cpp \
+    ../../../wlmotion/modules/wlmodulewhell.cpp \
+    ../../../wlmotion/modules/wlpwm.cpp \
+    ../../../wlmotion/modules/wlwhell.cpp \
+    ../../../wlmotion/wldevice.cpp \
+    ../../../wlmotion/wlflags.cpp \
+    ../../../wlmotion/wlmotion.cpp \
     main.cpp \
     widget.cpp
 
 HEADERS += \
-    ../../../WLMotion/WLDevice.h \
-    ../../../WLMotion/WLFlags.h \
-    ../../../WLMotion/WLMotion.h \
-    ../../../WLMotion/modules/WLAIOPut.h \
-    ../../../WLMotion/modules/WLAxis.h \
-    ../../../WLMotion/modules/WLDCan.h \
-    ../../../WLMotion/modules/WLElement.h \
-    ../../../WLMotion/modules/WLEncoder.h \
-    ../../../WLMotion/modules/WLFreq.h \
-    ../../../WLMotion/modules/WLIOPut.h \
-    ../../../WLMotion/modules/WLModule.h \
-    ../../../WLMotion/modules/WLModuleAIOPut.h \
-    ../../../WLMotion/modules/WLModuleAxis.h \
-    ../../../WLMotion/modules/WLModuleConnect.h \
-    ../../../WLMotion/modules/WLModuleDCan.h \
-    ../../../WLMotion/modules/WLModuleEncoder.h \
-    ../../../WLMotion/modules/WLModuleFW.h \
-    ../../../WLMotion/modules/WLModuleFreq.h \
-    ../../../WLMotion/modules/WLModuleIOPut.h \
-    ../../../WLMotion/modules/WLModulePWM.h \
-    ../../../WLMotion/modules/WLModulePlanner.h \
-    ../../../WLMotion/modules/WLModuleWhell.h \
-    ../../../WLMotion/modules/WLPWM.h \
-    ../../../WLMotion/modules/WLWhell.h \
+    ../../../wlmotion/modules/wlaioput.h \
+    ../../../wlmotion/modules/wlaxis.h \
+    ../../../wlmotion/modules/wldcan.h \
+    ../../../wlmotion/modules/wlelement.h \
+    ../../../wlmotion/modules/wlencoder.h \
+    ../../../wlmotion/modules/wlfreq.h \
+    ../../../wlmotion/modules/wlioput.h \
+    ../../../wlmotion/modules/wlmodule.h \
+    ../../../wlmotion/modules/wlmoduleaioput.h \
+    ../../../wlmotion/modules/wlmoduleaxis.h \
+    ../../../wlmotion/modules/wlmoduleconnect.h \
+    ../../../wlmotion/modules/wlmoduledcan.h \
+    ../../../wlmotion/modules/wlmoduleencoder.h \
+    ../../../wlmotion/modules/wlmodulefreq.h \
+    ../../../wlmotion/modules/wlmodulefw.h \
+    ../../../wlmotion/modules/wlmoduleioput.h \
+    ../../../wlmotion/modules/wlmoduleplanner.h \
+    ../../../wlmotion/modules/wlmodulepwm.h \
+    ../../../wlmotion/modules/wlmodulewhell.h \
+    ../../../wlmotion/modules/wlpwm.h \
+    ../../../wlmotion/modules/wlwhell.h \
+    ../../../wlmotion/wldevice.h \
+    ../../../wlmotion/wlflags.h \
+    ../../../wlmotion/wlmotion.h \
     widget.h
 
 FORMS += \

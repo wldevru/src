@@ -7,8 +7,8 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStringList>
-#include "WLElement.h"
-#include "WLFlags.h"
+#include "wlelement.h"
+#include "wlflags.h"
 
 #define idAxis 0
 #define idCut  10

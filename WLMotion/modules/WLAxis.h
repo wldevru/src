@@ -4,9 +4,10 @@
 #include <QObject>
 #include <QDataStream>
 #include <QTimer>
-#include "WLFlags.h"
-#include "WLModule.h"
-#include "WLModuleIOPut.h"
+
+#include "wlflags.h"
+#include "wlmodule.h"
+#include "wlmoduleioput.h"
 
 #define xPD 4
 
@@ -166,10 +167,10 @@ enum   typeFindAxis{AXIS_findNO
 
 class WLAxis : public WLElement
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:	
- WLAxis(QObject *parent=0);
+ WLAxis(QObject *parent=nullptr);
 ~WLAxis();
 
 private:

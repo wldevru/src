@@ -1,4 +1,4 @@
-#include "WLGModel.h"
+#include "wlgmodel.h"
 
 WLGModel::WLGModel(QObject *parent) : QObject(parent)
 {
