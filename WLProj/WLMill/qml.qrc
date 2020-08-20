@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>AxisPosLabel.qml</file>
-    </qresource>
-</RCC>
