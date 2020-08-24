@@ -18,7 +18,6 @@ m_HA.clear();
 
 m_nameDevice.clear();
 
-
 status=DEVICE_empty;
 
 m_version=0;
@@ -170,7 +169,10 @@ foreach(QSerialPortInfo portInfo,portList)
 
  Device->initSerialPort(portInfo.portName());
 
- if(Device->openConnect())  Devices+=Device;
+ if(Device->openConnect())
+      Devices+=Device;
+   else
+      delete Device;
  }
 
 
@@ -296,7 +298,7 @@ Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<static_cast<quint8>(comDev_getModule);
-
+qDebug()<<"comDev_getModule";
 setCommand(data);
 }
 
@@ -353,6 +355,8 @@ if(!outBuf.isEmpty())
  if(m_serialPort.isOpen())
     {    
     m_serialPort.write(outBuf);
+    m_serialPort.flush();
+
     outBuf.clear();
     }
 
@@ -458,24 +462,6 @@ callModules();
 
 sendData();
 
-
-m_serialPort.flush();
-/*
-QThread::msleep (50);
-
-if(!m_serialPort.portName().isEmpty())
- {
- if(m_serialPort.waitForReadyRead(100))
-                          readSlot();
- }
-else
-if(!m_HA.isNull())
- {
- if(m_udpSocket.waitForReadyRead(100))
-                          readSlot();
- }
-*/
-
 reset();
 
 return true;
@@ -564,7 +550,7 @@ return ret;
 void WLDevice::readSlot()
 {
 QMutexLocker locker(&InputDataMutex);
-
+qDebug()<<"readSlot";
 if(m_serialPort.isOpen())
  {
  inBuf+=m_serialPort.readAll();

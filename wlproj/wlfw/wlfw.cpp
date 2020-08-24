@@ -14,16 +14,7 @@ connect(ui.pbWrite,SIGNAL(clicked()),SLOT(onPBWrite()));
 connect(ui.pbConnect,SIGNAL(clicked()),SLOT(onPBConnect()));
 connect(ui.pbFileDevice,SIGNAL(clicked()),SLOT(onCreateFile()));
 
-QTimer *timer = new QTimer();
-connect(timer,SIGNAL(timeout()),SLOT(updatePort()));
-//timer->start(250);
-
 DFW = new WLDevFW;
-
-QThread *thread=new QThread;
-
-thread->moveToThread(thread);
-thread->start();
 
 connect(DFW,SIGNAL(changedProp(QString)),ui.labelName,SLOT(setText(QString)));
 connect(DFW,SIGNAL(changedReady(bool)),this,SLOT(updateReady(bool)));
@@ -162,10 +153,11 @@ void WLFW::setConnect(bool enable)
 {
 ui.labelName->setText("no connect");
 
-qDebug()<<"set Connect "<<ui.cbPorts->currentText();
+qDebug()<<"set Connect "<<enable<<ui.cbPorts->currentText();
 if(!m_listDevice.isEmpty())
 {
  if(enable) {
+     DFW->closeConnect();
      DFW->setInfo(m_listDevice[ui.cbPorts->currentIndex()]);
      DFW->openConnect();
  }
