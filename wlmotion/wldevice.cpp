@@ -169,8 +169,8 @@ foreach(QSerialPortInfo portInfo,portList)
  WLDevice *Device=new WLDevice;
 
  Device->initSerialPort(portInfo.portName());
- Device->openConnect();
- Devices+=Device;
+
+ if(Device->openConnect())  Devices+=Device;
  }
 
 
@@ -220,7 +220,7 @@ while(!Devices.isEmpty())
 
  if(!Device->getUID96().isEmpty())  retDevicesInfo+=Device->getInfo();
 
- delete Device;
+ Device->deleteLater();
  }
 
 return retDevicesInfo;
@@ -431,7 +431,7 @@ m_serialPort.close();
       sendMessage("WLDevice:","no device ("+m_serialPort.portName()+")",0);
       return false;
       }
- qDebug()<<"Open QSerialPort"<<thread();
+ qDebug()<<"Open QSerialPort"<<m_serialPort.isOpen()<<thread();
 }
 else
 {

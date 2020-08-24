@@ -65,7 +65,6 @@ SOURCES +=\
     ../../wlmotion/modules/wlfreq.cpp \
     ../../wlmotion/modules/wlioput.cpp \
     ../../wlmotion/modules/wlmodule.cpp \
-    ../../wlmotion/modules/wlmodule_planner.cpp \
     ../../wlmotion/modules/wlmoduleaioput.cpp \
     ../../wlmotion/modules/wlmoduleaxis.cpp \
     ../../wlmotion/modules/wlmoduleconnect.cpp \
@@ -74,6 +73,7 @@ SOURCES +=\
     ../../wlmotion/modules/wlmodulefreq.cpp \
     ../../wlmotion/modules/wlmodulefw.cpp \
     ../../wlmotion/modules/wlmoduleioput.cpp \
+    ../../wlmotion/modules/wlmoduleplanner.cpp \
     ../../wlmotion/modules/wlmodulepwm.cpp \
     ../../wlmotion/modules/wlmodulewhell.cpp \
     ../../wlmotion/modules/wlpwm.cpp \

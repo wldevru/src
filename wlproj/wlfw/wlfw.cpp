@@ -40,7 +40,7 @@ fileName=QCoreApplication::applicationDirPath()+"//FW//";
 QDir dir;
 dir.mkdir(fileName);
 
-onUpdateDevices();
+QTimer::singleShot(300,this,SLOT(onUpdateDevices()));
 }
 
 WLFW::~WLFW()
@@ -82,14 +82,14 @@ QStringList List=DFW->getProp().split(".");
 
 if(!List.isEmpty())
     {	
-	ui.gbReadWrite->setEnabled(List.first()=="WLFW");
+    ui.gbReadWrite->setEnabled(DFW->getModuleFW()!=nullptr);
 	ui.pbFileDevice->setEnabled(List.first()!="WLFW");
 
-    if(List.size()>2)
-        if(List[0]=="WLM55J"
+   /* if(List.size()>1)
+        if(List[1]=="WLM55J"
          ||List[2]=="WLM55J"
          ||List[0]=="WLM100S"
-         ||List[2]=="WLM100S") ui.pbReboot->setEnabled(enable);
+         ||List[2]=="WLM100S")*/ ui.pbReboot->setEnabled(enable);
     }
 
  connect(DFW->getModuleFW(),SIGNAL(changedProgress(int)),ui.progressBar,SLOT(setValue(int)));;
@@ -180,29 +180,6 @@ if(!m_listDevice.isEmpty())
 void WLFW::setUID96(QString uid96)
 {
 ui.lineEditUID->setText(uid96);
-}
-
-void WLFW::updatePort()
-{
-QList<QSerialPortInfo> portList=QSerialPortInfo::availablePorts(); 
-QStringList namePortList;
-QString curPort;
-int i;
-
-if(portList.size()!=ui.cbPorts->count())
- {
- for(i=0;i<portList.size();i++)
-     if(DFW->getPortName()==portList[i].portName()) break;
-
- for(i=0;i<portList.size();i++)
-	 namePortList+=portList[i].portName();
-
- curPort=ui.cbPorts->currentText();
-
- ui.cbPorts->clear();
- ui.cbPorts->addItems(namePortList); 
- ui.cbPorts->setEditText(curPort);
- }
 }
 
 

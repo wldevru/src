@@ -33,6 +33,11 @@ Stream>>ui1;
 
 switch(ui1)
 {
+case sendModule_error: Stream>>ui1;
+                       qDebug()<<"WLFW Detect Error"<<ui1;
+
+                       break;
+
 case _sendFW:     Stream>>ui1;//status
 	              //Stream>>ui16; 
 	

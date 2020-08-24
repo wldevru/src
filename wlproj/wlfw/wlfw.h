@@ -29,7 +29,7 @@ QList <WLDeviceInfo> m_listDevice;
 bool conn;
 
 private slots:
-	void updatePort();
+
 	void updateReady(bool enable);
 
 	void onPBRead();
