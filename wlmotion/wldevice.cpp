@@ -222,7 +222,7 @@ while(!Devices.isEmpty())
 
  if(!Device->getUID96().isEmpty())  retDevicesInfo+=Device->getInfo();
 
- Device->deleteLater();
+ delete Device;
  }
 
 return retDevicesInfo;
