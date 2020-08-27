@@ -151,7 +151,8 @@ str+=tr("input numbers are not unique")+"\n";
 if((ui.editOutRALM->value()==ui.editOutENB->value()&&ui.editOutRALM->value()>0&&ui.editOutENB->value()>0))
 str+=tr("output numbers are not unique")+"\n";
 
-if(ui.sbMLIM->value()>=ui.sbPLIM->value())
+if(ui.sbMLIM->value()>=ui.sbPLIM->value()
+ &&ui.gbLimit->isChecked())
  str+=tr("invalid movement limits")+"\n";
 else
  {

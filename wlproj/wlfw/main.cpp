@@ -1,4 +1,4 @@
-#include "WLFW.h"
+#include "wlfw.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])

@@ -6,6 +6,11 @@
 #include <QList>
 #include <QDir>
 #include <QFileDialog>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
+#include <QUrl>
+#include <QClipboard>
 
 #include "wldevfw.h"
 
@@ -26,12 +31,27 @@ private:
   QString fileName;
 QList <WLDeviceInfo> m_listDevice;
 
-bool conn;
+bool m_conn=false;
+bool m_reboot=false;
+float m_progressReboot=0;
+
+long m_timeReboot=6000;
+
+QTimer *m_timerReboot;
+
+WLDeviceInfo m_rebootDI;
+
+QNetworkAccessManager* m_netManager;
 
 private slots:
 
+    void onReplyFinished();
+
+    void updateRebootProgress();
 	void updateReady(bool enable);
 
+    void onCopyUID();
+    void onWriteCloud();
 	void onPBRead();
 	void onPBWrite();
 	void onPBConnect();

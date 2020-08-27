@@ -550,7 +550,7 @@ return ret;
 void WLDevice::readSlot()
 {
 QMutexLocker locker(&InputDataMutex);
-qDebug()<<"readSlot";
+
 if(m_serialPort.isOpen())
  {
  inBuf+=m_serialPort.readAll();

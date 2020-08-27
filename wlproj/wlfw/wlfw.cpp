@@ -13,6 +13,12 @@ connect(ui.pbRead,SIGNAL(clicked()),SLOT(onPBRead()));
 connect(ui.pbWrite,SIGNAL(clicked()),SLOT(onPBWrite()));
 connect(ui.pbConnect,SIGNAL(clicked()),SLOT(onPBConnect()));
 connect(ui.pbFileDevice,SIGNAL(clicked()),SLOT(onCreateFile()));
+connect(ui.pbWriteCloud,SIGNAL(clicked()),SLOT(onWriteCloud()));
+connect(ui.pbCopyUID,SIGNAL(clicked()),SLOT(onCopyUID()));
+
+m_timerReboot = new QTimer;
+m_timerReboot->setInterval(100);
+connect(m_timerReboot,&QTimer::timeout,this,&WLFW::updateRebootProgress);
 
 DFW = new WLDevFW;
 
@@ -26,17 +32,75 @@ connect(ui.pbReboot,&QPushButton::clicked,this,&WLFW::onPBReboot);
 connect(ui.pbUpdate,&QPushButton::clicked,this,&WLFW::onUpdateDevices);
 
 
-fileName=QCoreApplication::applicationDirPath()+"//FW//";
+fileName=QCoreApplication::applicationDirPath()+"/FW/";
 
 QDir dir;
 dir.mkdir(fileName);
 
 QTimer::singleShot(300,this,SLOT(onUpdateDevices()));
+
+m_netManager = new QNetworkAccessManager;
 }
 
 WLFW::~WLFW()
 {
-delete DFW;
+    delete DFW;
+}
+
+void WLFW::onReplyFinished()
+{
+QNetworkReply *reply=qobject_cast<QNetworkReply *>(sender());
+
+if(reply->error() == QNetworkReply::NoError)
+{
+if(!fileName.isEmpty())
+ {
+ QFile File(fileName+"/cloud/"+reply->url().fileName());
+
+ QDir dir;
+ dir.mkdir(fileName+"/cloud/");
+
+ qDebug()<<"write from url:"<<reply->url().toString();
+
+ if(File.open(QIODevice::WriteOnly))
+     {
+     program=reply->readAll();
+     qDebug()<<"write cloud file"<<File.write(program);
+     File.close();
+
+     if(program.size()==DFW->getModuleFW()->getSizeFW())
+        {
+        ui.label->setText("write\: "+fileName);
+        DFW->getModuleFW()->startWriteFW(program);
+        }
+     else
+        {
+        QMessageBox::information(this,tr("Message:"),tr("error size file!"));
+        }
+     }
+    else
+     {
+     QMessageBox::information(this,tr("Message:"),tr("error save file: ")+fileName);
+     }
+
+
+ }
+}
+else
+ {
+ QMessageBox::information(this,tr("Message:"),tr("error download: ")+reply->errorString());
+ }
+
+disconnect(reply,SIGNAL(finished()),this, SLOT(onReplyFinished()));
+reply->deleteLater();
+
+setEnabled(true);
+}
+
+void WLFW::updateRebootProgress()
+{
+m_progressReboot+=(float)m_timerReboot->interval()/(float)m_timeReboot;
+ui.progressBar->setValue(m_progressReboot*ui.progressBar->maximum());
 }
 
 void WLFW::showEndWrite()
@@ -89,6 +153,7 @@ if(!List.isEmpty())
  connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.progressBar,SLOT(setEnabled(bool)));
  connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbRead,SLOT(setDisabled(bool)));
  connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWrite,SLOT(setDisabled(bool)));
+ connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWriteCloud,SLOT(setDisabled(bool)));
 
  connect(DFW->getModuleFW(),SIGNAL(endWriteFW()),this,SLOT(showEndWrite()),Qt::QueuedConnection);
  connect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(showEndRead()),Qt::QueuedConnection);
@@ -104,6 +169,7 @@ else
  disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.progressBar,SLOT(setEnabled(bool)));
  disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbRead,SLOT(setDisabled(bool)));
  disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWrite,SLOT(setDisabled(bool)));
+ disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWriteCloud,SLOT(setDisabled(bool)));
 
  disconnect(DFW->getModuleFW(),SIGNAL(endWriteFW()),this,SLOT(showEndWrite()));
  disconnect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(showEndRead()));
@@ -111,6 +177,34 @@ else
  ui.gbReadWrite->setEnabled(enable);
  ui.pbFileDevice->setEnabled(enable);
  }
+
+ui.pbCopyUID->setEnabled(enable);
+}
+
+void WLFW::onCopyUID()
+{
+QClipboard *clipboard=QGuiApplication::clipboard();
+
+clipboard->setText(DFW->getUID96());
+}
+
+void WLFW::onWriteCloud()
+{
+QStringList List=DFW->getProp().split(".");
+QString prefix;
+
+if(List.size()<3) return;
+
+if(List[0]=="WLFW")
+    prefix=List[1]=="B1" ? "B1_": "B0_";
+
+QNetworkRequest request(QUrl("https://raw.githubusercontent.com/wldevru/fw/master/"+prefix+List.at(2)+".wlfw"));
+
+QNetworkReply *reply =  m_netManager->get(request);
+
+connect(reply,SIGNAL(finished()),this, SLOT(onReplyFinished()));
+
+setDisabled(true);
 }
 
 void WLFW::onCreateFile()
@@ -133,6 +227,23 @@ setConnect(!DFW->isOpenConnect());
 void WLFW::onPBReboot()
 {
 DFW->reboot(ui.pbFileDevice->isEnabled() ? 1:0);
+setConnect(0);
+
+if(DFW->getInfo().name=="WLM100S")
+    m_timeReboot=6500;
+else
+    m_timeReboot=1000;
+
+m_rebootDI=DFW->getInfo();
+m_reboot=true;
+
+m_progressReboot=0;
+ui.progressBar->reset();
+
+m_timerReboot->start(m_timeReboot);
+
+setEnabled(false);
+QTimer::singleShot(m_timeReboot,this,SLOT(onUpdateDevices()));
 }
 
 void WLFW::onUpdateDevices()
@@ -147,6 +258,24 @@ foreach(WLDeviceInfo info,m_listDevice)
  }
 
 ui.pbConnect->setDisabled(m_listDevice.isEmpty());
+
+setEnabled(true);
+
+if(m_reboot)
+ {
+ m_reboot=false;
+
+ m_timerReboot->stop();
+ ui.progressBar->reset();
+
+ for(int i=0;i<m_listDevice.size();i++)
+  if(m_listDevice[i].UID96 == m_rebootDI.UID96)
+     {
+     ui.cbPorts->setCurrentIndex(i);
+     onPBConnect();
+     }
+ }
+
 }
 
 void WLFW::setConnect(bool enable)
@@ -158,6 +287,7 @@ if(!m_listDevice.isEmpty())
 {
  if(enable) {
      DFW->closeConnect();
+     DFW->removeModules();
      DFW->setInfo(m_listDevice[ui.cbPorts->currentIndex()]);
      DFW->openConnect();
  }
@@ -167,11 +297,12 @@ if(!m_listDevice.isEmpty())
   DFW->removeModules();
   }
 }
+
 }
 
 void WLFW::setUID96(QString uid96)
 {
-ui.lineEditUID->setText(uid96);
+//ui.lineEditUID->setText(uid96);
 }
 
 
@@ -182,11 +313,16 @@ program.clear();
 QString dir =QFileDialog::getExistingDirectory(this, tr("Save firmware to dir"),fileName);
 
 QStringList List=DFW->getProp().split(".");
+QString prefix;
 
 if(!dir.isEmpty())
 	{
-    fileName = dir+"/"+List[2]+".wlfw";
-    ui.label->setText("read to file\: "+fileName);
+    if(List[0]=="WLFW")
+                prefix=List[1]=="B1" ? "B1_": "B0_";
+
+    fileName = dir+"/"+prefix+List[2]+".wlfw";
+
+    ui.label->setText("read\: "+fileName);
     DFW->getModuleFW()->startReadFW(0);
     }	
 }
@@ -194,9 +330,6 @@ if(!dir.isEmpty())
 void WLFW::saveProgram()
 {
 qDebug()<<"saveProgram()";
-
-program=DFW->getModuleFW()->getBufFW();
-
 if(!fileName.isEmpty())
 {
 QFile File(fileName);
