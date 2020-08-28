@@ -70,7 +70,7 @@ if(!fileName.isEmpty())
 
      if(program.size()==DFW->getModuleFW()->getSizeFW())
         {
-        ui.label->setText("write\: "+fileName);
+        ui.label->setText("write: "+fileName);
         DFW->getModuleFW()->startWriteFW(program);
         }
      else
@@ -191,14 +191,14 @@ clipboard->setText(DFW->getUID96());
 void WLFW::onWriteCloud()
 {
 QStringList List=DFW->getProp().split(".");
-QString prefix;
+QString suffix;
 
 if(List.size()<3) return;
 
 if(List[0]=="WLFW")
-    prefix=List[1]=="B1" ? "B1_": "B0_";
+    suffix=List[1]=="B1" ? "_B1": "_B0";
 
-QNetworkRequest request(QUrl("https://raw.githubusercontent.com/wldevru/fw/master/"+prefix+List.at(2)+".wlfw"));
+QNetworkRequest request(QUrl("https://raw.githubusercontent.com/wldevru/fw/master/"+List.at(2)+suffix+".wlfw"));
 
 QNetworkReply *reply =  m_netManager->get(request);
 
@@ -230,9 +230,9 @@ DFW->reboot(ui.pbFileDevice->isEnabled() ? 1:0);
 setConnect(0);
 
 if(DFW->getInfo().name=="WLM100S")
-    m_timeReboot=6500;
+    m_timeReboot=10000;
 else
-    m_timeReboot=1000;
+    m_timeReboot=2500;
 
 m_rebootDI=DFW->getInfo();
 m_reboot=true;
@@ -240,7 +240,7 @@ m_reboot=true;
 m_progressReboot=0;
 ui.progressBar->reset();
 
-m_timerReboot->start(m_timeReboot);
+m_timerReboot->start();
 
 setEnabled(false);
 QTimer::singleShot(m_timeReboot,this,SLOT(onUpdateDevices()));
@@ -313,16 +313,16 @@ program.clear();
 QString dir =QFileDialog::getExistingDirectory(this, tr("Save firmware to dir"),fileName);
 
 QStringList List=DFW->getProp().split(".");
-QString prefix;
+QString suffix;
 
 if(!dir.isEmpty())
 	{
     if(List[0]=="WLFW")
-                prefix=List[1]=="B1" ? "B1_": "B0_";
+                suffix=List[1]=="B1" ? "_B1": "_B0";
 
-    fileName = dir+"/"+prefix+List[2]+".wlfw";
+    fileName = dir+"/"+List[2]+suffix+".wlfw";
 
-    ui.label->setText("read\: "+fileName);
+    ui.label->setText("read: "+fileName);
     DFW->getModuleFW()->startReadFW(0);
     }	
 }

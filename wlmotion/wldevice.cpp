@@ -791,8 +791,15 @@ qDebug()<<"onErrorSerialPort"<<serialPortError;
 
 switch(serialPortError)
 {
-case QSerialPort::DeviceNotFoundError:// reconnectSerialPort();
-                                       break;
+case QSerialPort::DeviceNotFoundError:if(getModuleConnect())
+                                         {
+                                         if(!getModuleConnect()->isEnableHeart())
+                                            {
+                                            sendMessage(getNameDevice(),"QSerialPort::DeviceNotFoundError",0);
+                                            closeConnect();
+                                            }
+                                         }
+                                         break;
 
 
 default: break;

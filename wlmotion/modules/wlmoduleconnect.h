@@ -52,6 +52,7 @@ public:
 
     bool setEnableHeart(bool enable);
 
+    bool isEnableHeart();
 public slots:	
 	void sendHeart();
 	void restartHeart();

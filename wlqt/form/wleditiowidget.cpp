@@ -81,20 +81,16 @@ return ui->spinBox->value();
 
 void WLEditIOWidget::update()
 {
-QPalette pal;
-
 if(m_Module->type()==typeMIOPut)
 {
+
+
 if(m_enLatchInput)
-    pal.setColor(QPalette::Base,QColor(110,255,110));
- else
-    pal.setColor(QPalette::Base,getIOPut()->getNow() ?
-                            QColor(255,110,110)
-                            :
-                            Qt::white);
-
-ui->spinBox->setPalette(pal);
-
+    ui->spinBox->setStyleSheet("background-color: rgb(20, 255, 205)");
+ else  if (getIOPut()->getNow())
+                  ui->spinBox->setStyleSheet("background-color: rgb(255, 120, 120)");
+                 else
+                  ui->spinBox->setStyleSheet("background-color: rgb(255,250,250)");
 }
 }
 

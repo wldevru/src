@@ -79,6 +79,11 @@ emit sendCommand(data);
 return true;
 }
 
+bool WLModuleConnect::isEnableHeart()
+{
+return Flags.get(MCF_enbheart);
+}
+
 
 void WLModuleConnect::setTimeoutConnect()
 {
