@@ -22,15 +22,16 @@ const QString namesTypeElement("typeEEmpty,typeEInput,typeEOutput,typeEOutPWM,ty
 
 
 enum typeElement{typeEEmpty=0
-                ,typeEInput
-                ,typeEOutput
-                ,typeEOutPWM
-                ,typeEEncoder
-                ,typeEAInput
-                ,typeEAxis
-                ,typeEDCan
-                ,typeEFreq
-                ,typeEWhell
+                 ,typeEInput
+                 ,typeEOutput
+                 ,typeEOutPWM
+                 ,typeEEncoder
+                 ,typeEAInput
+                 ,typeEAxis
+                 ,typeEDCan
+                 ,typeEFreq
+                 ,typeEWhell
+                 ,typeEAOutput
                 };
 
 class WLElement : public QObject
@@ -39,7 +40,7 @@ class WLElement : public QObject
 
 public:
 
-    WLElement(QObject *parent=0);
+    WLElement(QObject *parent=nullptr);
    ~WLElement();
 
 typeElement getTypeElement() {return m_typeE;}

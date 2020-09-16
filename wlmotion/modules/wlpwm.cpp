@@ -11,6 +11,7 @@ error=0;
 connect(this,SIGNAL(changedPower(float)),SIGNAL(changed()));
 connect(this,SIGNAL(changedK(float)),SIGNAL(changed()));
 connect(this,SIGNAL(changedFreq(float)),SIGNAL(changed()));
+connect(this,SIGNAL(changedEnable(bool)),SIGNAL(changed()));
 }
 
 WLPWM::~WLPWM()
@@ -20,7 +21,14 @@ WLPWM::~WLPWM()
 
 void WLPWM::setData(quint8 _flag, float P, float F)
 {
+const auto last=Flags.m_Data;
+
 Flags.m_Data=_flag;
+
+if(last!=Flags.m_Data)
+  {
+  emit changed();
+  }
 
 if(m_Power!=P)
   {
@@ -33,8 +41,8 @@ m_Freq=F;
 
 bool WLPWM::setOut(float P)
 {
-    QByteArray data;
-    QDataStream Stream(&data,QIODevice::WriteOnly);
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);

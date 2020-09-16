@@ -40,7 +40,7 @@ if(Inputs.size()<sizeInputs)
 	  input->setIndex(i);	  
       input->setParent(this);
 	  connect(input,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
-      connect(input,SIGNAL(changed(bool)),SLOT(updateIOPut()));
+      connect(input,SIGNAL(changed()),SLOT(updateIOPut()));
 	  Inputs+=input;  
       }
 else
@@ -48,7 +48,7 @@ else
 	  {	
 	  input = Inputs.takeLast();
 	  disconnect(input,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-      disconnect(input,SIGNAL(changed(bool)),this,SLOT(updateIOPut()));
+      disconnect(input,SIGNAL(changed()),this,SLOT(updateIOPut()));
       delete input;
       }
 
@@ -75,14 +75,14 @@ if(Outputs.size()<sizeOutputs)
   output->setParent(this);
   Outputs+=output;
   connect(output,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-  connect(output,SIGNAL(changed(bool)),SLOT(updateIOPut()));
+  connect(output,SIGNAL(changed()),SLOT(updateIOPut()));
   }
 else
   while(Outputs.size()!=sizeOutputs) 
 	 {	  	 
      output = Outputs.takeLast();
 	 disconnect(output,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-     disconnect(output,SIGNAL(changed(bool)),this,SLOT(updateIOPut()));
+     disconnect(output,SIGNAL(changed()),this,SLOT(updateIOPut()));
 	 delete output;
      }
 
@@ -93,14 +93,14 @@ else
 return true;
 }
 
-WLIOPut *WLModuleIOPut::getInputV(int index)
+WLIOPut *WLModuleIOPut::getInput(int index)
 {
 Q_ASSERT((index<Inputs.size())&&(index<255));
 
 return index<Inputs.size() ?  Inputs[index] :nullptr;
 }
 
-WLIOPut *WLModuleIOPut::getOutputV(int index)
+WLIOPut *WLModuleIOPut::getOutput(int index)
 {
 Q_ASSERT((index<Outputs.size())&&(index<255));
 
@@ -179,7 +179,7 @@ void WLModuleIOPut::setInputInvStr(QString data)
 QStringList List=data.split(",");
 
 for(int i=0;i<List.size();i++)
-  if((List[i].toInt()<Inputs.size())&&(List[i].toInt()>1)) getInputV(List[i].toInt())->setInv(true);
+  if((List[i].toInt()<Inputs.size())&&(List[i].toInt()>1)) getInput(List[i].toInt())->setInv(true);
 }
 
 QString WLModuleIOPut::getInputInvStr()
@@ -203,7 +203,7 @@ void WLModuleIOPut::setOutputInvStr(QString data)
 QStringList List=data.split(",");
 
 for(int i=0;i<List.size();i++)
-  if(List[i].toInt()<Outputs.size()&&List[i].toInt()>0) getOutputV(List[i].toInt())->setInv();
+  if(List[i].toInt()<Outputs.size()&&List[i].toInt()>0) getOutput(List[i].toInt())->setInv();
 }
 
 QString WLModuleIOPut::getOutputInvStr()
@@ -361,7 +361,6 @@ if(stream.name()=="inputs")
     if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
 
     }
-
    }
 
 if(stream.name()=="outputs")

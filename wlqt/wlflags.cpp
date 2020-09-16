@@ -23,6 +23,11 @@ return set_data;
 }
 
 
+void WLFlags::tog(long tog_flag)
+{
+m_Data^=tog_flag;
+}
+
 
 void WLFlags::reset()
 {

@@ -79,6 +79,8 @@ void WLModulePWM::updatePWM()
 {
 WLPWM *PWM=static_cast<WLPWM*>(sender());
 
+qDebug()<<"updatePWM()"<<PWM->getIndex();
+
 emit changedOutPWM(PWM->getIndex());
 }
 

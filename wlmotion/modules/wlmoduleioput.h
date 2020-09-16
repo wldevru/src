@@ -26,8 +26,8 @@ bool Init(int _sizeInputs,int _sizeOutputs);
 bool InitInputs(int _sizeInputs);
 bool InitOutputs(int _sizeOutputs);
 
-WLIOPut* getInputV(int m_index);
-WLIOPut* getOutputV(int m_index);
+WLIOPut* getInput(int m_index);
+WLIOPut* getOutput(int m_index);
 
 void setInputInvStr(QString data);
 QString getInputInvStr();
@@ -44,7 +44,7 @@ public:
 int getSizeInputs()  {return Inputs.size();}
 int getSizeOutputs() {return Outputs.size();}	
 
-Q_INVOKABLE   bool input(int index) {return getInputV(index)->getNow();}
+Q_INVOKABLE   bool input(int index) {return getInput(index)->getNow();}
 Q_INVOKABLE   quint8 byte(int in7,int in6,int in5,int in4,int in3,int in2,int in1,int in0)
                               {return (input(in7)? 1<<7:0)
 								     |(input(in6)? 1<<6:0)
@@ -56,15 +56,15 @@ Q_INVOKABLE   quint8 byte(int in7,int in6,int in5,int in4,int in3,int in2,int in
 								     |(input(in0)? 1<<0:0);}
 
 
-Q_INVOKABLE void otputPulse(int index, bool out,quint32 time) {getOutputV(index)->setOutPulse(out,time);}
-Q_INVOKABLE bool output(int index)   {return getOutputV(index)->getNow();}
+Q_INVOKABLE void otputPulse(int index, bool out,quint32 time) {getOutput(index)->setOutPulse(out,time);}
+Q_INVOKABLE bool output(int index)   {return getOutput(index)->getNow();}
 
 public slots:
 
-    void outputSetTo(int index, bool out) {getOutputV(index)->setOut(out);}
+    void outputSetTo(int index, bool out) {getOutput(index)->setOut(out);}
     void outputSet(int index)   {outputSetTo(index,1);}
     void outputReset(int index) {outputSetTo(index,0);}
-    void outputTog(int index)   {getOutputV(index)->setTog();}
+    void outputTog(int index)   {getOutput(index)->setTog();}
 
 public:
     void callInputData(quint8 m_index);

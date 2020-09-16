@@ -675,26 +675,7 @@ glDrawElements(GL_LINE_LOOP,8,GL_UNSIGNED_BYTE,0);
 }
 
 void WLVisualWidget::showSC(QString nameSC,int f)
-{/*
-QFont font;
-
-font.setFamily(QString::fromUtf8("Arial"));
-font.setPointSize(15);
-font.setBold(true);
-font.setItalic(false);
-font.setUnderline(false);
-font.setWeight(75);
-font.setStrikeOut(false);
-
-GLfloat  Points[]={0 ,0 ,0
-	              ,50, 0,0
-	              ,0,50, 0
-				  ,0, 0,50};
-
-GLubyte iX[]={0,1};
-GLubyte iY[]={0,2};
-GLubyte iZ[]={0,3};
-*/
+{
 int vertexLocation;
 
 QMatrix4x4 matrix,rotM;
@@ -938,7 +919,7 @@ void WLVisualWidget::showProgramTraj(bool select)
 {
 QMutexLocker locker1(&Mutex);
 
-if(!m_Program->pointShow.isEmpty()
+if(!m_Program->showPoints.isEmpty()
   &&m_Program->MutexShowPoint.tryLock(5))
 {
 int vertexLocation;
@@ -946,34 +927,21 @@ int vertexLocation;
 QMatrix4x4 Mrot;
 QVector4D P;
 
-vGLBufProgram.bind();//if(vGLBufProgram.size()==0)
+vGLBufProgram.bind();
 
-int curSize=(m_Program->pointShow.size()*sizeof(WLShowPointProgram));
+int curSize=(m_Program->showPoints.size()*sizeof(WLShowPointProgram));
 
 if(lastSizeSPsize!=curSize)
 {
 if((vGLBufProgram.size()/sizeof(WLShowPointProgram))!=m_Program->maxShowPoints())
      vGLBufProgram.allocate(m_Program->maxShowPoints()*sizeof(WLShowPointProgram));
 
-//vGLBufProgram.allocate(Program->pointShow.data(),curSize);
-QVector <WLShowPointProgram> data=m_Program->pointShow.mid(lastSizeSPsize/sizeof(WLShowPointProgram)).toVector();
+QVector <WLShowPointProgram> data=m_Program->showPoints.mid(lastSizeSPsize/sizeof(WLShowPointProgram)).toVector();
 
 vGLBufProgram.write(lastSizeSPsize,data.data(),data.size()*sizeof(WLShowPointProgram));
 
 lastSizeSPsize=curSize;
 }
-
-/*
-if(vGLBufProgram.size()!=curSize)
-   {
-   qDebug()<<Program->pointShow.size();
-   vGLBufProgram.allocate(Program->pointShow.data(),Program->pointShow.size()*sizeof(WLShowPointProgram));
-   }
-*/
-//glGetIntegerv(GL_MAX_NAME_STACK_DEPTH,&max);
-
-// glLoadName(5);  
-//if(!GLProgramElemntsList.isEmpty()) 
 
 if(select)
 {
@@ -997,23 +965,13 @@ progSelect.enableAttributeArray(vertexLocation);
 progSelect.setAttributeBuffer(vertexLocation,GL_FLOAT,sizeof(WL3DPointf)*2,1,sizeof(WLShowPointProgram));
 
 glLineWidth(4);
-glDrawArrays(GL_LINE_STRIP, 0,m_Program->pointShow.size());
+glDrawArrays(GL_LINE_STRIP, 0,m_Program->showPoints.size());
 }
 else
 {
-	/*
-glEnableClientState(GL_VERTEX_ARRAY);
 
- glVertexPointer(3, GL_FLOAT, 0,Program->pointShow[i].data()+1);
- glDrawArrays(GL_LINE_STRIP, 0, Program->pointShow[i].size()-1);
- //qDebug()<<"ToolIndices.size()"<<ToolIndices.size();
-
-glDisableClientState(GL_VERTEX_ARRAY);
-*/
-
-if(!m_Program->pointShow.isEmpty())
+if(!m_Program->showPoints.isEmpty())
 {
-//qDebug()<<"show";
 
 QMatrix4x4 matrix;
 
@@ -1025,7 +983,6 @@ matrix.scale(Zoom);
 progTraj.bind();
 progTraj.setUniformValue("mpv_matrix",projection*matrix*getShowMatrix());
 
-//progTraj.setUniformValue("u_tcolor",1);
 
 vertexLocation = progTraj.attributeLocation("a_position");
 progTraj.enableAttributeArray(vertexLocation);
@@ -1036,32 +993,15 @@ progTraj.enableAttributeArray(vertexLocation);
 progTraj.setAttributeBuffer(vertexLocation,GL_FLOAT,sizeof(WL3DPointf),3,sizeof(WLShowPointProgram));
 
 glLineWidth(1);
-glDrawArrays(GL_LINE_STRIP, 0,m_Program->pointShow.size());
+glDrawArrays(GL_LINE_STRIP, 0,m_Program->showPoints.size());
 
 progTraj.release();
 
-/*
-glLineWidth(0.1); 
-glEnableClientState(GL_VERTEX_ARRAY);
-glEnableClientState(GL_COLOR_ARRAY);
-//for(int i=0;i<Triangles.size();i++)
- {
-   // glNormal3d(Triangles[i].N.x,Triangles[i].N.y,Triangles[i].N.z);
- glColorPointer (3,GL_FLOAT,2*sizeof(WL3DPointf),&Program->pointShow[0]);
- glVertexPointer(3,GL_FLOAT,2*sizeof(WL3DPointf),&Program->pointShow[1]);
- //qDebug()<<" Program->pointShow.size()"<< Program->pointShow.size();
- glDrawArrays(GL_LINE_STRIP, 0, Program->pointShow.size()/2);
- }
-//glNormalPointer(GL_DOUBLE,   sizeof(WL3DPoint),&Triangles.data()+1);
-//qDebug()<<"ToolIndices.size()"<<ToolIndices.size();
-glDisableClientState(GL_COLOR_ARRAY);
-glDisableClientState(GL_VERTEX_ARRAY);
-*/
 }	
 
 
 if((0<=EditElement)&&((EditElement+1)<m_Program->getElementCount())
- &&(m_Program->indexData[EditElement+1].offsetPoint<m_Program->pointShow.size()))
+ &&(m_Program->indexData[EditElement+1].offsetPoint<m_Program->showPoints.size()))
 { 
   QMatrix4x4 matrix;
 
@@ -1084,53 +1024,16 @@ if((0<=EditElement)&&((EditElement+1)<m_Program->getElementCount())
    glDrawArrays(GL_LINE_STRIP, m_Program->indexData[EditElement].offsetPoint, m_Program->indexData[EditElement+1].offsetPoint
                                                                            -m_Program->indexData[EditElement].offsetPoint);
   else
-   glDrawArrays(GL_LINE_STRIP, m_Program->indexData[EditElement].offsetPoint, m_Program->pointShow.size()
+   glDrawArrays(GL_LINE_STRIP, m_Program->indexData[EditElement].offsetPoint, m_Program->showPoints.size()
                                                                            -m_Program->indexData[EditElement].offsetPoint);
 
 
   progOneColor.release();
 
- // showTool(Program->pointShow[Program->indexData[EditElement].offsetPoint].pos.to3D(),false,2);
-
-  /*
- glColor3f(1,1,1);
- glLineWidth(3);
-
- //if(typeView == HEADHEAD)
- glEnableClientState(GL_VERTEX_ARRAY);
-
- glVertexPointer(3,GL_FLOAT,2*sizeof(WL3DPointf),&Program->pointShow[1]);
-
- if(EditElement!=(Program->indexData.size()-1))
-  glDrawArrays(GL_LINE_STRIP, Program->indexData[EditElement].offsetPoint, Program->indexData[EditElement+1].offsetPoint
-                                                                          -Program->indexData[EditElement].offsetPoint);
- else
-  glDrawArrays(GL_LINE_STRIP, Program->indexData[EditElement].offsetPoint, Program->pointShow.size()/2
-                                                                          -Program->indexData[EditElement].offsetPoint);
-
- //glNormalPointer(GL_DOUBLE,   sizeof(WL3DPoint),&Triangles.data()+1);
- //qDebug()<<"ToolIndices.size()"<<ToolIndices.size();
- glDisableClientState(GL_VERTEX_ARRAY);
-
-*/
-   //glLineWidth(1);
- /*
-   glColor3f(0.0f,0.9f,0.9f);
-
-   if(EditElement!=(Program->indexData.size()-1))
-       showTool(Program->pointShow[Program->indexData[EditElement].offsetPoint].pos.to3D(),false,2);
-   */
-//	else
-	//  WLDrawArrow(Program->pointShow[Program->indexData[EditElement].offsetPoint].to3D(),
-	//              Program->pointShow[Program->indexData[EditElement+1].offsetPoint].to3D());
-
-
-  
-
 } 
 
 }
-//vGLBufProgram.release();
+
 m_Program->MutexShowPoint.unlock();
 }
 
@@ -1155,32 +1058,16 @@ if (event->buttons() & Qt::LeftButton)
  n=selectElement(x,y);
  setEditElement(n);  
 
- //qDebug()<<"EditElement="<<n;  
- //if(!EditElements.isEmpty()) emit ChangedEditElement(EditElements.first());
- //emit ChangediEditElement(iEditElement);
-// qDebug()<<"EditElement="<<EditElements.first();
+ m_timePress.start();
 
- /*
- for(int i=0;i<ListTraj.size();i++)
-	 if(ListTraj[i].iline==n)
-	       {
-		   //emit ChangedEditElement(ListTraj[i].ikadr);
-		   break;
-	       }
-       */
-/*  switch(nowTypeWork)
-  {
-  case Correct: setCorrectElement(n); break;
-  case Edit:    setEditElement(n);  emit ChangedEditElement(n);  break;
-  }
- */
+ updatePointRot();
  } 
- //updatePointRot();
  else
  if (event->buttons() & Qt::MidButton )  updatePointRot();
-  
-//updateGL();
+
 }
+
+
 int WLVisualWidget::selectElement(int x,int y)
 {
  makeCurrent();
@@ -1246,9 +1133,8 @@ int WLVisualWidget::selectElement(int x,int y)
      int dx = event->x() - LastMousePos.x();
      int dy = event->y() - LastMousePos.y();
 
-	 if (event->buttons() & Qt::MidButton ) 
-	 {  
-		// qDebug()<<"mov mouse+mid";
+     if (event->buttons() & Qt::MidButton)
+     {
 	 if(QApplication::keyboardModifiers()&Qt::ControlModifier)
 	    movView(dx,-dy);
       else
@@ -1256,11 +1142,30 @@ int WLVisualWidget::selectElement(int x,int y)
 	 
      //QTimer::singleShot(0,this,SLOT(updateGL()));
 	 }
-    /* else {
-          if (event->buttons() & Qt::RightButton)  movView(dx,-dy);
-     }*/
-	 LastMousePos = event->pos();     
+     else if (event->buttons() & Qt::LeftButton)
+         {
+         if(LastMousePos.x()>(width()*0.85f)
+          ||LastMousePos.x()<(width()*0.15f))
+           {
+           zoomView(QPoint(width()/2,height()/2),zoomDir()? -dy:dy);
+           }
+          else
+           {
+           if(m_timePress.elapsed()<500)
+             movView(dx,-dy);
+            else
+             rotView(dy/3,dx/3);
+           }
+         }
+
+     LastMousePos = event->pos();
  }
+
+void WLVisualWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+Q_UNUSED(event);
+setViewCenter();
+}
 
 void WLVisualWidget::keyPressEvent ( QKeyEvent * event )
 {/*
@@ -1392,99 +1297,10 @@ vGLBufTrack.allocate(defTrackSize*sizeof(WL3DPointf));
 void WLVisualWidget::wheelEvent( QWheelEvent * event )
 {
 zoomView(event->pos(),zoomDir()? -event->delta():event->delta());
-//paintGL();
 }
-/*
-void  WLVisualWidget::NormalizeRot(int *angle)
- {
-     while (*angle < -360)
-         *angle += 360 ;
-     while (*angle > 360)
-         *angle -= 360 ;
- }
 
-void  WLVisualWidget::NormalizeZoom(float *zoom)
- {
-	 if(*zoom<0.5) *zoom=0.5;
-     if(*zoom>100) *zoom=100;
- }
-*/
-
-/*
-void WLVisualWidget::createGLTool()
-{
-WL3DPoint P;
-
-glColor3f(0,1,1);
-glBegin(GL_LINE_LOOP);
-    for(int i=0;i<ToolPoints.size();i++)
-	  {
-	  P=ToolPoints[i];
-	  glVertex3f(P.x,P.y,P.z);
-	  }
-glEnd();
-
-glBegin(GL_LINE_LOOP);
-    for(int i=0;i<ToolPoints.size();i++)
-	  {
-	  P=ToolPoints[i];
-	  glVertex3f(P.x,P.y,P.z+40);
-	  }
-glEnd();
-
-glBegin(GL_LINES);
-    for(int i=0;i<ToolPoints.size();i++)
-	  {
-	  P=ToolPoints[i];
-	  glVertex3f(P.x,P.y,P.z);
-	  glVertex3f(P.x,P.y,P.z+40);
-	  }
-glEnd();
-
-glBegin(GL_LINES);
-    for(int i=0;i<ToolPoints.size();i++)
-	  {
-	  P=ToolPoints[i];
-	  glVertex3f(P.x,P.y,P.z);
-	  glVertex3f(0,0,0);
-	  }
-glEnd();
-}
-*/
 void WLVisualWidget::createGLListTraj()
 {
-/*
-if(ListTraj.size()==0) return;
-
-int i,k;
-
-GLuint GLList;
-
-GLListTraj.clear();
-
-for(i=0;i<ListTraj.size();i++)
-{
-GLList=glGenLists(i+1);
-
-glNewList(GLList,GL_COMPILE);
-
-glLoadName(i);
-
-glBegin(GL_LINE_STRIP);
-
-for(k=0;k<ListTraj[i].Points.size();k++)
-   {
-   glVertex3f(ListTraj[i].Points[k].x
-	         ,ListTraj[i].Points[k].y
-			 ,ListTraj[i].Points[k].z);
-  // qDebug("Point X:%f Y:%f Z:%f",ListTraj[i].Points[k].x,ListTraj[i].Points[k].y,ListTraj[i].Points[k].z);
-   }
-glEnd();
-
-glEndList();
-GLListTraj+=GLList;
-}
-*/
 
 }
 
@@ -1503,9 +1319,9 @@ else {
  {
  if(EditElement>0
  &&(EditElement<m_Program->indexData.size())
- &&((m_Program->indexData[EditElement].offsetPoint)<m_Program->pointShow.size()))
+ &&((m_Program->indexData[EditElement].offsetPoint)<m_Program->showPoints.size()))
   {
-  Psum=m_Program->pointShow[m_Program->indexData[EditElement].offsetPoint+1].pos;
+  Psum=m_Program->showPoints[m_Program->indexData[EditElement].offsetPoint+1].pos;
   }
  else
   {
@@ -1527,23 +1343,16 @@ if(m_typeOffset==Tool)
  if(m_typeView==XYZ)
    {
    ret=showMatrix*m_MillMachine->getCurrentPosition().to3D().toM().inverted();
-
-
    }
  else
    {
    WLFrame Fr=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition());
 
    ret=showMatrix*Fr.toM().inverted();
-/*
-   ret.translate(Fr.x,
-                 Fr.y,
-                 Fr.z);*/
    }
 
  }
 else
-
  ret=WLOpenGL::getShowMatrix();
 
 return ret;
@@ -1560,16 +1369,44 @@ m_tbGModelView-> move(this->width()-m_tbCenterView->width()-8,m_tbToolView->geom
 void WLVisualWidget::setViewCenter()
 {
 WL3DPointf minP,maxP;
+QVector4D P;
 
- minP=m_Program->getMinShowPoint();
- maxP=m_Program->getMaxShowPoint();
+QMatrix4x4 M=getShowMatrix();
 
- qDebug()<<"showPoint"<<m_Program->getMinShowPoint().to3D().toString();
- qDebug()<<"showPoint"<<m_Program->getMaxShowPoint().to3D().toString();
+ bool first=true;
+ P.setW(1);
+
+ m_Program->MutexShowPoint.lock();
+
+ foreach(WLShowPointProgram point,m_Program->showPoints)
+ {
+ P.setX(point.pos.x);
+ P.setY(point.pos.y);
+ P.setZ(point.pos.z);
+ P.setW(1);
+
+ P=M*P;
+
+ if(first)
+  {
+  minP.x=maxP.x=P.x();
+  minP.y=maxP.y=P.y();
+  first=false;
+  }
+ else
+   {
+   if(minP.x>P.x()) minP.x=P.x();
+     else if(maxP.x<P.x()) maxP.x=P.x();
+
+   if(minP.y>P.y()) minP.y=P.y();
+     else if(maxP.y<P.y()) maxP.y=P.y();
+   }
+ }
+
+ m_Program->MutexShowPoint.unlock();
 
  Zoom=qMin(qAbs(vport[2]/(maxP.x-minP.x)),qAbs(vport[3]/(maxP.y-minP.y)));
 
- showMatrix.setToIdentity();
 
  if(m_typeOffset==Model)   {
  showOffset.setX(-(minP.x+maxP.x)/2*Zoom);

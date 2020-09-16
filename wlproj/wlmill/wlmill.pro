@@ -4,6 +4,7 @@
 
 TEMPLATE = app
 TARGET = wlmill
+QT += core widgets serialport gui network script quickwidgets
 
 QMAKE_LFLAGS = -no-pie
 #DEFINES += QT_NO_DEBUG_OUTPUT\
@@ -11,7 +12,7 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_WARNING_OUTPUT\
 
 #QT += core widgets serialport gui network opengl script
-QT += core widgets serialport gui network script quickwidgets
+
 
 VERSION = 1.0.0.2
 
@@ -124,7 +125,6 @@ HEADERS += \
     ../../wlmotion/modules/wlpwm.h \
     ../../wlmotion/modules/wlwhell.h \
     ../../wlmotion/wldevice.h \
-    ../../wlmotion/wlmotion.h \
     ../../wlqt/form/WLMillDriveWidget.h \
     ../../wlqt/form/wldevicewidget.h \
     ../../wlqt/form/wldrivewidget.h \
@@ -155,7 +155,7 @@ HEADERS += \
     ../../wlqt/wlmcodesh.h \
     ../../wlqt/wlopengl.h \
     ../../wlqt/wlpad.h \
-    1wlmill.h \
+    wlmill.h \
     wldelayscript.h \
     wldialogobscript.h \
     wldialogscript.h \
@@ -168,7 +168,8 @@ HEADERS += \
     wlmilldrivewidget.h \
     wlmillmachine.h \
     wlpositionwidget.h \
-    wlvisualwidget.h
+    wlvisualwidget.h \
+    ../../wlmotion/wlmotion.h
 
 
 FORMS += \
@@ -193,12 +194,9 @@ FORMS += \
 
 
 RESOURCES += \
-    config.qrc \
     image.qrc \
-    qml.qrc \
-    shaders.qrc
-
-DISTFILES += \
-    AxisPosLabel.qml
+    shaders.qrc \
+    config.qrc \
+    qml.qrc
 
 

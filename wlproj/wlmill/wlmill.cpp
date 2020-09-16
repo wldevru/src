@@ -399,26 +399,24 @@ font.setUnderline(false);
 font.setWeight(75);
 font.setStrikeOut(false);
 */
+
 DockPosition=new QDockWidget(this);
 
 DockPosition->setWindowTitle(tr("Positions"));
 DockPosition->setObjectName("DPosition");
 
-PositionWidget=new WLPositionWidget(MillMachine,Program);
-
-//connect(PositionWidget,&WLPositionWidget::changedHomePosition,Program,&WLGProgram::setSLOT(setHomePosition(WLFrame)));
-//connect(PositionWidget,SIGNAL(changedBackPosition(WLFrame)),Program,SLOT(setBackPosition(WLFrame)));
-
-//connect(MillMachine,SIGNAL(changedReadyRunList(bool)),PositionWidget,SLOT(setEditDisabled(bool)));
+PositionWidget=new WLPositionWidget(MillMachine,Program,this);
 
 connect(PositionWidget,SIGNAL(changedViewSC(int)),VisualWidget,SLOT(setViewSC(int)));
 
-
+PositionWidget->show();
 
 //DockPosition->setFont(font);
 
 DockPosition->setWidget(PositionWidget);
-DockPosition->setFeatures(QDockWidget::NoDockWidgetFeatures|QDockWidget::DockWidgetMovable);
+DockPosition->setFeatures(QDockWidget::DockWidgetFloatable
+                         |QDockWidget::DockWidgetMovable
+                         |QDockWidget::DockWidgetClosable);
 
 addDockWidget(Qt::RightDockWidgetArea,DockPosition);
 
@@ -438,19 +436,24 @@ font.setUnderline(false);
 font.setWeight(75);
 font.setStrikeOut(false);
 */
+
 DockMillControl=new QDockWidget(this);
 
 DockMillControl->setWindowTitle(tr("Mill Control"));
 DockMillControl->setObjectName("DMillControl");
 
 MillControl = new WLMillControl(MillMachine,Program,this);
+MillControl->show();
+
 
 DockMillControl->setWidget(MillControl);
 
 DockMillControl->setFeatures(QDockWidget::DockWidgetFloatable
-                            |QDockWidget::DockWidgetMovable);
+                            |QDockWidget::DockWidgetMovable
+                            |QDockWidget::DockWidgetClosable);
 
-addDockWidget(Qt::LeftDockWidgetArea,DockMillControl);
+addDockWidget(Qt::RightDockWidgetArea,DockMillControl);
+
 }
 
 
@@ -476,8 +479,7 @@ DockIOPut->setObjectName("DIOPut");
 
 IOWidget =new WLIOWidget();
 
-IOWidget->setModuleIOPut(MillMachine->m_motDevice->getModuleIOPut());
-IOWidget->setModulePWM(MillMachine->m_motDevice->getModulePWM());
+IOWidget->setDevice(MillMachine->m_motDevice);
 
 IOWidget->Init();
 
@@ -535,16 +537,7 @@ delete EVMScript;
 qDebug("DELETE WHITE END");
 }
 
-void WLMill::onLoadConfigDevice()
-{/*
-QString fileName = QFileDialog::getSaveFileName(this, tr("Load config WLMotion"),fileName,"xml (*.xml)");
 
-if(!fileName.isEmpty()) 
-	{
-	MillMachine->motDevice->readFromFile(fileName,false);
-    }	
-*/
-}
 
 void WLMill::onEditDrive(QString nameDrive)
 {
@@ -1106,24 +1099,6 @@ stream.writeStartElement("WhiteLineMillConfig");
  stream.writeAttribute("clear",VisualWidget->getClearColor().name());
  stream.writeEndElement();
 
- /*
- stream.writeStartElement("HomePos");
- stream.writeAttribute("Frame",MillMachine->GCode.getHomePosition().toString());
-
- stream.writeEndElement();
-
- for(int i=0;i<sizeSC;i++)
- {
- stream.writeStartElement("SC");
- stream.writeAttribute("i",QString::number(i));
-
- stream.writeAttribute("Frame",MillMachine->GCode.getOffsetSC(i).toString());
- stream.writeAttribute("refPoint0",MillMachine->GCode.getRefPoint0SC(i).toString());
- stream.writeAttribute("refPoint1",MillMachine->GCode.getRefPoint1SC(i).toString());
- stream.writeEndElement();
- }
- */
-
  stream.writeStartElement("Operating"); 
  stream.writeAttribute("Minute",QString::number(getLifeM(),'g',36));	 
  stream.writeEndElement();
@@ -1180,7 +1155,6 @@ if(FileXML.open(QIODevice::ReadOnly))
 	lastProg=stream.attributes().value("LastProgram").toString();
 	Program->setLastMovElement(stream.attributes().value("LastElementProgram").toString().toLong());
 
-	//Program->loadFile(stream.attributes().value("LastProgram").toString()); перенесли в конец
 	lastFileSC=(stream.attributes().value("LastSC").toString());
 
 	 while(!stream.atEnd())
@@ -1213,45 +1187,12 @@ if(FileXML.open(QIODevice::ReadOnly))
 		  continue;
 	      }
 
-        /*
-		if(stream.name()=="HomePos")
-		 {
-		 qDebug()<<"loadHomePos";
-
-		 WLFrame Fr;
-		 Fr.fromString(stream.attributes().value("Frame").toString());
-		 MillMachine->GCode.setHomePosition(Fr);
-
-		 continue;
-		 }
-		if(stream.name()=="SC")
-		 {
-		 qDebug()<<"loadSC";
-		 WL3DPoint SC;
-		 int i=0;
-
-		 i=stream.attributes().value("i").toString().toInt();
-
-		 WLFrame Fr;
-
-		 Fr.fromString(stream.attributes().value("Frame").toString());
-		 MillMachine->GCode.setOffsetSC(i,Fr);
-		 
-		 Fr.fromString(stream.attributes().value("refPoint0").toString());
-		 MillMachine->GCode.setRefPoint0SC(i,Fr);
-
-		 Fr.fromString(stream.attributes().value("refPoint1").toString());
-		 MillMachine->GCode.setRefPoint1SC(i,Fr); 
-		 continue;		 
-	     }
-       //---
-       */
 	 }
 	
     }
    }
 
-  Program->loadFile(lastProg,true);//чтобы сразу не загружал программу
+  Program->loadFile(lastProg,true);
   }
   else
     ret=0;
@@ -1278,6 +1219,25 @@ QMessageBox::about(this,("program"),
 
 void WLMill::help()
 {
-about();
+    about();
 }
+
+void WLMill::placeVisualizer()
+{
+//if(MillControl)    MillControl->move(2,0);
+//if(PositionWidget) PositionWidget->move(VisualWidget->width()-PositionWidget->width()-2,0);
+}
+
+void WLMill::resizeEvent(QResizeEvent *event)
+{
+Q_UNUSED(event);
+ placeVisualizer();
+}
+
+void WLMill::showEvent(QShowEvent *event)
+{
+Q_UNUSED(event);
+    placeVisualizer();
+}
+
 

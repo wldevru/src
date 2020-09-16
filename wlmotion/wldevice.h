@@ -52,6 +52,12 @@ QString  comPort;
 QHostAddress  HA;
 QString UID96;
 quint32 version;
+
+bool isValid(WLDeviceInfo info)
+                              {
+                               return name==info.name
+                                   &&UID96==info.UID96;
+                              }
 };
 
 class WLDevice: public WLModule

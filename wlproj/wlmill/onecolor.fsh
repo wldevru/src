@@ -3,7 +3,7 @@
 precision mediump int;
 precision mediump float;
 #endif
-uniform vec3   u_color;
+uniform vec3  u_color;
 
 //varying lowp vec4 col;
 

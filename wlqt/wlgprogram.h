@@ -76,7 +76,7 @@ public:
 	//QList<WLElementTraj>  ListTraj;	
     QList <WLElementGProgram> indexData;
     //QVector <WL3DPointf>       pointShow;
-    QList <WLShowPointProgram>  pointShow;
+    QList <WLShowPointProgram>  showPoints;
 
 	QMutex Mutex;	
     QMutex MutexShowPoint;

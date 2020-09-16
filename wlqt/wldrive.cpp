@@ -521,7 +521,7 @@ void WLDrive::addInResolutionMov(WLIOPut *_inEnableMov,bool state)
 {
 resolutMovIOData+=WLIOData(_inEnableMov,state);
 
-connect(_inEnableMov,SIGNAL(changed(bool)),SLOT(updateInResolutionMov()),Qt::QueuedConnection);
+connect(_inEnableMov,SIGNAL(changed()),SLOT(updateInResolutionMov()),Qt::QueuedConnection);
 }
 
 void WLDrive::removeInResolutionMov(WLIOPut *_inEnableMov)
@@ -533,7 +533,7 @@ WLIOData data=resolutMovIOData.at(i);
 if(data.IOput==_inEnableMov)
   {
   resolutMovIOData.removeAt(i);
-  disconnect(_inEnableMov,SIGNAL(changed(bool)),this,SLOT(updateInResolutionMov()));
+  disconnect(_inEnableMov,SIGNAL(changed()),this,SLOT(updateInResolutionMov()));
   break;
   }
 }

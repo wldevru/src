@@ -229,7 +229,7 @@ void  WLModuleAxis::setInEMGStop(int index)
 disconnect(inEMGStop,SIGNAL(changed(bool)),this,SIGNAL(changedInEMGStop(bool)));
 
 inEMGStop->removeComment("inEMGStop");
-inEMGStop=ModuleIOPut->getInputV(index);;
+inEMGStop=ModuleIOPut->getInput(index);;
 inEMGStop->addComment("inEMGStop");
 
 connect(inEMGStop,SIGNAL(changed(bool)),this,SIGNAL(changedInEMGStop(bool)));
@@ -242,7 +242,7 @@ void  WLModuleAxis::setInSDStop(int index)
 disconnect(inSDStop,SIGNAL(changed(bool)),this,SIGNAL(changedInSDStop(bool)));
 
 inSDStop->removeComment("inSDStop");
-inSDStop=ModuleIOPut->getInputV(index);;
+inSDStop=ModuleIOPut->getInput(index);;
 inSDStop->addComment("inSDStop");
 
 
@@ -254,7 +254,7 @@ setInputMAxis(IO_inSDStop,index);
 void  WLModuleAxis::setInProbe(int index)
 {
 inProbe->removeComment("inProbe");
-inProbe=ModuleIOPut->getInputV(index);;
+inProbe=ModuleIOPut->getInput(index);;
 inProbe->addComment("inProbe");
 
 setInputMAxis(IO_inProbe,index);

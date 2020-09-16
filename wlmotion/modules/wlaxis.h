@@ -271,7 +271,7 @@ signals:
  void changedStatus(statusAxis);
  void changedMode(modeAxis);
  void changedFreq(float);
- void changedInALM(bool);
+ void changedInALM();
 
  void finished();
  void started();

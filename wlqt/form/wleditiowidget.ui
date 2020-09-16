@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>192</width>
-    <height>47</height>
+    <height>50</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>right key - menu</string>
+      <string>press to menu</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>

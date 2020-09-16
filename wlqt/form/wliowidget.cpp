@@ -24,7 +24,14 @@ m_IconOff = new QIcon(":/data/icons/ioff.png");
 WLIOWidget::~WLIOWidget()
 {
 delete m_IconOn;
-delete m_IconOff;
+    delete m_IconOff;
+}
+
+void WLIOWidget::setDevice(WLMotion *Device)
+{
+if(Device->getModuleIOPut()) setModuleIOPut(Device->getModuleIOPut());
+if(Device->getModulePWM())   setModulePWM(Device->getModulePWM());
+if(Device->getModuleAIOPut())setModuleAIOPut(Device->getModuleAIOPut());
 }
 
 void WLIOWidget::Init()
@@ -40,8 +47,10 @@ if(m_inputViewModel)
 
   connect(m_tableViewIn,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableInput(QModelIndex)));
   connect(m_inputViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewIn,SLOT(update(QModelIndex)));
+  }
 
-
+if(m_outputViewModel)
+  {
   m_tableViewOut=new QTableView();
   m_tableViewOut->setModel(m_outputViewModel);
 
@@ -61,26 +70,45 @@ if(m_outPWMViewModel)
   connect(m_tableViewOutPWM,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableOutPWM(QModelIndex)));
   connect(m_outPWMViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewOutPWM,SLOT(update(QModelIndex)));
   }
+
+if(m_ainputViewModel)
+  {
+  m_tableViewAIn=new QTableView();
+  m_tableViewAIn->setModel(m_ainputViewModel);
+
+  addTab(m_tableViewAIn ,"AIN");
+
+  //connect(m_tableViewIn,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableInput(QModelIndex)));
+  connect(m_ainputViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewAIn,SLOT(update(QModelIndex)));
+  }
+
+if(m_aoutputViewModel)
+  {
+  m_tableViewAOut=new QTableView();
+  m_tableViewAOut->setModel(m_aoutputViewModel);
+
+  addTab(m_tableViewAOut ,"AOUT");
+
+  connect(m_tableViewAOut,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableAOutput(QModelIndex)));
+  connect(m_aoutputViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewAOut,SLOT(update(QModelIndex)));
+  }
+
 /*
 if(m_moduleAIOPut)
   {
-  TableAIn = new QTableWidget(this);
-  addTab(TableAIn,"AIN");
+  m_tableViewAIn=new QTableView();
+  m_tableViewAIn->setModel(m_aoutPWMViewModel);
 
-  TableAIn->setRowCount(m_moduleAIOPut->getSizeInputs());
-  TableAIn->setColumnCount(1);
+  addTab(m_tableViewOutPWM,"OUTPWM");
 
-  label.clear();
-  for(int i=0;i<m_moduleAIOPut->getSizeInputs();i++)
-    label+=QString::number(i);
-
-  TableAIn->setVerticalHeaderLabels(label);
-  TableAIn->setHorizontalHeaderLabels(QString(tr("value,inv,F")).split(","));
+  connect(m_tableViewOutPWM,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableOutPWM(QModelIndex)));
+  connect(m_outPWMViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewOutPWM,SLOT(update(QModelIndex)));
   }
-*/
+
 QTimer *timer = new QTimer;
 connect(timer,SIGNAL(timeout()),SLOT(updateData()));
 timer->start(100);
+*/
 }
 
 /*
@@ -117,7 +145,7 @@ case 1: if(QMessageBox::question(this,tr("Question"),tr("invert input")+" PC "+Q
 		break;*/
 case 1: if(QMessageBox::question(this,tr("Question"),tr("invert input")+" WLMotion "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
 		{
-        m_inputViewModel->moduleIOPut()->getInputV(row)->togInv();
+        m_inputViewModel->moduleIOPut()->getInput(row)->togInv();
 		}
 } 
 
@@ -130,7 +158,7 @@ int row=mindex.row();
 qDebug()<<"setDClick Out"<<row;
 switch(mindex.column())
 {
-case 0: m_outputViewModel->moduleIOPut()->getOutputV(row)->setTog();
+case 0: m_outputViewModel->moduleIOPut()->getOutput(row)->setTog();
         break;
 /*
 case 1: if(QMessageBox::question(this,tr("Question"),tr("invert output")+" PC "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
@@ -140,7 +168,7 @@ case 1: if(QMessageBox::question(this,tr("Question"),tr("invert output")+" PC "+
 		break;*/
 case 1: if(QMessageBox::question(this,tr("Question"),tr("invert output")+" WLMotion "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
           {
-          m_outputViewModel->moduleIOPut()->getOutputV(row)->togInv();
+          m_outputViewModel->moduleIOPut()->getOutput(row)->togInv();
           }
         break;
 
@@ -195,110 +223,22 @@ case 3: EN.setMinMaxNow(1,30000, m_outPWMViewModel->modulePWM()->getOutPWM(row)-
 }
 }
 
-
-void WLIOWidget::updateData()
+void WLIOWidget::setDCTableAOutput(QModelIndex mindex)
 {
-//m_tableViewIn->reset();
-//m_tableViewOut->reset();
-return;
+int row=mindex.row();
 
-QTableWidgetItem *item;
+WLEnterNum EN;
+qDebug()<<"setDClick AOut"<<row;
 
-WLIOPut  *ioput;
-WLAIOPut *aioput;
-WLPWM    *pwm;
-/*
-if(m_moduleIOPut)
-{
- for(int i=0;i<m_moduleIOPut->getSizeInputs();i++)
-  {
-  item = new QTableWidgetItem;
-  item->setFlags(0);
+EN.setMinMaxNow(0,1,m_aoutputViewModel->moduleAIOPut()->getOutput(row)->value());
+EN.setLabel(tr("Value (0-1):"));
+EN.setSuffix(tr(""));
 
-  //if(MillMachine->motDevice->inputs[i]!=NULL)
-  ioput=m_moduleIOPut->getInputV(i);
-     {
-     item->setFlags(ioput->isEnable()?Qt::ItemIsEnabled : Qt::NoItemFlags);
-     item->setText(ioput->getComment());
-     if(ioput->isInvalid())
-         {
-         item->setText("invalid");
-         }
-     item->setToolTip(ioput->getComment());
-     item->setIcon(ioput->getNow() ? *m_IconOn:*m_IconOff);
-     }
+if(EN.exec())
+        {
+        m_aoutputViewModel->moduleAIOPut()->getOutput(row)->setValue(EN.getNow());
+        }
 
-  TableIn->setItem(i,0,item);
 
-  item = new QTableWidgetItem;
-  item->setFlags(ioput->isEnable() ? Qt::ItemIsEnabled : Qt::NoItemFlags);
-  item->setIcon(ioput->isInv()? *m_IconOn:*m_IconOff);
-
-  TableIn->setItem(i,1,item);
-  }
-
-for(int i=0;i<m_moduleIOPut->getSizeOutputs();i++)
-  {
-  item = new QTableWidgetItem;
-  item->setFlags(0);
-
-  //if(MillMachine->outputs[i]!=NULL)
-  ioput=m_moduleIOPut->getOutputV(i);
-     {
-     item->setFlags(ioput->isEnable()?Qt::ItemIsEnabled : Qt::NoItemFlags);
-     item->setText(ioput->getComment());
-     if(ioput->isInvalid())
-         item->setText("invalid");
-     item->setToolTip(ioput->getComment());
-     item->setIcon(ioput->getNow() ? *m_IconOn:*m_IconOff);
-     }
-  TableOut->setItem(i,0,item);
-
-  item = new QTableWidgetItem;
-  item->setFlags(ioput->isEnable()?Qt::ItemIsEnabled : Qt::NoItemFlags);
-  item->setIcon(ioput->isInv()? *m_IconOn:*m_IconOff);
-
-  TableOut->setItem(i,1,item);
-  }
-}
-*/
-
-if(m_moduleAIOPut)
-{
- for(int i=0;i<m_moduleAIOPut->getSizeInputs();i++)
-  {
-  item = new QTableWidgetItem;
-  item->setFlags(0);
-
-  //if(MillMachine->motDevice->inputs[i]!=NULL)
-  aioput=m_moduleAIOPut->getInput(i);
-     {
-     item->setFlags(aioput->isEnable()?Qt::ItemIsEnabled : Qt::NoItemFlags);
-     //item->setText(pwm->getComment());
-     /*if(pwm->isInvalid())
-         {
-         item->setText("invalid");
-         }*/
-     //item->setToolTip("F="+QString::number(pwm->freq()));
-     item->setText(QString::number(aioput->getValue()*100,'f',2)+"%");
-     //item->setIcon(pwm->isUnlock() ? *IconOn:*IconOff);
-     }
-
-  TableAIn->setItem(i,0,item);
-/*
-  item = new QTableWidgetItem;
-  item->setFlags(pwm->isEnable() ? Qt::ItemIsEnabled : Qt::NoItemFlags);
-  item->setIcon(pwm->isInv()? *IconOn:*IconOff);
-
-  TableOutPWM->setItem(i,1,item);
-
-  item = new QTableWidgetItem;
-  item->setFlags(pwm->isEnable() ? Qt::ItemIsEnabled : Qt::NoItemFlags);
-  item->setText(QString::number(pwm->freq()));
-
-  TableOutPWM->setItem(i,2,item);
-*/
-  }
-}
 }
 

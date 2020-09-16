@@ -209,7 +209,7 @@ QToolBar *TBMessage;
 QToolBar *TBScript;
 QToolBar *TBWireChild;
 
-WLMillControl *MillControl;
+WLMillControl *MillControl=nullptr;
 /*
 QToolBar *TBWireCorrect;
 QToolBar *TBWireEdit;
@@ -222,10 +222,10 @@ WLDialog     *Dialog;
 WLEVScript *EVLScript;
 WLEVScript *EVMScript;
 
-WLMessManager *MessManager;
+WLMessManager *MessManager=nullptr;
 
-WLPositionWidget *PositionWidget;
-WLVisualWidget *VisualWidget;
+WLPositionWidget *PositionWidget=nullptr;
+WLVisualWidget *VisualWidget=nullptr;
 
 WLIOWidget *IOWidget;
 
@@ -294,7 +294,6 @@ private slots:
     void onEditDevice();
     void onEditWhell();
     void onSetColors();
-	void onLoadConfigDevice();
 
     void onEditDrive(QString nameDrive);
 
@@ -333,6 +332,15 @@ private slots:
 	void about();
 	void help();
 
+    void placeVisualizer();
+
+    // QWidget interfaceplaceVisualizer()
+protected:
+    void resizeEvent(QResizeEvent *event);
+
+    // QWidget interface
+protected:
+    void showEvent(QShowEvent *event);
 
 };
 

@@ -29,7 +29,7 @@ public:
     WLIOPut *getIOPut() {if(m_Module->type()==typeMIOPut)
                                {
                                WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
-                               return  m_input ? ModuleIOPut->getInputV(value()): ModuleIOPut->getOutputV(value());
+                               return  m_input ? ModuleIOPut->getInput(value()): ModuleIOPut->getOutput(value());
                                }
                             else
                                return nullptr;
@@ -52,9 +52,10 @@ private slots:
    void onActLatchInput();
 
    void setLatchInput(int);
+
    // QWidget interface
-protected:
-   void contextMenuEvent(QContextMenuEvent *event);
+protected:   
+   void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // WLEDITIOPUTWIDGETT_H

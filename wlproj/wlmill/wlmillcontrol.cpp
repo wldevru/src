@@ -115,13 +115,6 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 	connect(ui.pbMinusProbeZ,SIGNAL(clicked()),SLOT(updateProbeButtons()));
 	connect(ui.pbMinusProbeH,SIGNAL(clicked()),SLOT(updateProbeButtons()));
 	
-    ui.pbMinusProbeH->setIcon(QIcon(QCoreApplication::applicationDirPath()+"//icons//H.png"));
-
-    //ui.FtouchLabel->setPrefix("F:");
-
-    //dataPad Pad=MillMachine->getPad("main");
-
-    //ui.hSBFtouch->setMaximum(200);
     ui.sbFtouch->setValue(MillMachine->VProbe());
 
     connect(ui.pushButtonGo,SIGNAL(clicked()),MillMachine,SLOT(Start()));
@@ -343,40 +336,14 @@ if(ret==QMessageBox::Ok)
 
 
 }
-/*
-void WLMillControl::setPercentS(float per)
-{
-//float pos=per/maxFPercent*ui.horizontalScrollBarF->maximum();
-//ui.horizontalScrollBarS->setSliderPosition(pos);
-}
-*/
-/*
-void WLMillControl::updateScrollBarF(int i)
-{
-double percent=(double)i/ui.horizontalScrollBarF->maximum()*100;
-
-percent*=maxFPercent/100;
-
-MillMachine->setPercentSpeed(percent);
-}
-
-void WLMillControl::updateScrollBarS(int i)
-{
-double percent=(double)i/ui.horizontalScrollBarS->maximum()*100;
-
-percent*=maxSPercent/100;
-
-MillMachine->setPercentSOut(percent);
-}	
-*/
 void WLMillControl::updateLabelInProbe()
 {
 WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->m_motDevice->getModule(typeMAxis));
 
 if(ModuleAxis->getInput(MAXIS_inProbe)->getNow())
-    ui.labelInProbe->setPixmap(QPixmap(QCoreApplication::applicationDirPath()+"//icons//ion.png"));
+    ui.labelInProbe->setPixmap(QPixmap(":/data/icons/ion.png"));
 else
-    ui.labelInProbe->setPixmap(QPixmap(QCoreApplication::applicationDirPath()+"//icons//ioff.png"));
+    ui.labelInProbe->setPixmap(QPixmap(":/data/icons/ioff.png"));
 }
 
 void WLMillControl::updateRunSrcipt()
@@ -409,12 +376,6 @@ if(EditText.exec())
 void WLMillControl::updateLabelOnMachine(bool on)
 {
 Q_UNUSED(on)
-/*
-if(on)
-  ui.pushButtonOnMachine->setText("ON Machine ON");	
- else
-  ui.pushButtonOnMachine->setText("OFF Machine OFF");	 
-*/  
 }
 
 

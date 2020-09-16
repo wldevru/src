@@ -59,6 +59,8 @@ private:
 
     QTimer *m_timerView;
 
+    QTime m_timePress;
+
     int lastSizeSPsize=0;
 
 	QVector<WL3DPoint> ToolPoints;
@@ -121,6 +123,7 @@ protected:
   
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 
 	void wheelEvent( QWheelEvent * event );
 	void keyPressEvent (QKeyEvent * event );
@@ -188,6 +191,7 @@ private slots :
 	void  setEnRotTool(bool en) {enRotTool=en;}
     void  resetProgramBuffer() {lastSizeSPsize=0;}
     void  placeVisualElements();
+
 public slots:
 		
     void setTypeView(int type)   {m_typeView=(TypeViewModel)type; updateTrajProgram();}
@@ -218,9 +222,6 @@ public slots:
 
     void setViewOffsetModel()     {m_typeOffset=Model;setViewCenter();}
     void setViewOffsetTool()      {m_typeOffset=Tool; setViewCenter();}
-
-    
-
     // QWidget interface
 protected:
    void showEvent(QShowEvent *event);

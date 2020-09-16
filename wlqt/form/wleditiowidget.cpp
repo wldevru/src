@@ -82,16 +82,14 @@ return ui->spinBox->value();
 void WLEditIOWidget::update()
 {
 if(m_Module->type()==typeMIOPut)
-{
-
-
-if(m_enLatchInput)
-    ui->spinBox->setStyleSheet("background-color: rgb(20, 255, 205)");
- else  if (getIOPut()->getNow())
+ {
+ if(m_enLatchInput)
+     ui->spinBox->setStyleSheet("background-color: rgb(20, 255, 205)");
+  else  if (getIOPut()->getNow())
                   ui->spinBox->setStyleSheet("background-color: rgb(255, 120, 120)");
                  else
                   ui->spinBox->setStyleSheet("background-color: rgb(255,250,250)");
-}
+ }
 }
 
 void WLEditIOWidget::onActTogInvers()
@@ -120,7 +118,7 @@ if(m_enLatchInput)
   }
 }
 
-void WLEditIOWidget::contextMenuEvent(QContextMenuEvent *event)
+void WLEditIOWidget::mousePressEvent(QMouseEvent *event)
 {
     QMenu menu(this);
 

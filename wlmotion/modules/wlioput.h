@@ -67,7 +67,7 @@ Q_OBJECT
 
 public:
 
-Q_PROPERTY(bool inv READ isInv() WRITE setInv() NOTIFY invChanged)
+Q_PROPERTY(bool inv READ isInv() WRITE setInv() NOTIFY changedInv)
 Q_PROPERTY(bool now READ getNow() NOTIFY changed)
 Q_PROPERTY(bool out READ getNow() WRITE setOut())
 
@@ -75,15 +75,7 @@ private:
          WLFlags Flags;
 		 
 public:
-    WLIOPut (QString _comment="",bool input=false) 
-	                        {							
-							setTypeElement(input ? typeEInput : typeEOutput);
-                            setComment(_comment);
-							Flags.reset();
-							Flags.set(IOPF_input,input);                            
-                            setObjectName("IO");
-                            }
-	
+    WLIOPut (QString _comment="",bool input=false);
 void setInv(bool _inv=true);
 void togInv()  {setInv(!Flags.get(IOPF_inv));}
 
@@ -113,8 +105,6 @@ void fromString(QString data)
 					}					
                     }
 
-private:
- void sendChanged() {emit changedState(getIndex(),getNow()); emit changed(getNow());}
 
 private slots:
 
@@ -129,7 +119,7 @@ void setNow(bool _now)     {
                              Flags.set(IOPF_old,getNow());
                              Flags.set(IOPF_now,_now);
 
-                             if(getCond()>1) sendChanged();
+                             if(getCond()>1) emit changed();
                              }
                            }
 
@@ -141,10 +131,9 @@ void setTog()  {setOut(!getNow());}
 
 signals:
 
-  void changed(bool);
-  void changedState(int,bool);
+  void changed();
 
-  void invChanged(bool);
+  void changedInv(bool);
 
 public:
 static WLIOPut In0;

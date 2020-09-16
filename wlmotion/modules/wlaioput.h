@@ -10,9 +10,12 @@
 #include "wlflags.h"
 
 
-#define comAIOPut_setHist    4
-#define comAIOPut_setValue 128
-#define comAIOPut_getValue 129
+#define comAIOPut_setDataInput  128
+#define comAIOPut_getDataInput  129
+
+#define comAIOPut_setDataOutput 130
+#define comAIOPut_getDataOutput 131
+
 
 #define AIOPF_inv       1<<2
 #define AIOPF_enable    1<<3
@@ -33,21 +36,20 @@ class WLAIOPut: public WLElement
 Q_OBJECT
 
 private:
-enum  typeDataAIOPut
-      {
-      dataAIOPut_hist=0,
-      dataAIOPut_value,
-      dataAIOPut_inv,
-      dataAIOPut_flag,
-      };
+ enum  typeDataAIOPut
+     {
+     dataAIOPut_hist=0,
+     dataAIOPut_value,
+     dataAIOPut_inv,
+     dataAIOPut_flag,
+     dataAIOPut_enable,
+     };
 
 
 public:
-/*
-Q_PROPERTY(bool inv READ isInv() WRITE setInv() NOTIFY invChanged)
-Q_PROPERTY(bool valuenow READ getNow() NOTIFY changed)
-Q_PROPERTY(bool out READ getNow() WRITE setOut())
-*/
+
+Q_PROPERTY(bool inv READ isInv() WRITE setInv() NOTIFY changedInv())
+
 private:
          WLFlags Flags;
 
@@ -83,18 +85,23 @@ void fromString(QString data)
 
 
 void sendGetData();
+void sendGetData(enum  typeDataAIOPut);
 
 void setData(QDataStream&);
 
- void setValue(float _value) {m_value=_value; emit changedValue(m_value);}
-float getValue() {return  m_value;}
+float value() {return  m_value;}
+ void setValue(float _value);
+
+bool isInput() {return  Flags.get(AIOPF_input);}
 
 signals:
-
   void changedValue(float);
   void changedHistValue(float);
+  void changedEnable(bool);
 
   void changedInv(bool);
+
+  void changed();
 
 public:
 

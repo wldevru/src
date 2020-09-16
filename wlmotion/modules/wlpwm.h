@@ -72,6 +72,7 @@ public:
    bool isUnlock()            {return Flags.get(PWMF_unlock);}
 
    float power() {return m_Power;}
+   float value() {return power()/100.0f;}
 
 signals:
  

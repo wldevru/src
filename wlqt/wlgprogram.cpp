@@ -190,10 +190,10 @@ GCode.reset();
 
 
 MutexShowPoint.lock();
-pointShow.clear();
+showPoints.clear();
 MutexShowPoint.unlock();
 
-pointShow.reserve(m_maxShowPoints+1000);
+showPoints.reserve(m_maxShowPoints+1000);
 
 minShowPoint=maxShowPoint=WL3DPointf();
 
@@ -202,7 +202,7 @@ emit startedBuildShow();
 emit ChangedShowProgress(0);
 
 for(qint32 index=0;(index<indexData.size())
-                 &&(pointShow.size()<m_maxShowPoints)
+                 &&(showPoints.size()<m_maxShowPoints)
                  &&(m_buildShow&&ok);index++)
   {    
 
@@ -214,14 +214,14 @@ for(qint32 index=0;(index<indexData.size())
       break;
       }
 
-  indexData[index].offsetPoint=pointShow.size();
+  indexData[index].offsetPoint=showPoints.size();
   Point.scolor=index;
 
   if(index%10000==0) emit ChangedShowProgress(50+((float)index*50)/indexData.size());
 
   MutexShowPoint.lock();
 
-  if(pointShow.isEmpty()
+  if(showPoints.isEmpty()
 	&&!curListTraj.isEmpty()) fast=curListTraj.first().isFast();
 
   for(int i=0,j=0;i<curListTraj.size();i++)
@@ -238,10 +238,10 @@ for(qint32 index=0;(index<indexData.size())
      if((fast!=curListTraj[i].isFast())
       ||Points.isEmpty())
            {
-           if(!pointShow.isEmpty())
+           if(!showPoints.isEmpty())
 		     {
-             Point.pos=pointShow.last().pos;
-             pointShow+=Point;
+             Point.pos=showPoints.last().pos;
+             showPoints+=Point;
 		     }
                fast=curListTraj[i].isFast();
            }
@@ -249,7 +249,7 @@ for(qint32 index=0;(index<indexData.size())
      for(;j<Points.size();j++)
         {
         Point.pos=Points[j].to3Df();
-        pointShow+=Point;  
+        showPoints+=Point;
         }
      j=1;
     }
@@ -260,35 +260,35 @@ for(qint32 index=0;(index<indexData.size())
         &&!qIsInf(lastGPoint.y)
         &&!qIsInf(lastGPoint.z))
                   {
-                  istart=pointShow.size()-1;
+                  istart=showPoints.size()-1;
                   for(int j=0;j<istart;j++)
-                          pointShow[j].pos=pointShow[istart].pos;
+                          showPoints[j].pos=showPoints[istart].pos;
                   }
 	   }
     else
-    if(!pointShow.isEmpty())
+    if(!showPoints.isEmpty())
     {
-    if(iLast==0) maxShowPoint=minShowPoint=pointShow[iLast++].pos;
+    if(iLast==0) maxShowPoint=minShowPoint=showPoints[iLast++].pos;
 
-    for (;iLast<pointShow.size();iLast++)
+    for (;iLast<showPoints.size();iLast++)
      {
-     if(maxShowPoint.x<pointShow[iLast].pos.x)
-         maxShowPoint.x=pointShow[iLast].pos.x;
+     if(maxShowPoint.x<showPoints[iLast].pos.x)
+         maxShowPoint.x=showPoints[iLast].pos.x;
      else
-         if (minShowPoint.x>pointShow[iLast].pos.x)
-             minShowPoint.x=pointShow[iLast].pos.x;
+         if (minShowPoint.x>showPoints[iLast].pos.x)
+             minShowPoint.x=showPoints[iLast].pos.x;
 
-     if(maxShowPoint.y<pointShow[iLast].pos.y)
-         maxShowPoint.y=pointShow[iLast].pos.y;
+     if(maxShowPoint.y<showPoints[iLast].pos.y)
+         maxShowPoint.y=showPoints[iLast].pos.y;
      else
-         if (minShowPoint.y>pointShow[iLast].pos.y)
-             minShowPoint.y=pointShow[iLast].pos.y;
+         if (minShowPoint.y>showPoints[iLast].pos.y)
+             minShowPoint.y=showPoints[iLast].pos.y;
 
-     if(maxShowPoint.z<pointShow[iLast].pos.z)
-         maxShowPoint.z=pointShow[iLast].pos.z;
+     if(maxShowPoint.z<showPoints[iLast].pos.z)
+         maxShowPoint.z=showPoints[iLast].pos.z;
      else
-         if (minShowPoint.z>pointShow[iLast].pos.z)
-             minShowPoint.z=pointShow[iLast].pos.z;            
+         if (minShowPoint.z>showPoints[iLast].pos.z)
+             minShowPoint.z=showPoints[iLast].pos.z;
      }
 
     }
@@ -302,7 +302,7 @@ qDebug()<<minShowPoint.to3D().toString();
 emit ChangedShowTraj();
 emit ChangedShowProgress(100);
 
-qDebug()<<"end buildShowTraj"<<pointShow.size();
+qDebug()<<"end buildShowTraj"<<showPoints.size();
 
 }
 

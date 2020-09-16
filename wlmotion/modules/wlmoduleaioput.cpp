@@ -4,16 +4,21 @@ WLModuleAIOPut::WLModuleAIOPut(QObject *parent)
 	: WLModule(parent)
 {
 setType(typeMAIOPut);
-Init(1);
+Init(1,1);
 }
 
 WLModuleAIOPut::~WLModuleAIOPut()
 {
 while(Inputs.isEmpty())
-       delete Inputs.takeLast();
+    delete Inputs.takeLast();
 }
 
-bool WLModuleAIOPut::Init(int sizeInputs)
+bool WLModuleAIOPut::Init(int _sizeInputs, int _sizeOutputs)
+{
+return InitInputs(_sizeInputs)&&InitOutputs(_sizeOutputs);
+}
+
+bool WLModuleAIOPut::InitInputs(int sizeInputs)
 {
 if((sizeInputs<1)||(Inputs.size()== sizeInputs)) return false;
 
@@ -22,10 +27,11 @@ WLAIOPut *ainput;
 if(sizeInputs>Inputs.size())
  for(int i=Inputs.size();i<sizeInputs;i++ )
   {
-  ainput = new WLAIOPut;
+  ainput = new WLAIOPut("",true);
   ainput->setIndex(i);
   ainput->setParent(this);
   connect(ainput,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
+  connect(ainput,SIGNAL(changed()),SLOT(updateAIOPut()));
   Inputs+=ainput;
   }
 else
@@ -33,7 +39,36 @@ else
 	  {	  
       ainput=Inputs.takeLast();
       disconnect(ainput,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
+      disconnect(ainput,SIGNAL(changed()),this,SLOT(updateAIOPut()));
       delete ainput;
+      }
+
+return true;
+}
+
+bool WLModuleAIOPut::InitOutputs(int sizeOutputs)
+{
+if((sizeOutputs<1)||(Inputs.size()== sizeOutputs)) return false;
+
+WLAIOPut *aoutput;
+
+if(sizeOutputs>Outputs.size())
+ for(int i=Outputs.size();i<sizeOutputs;i++ )
+  {
+  aoutput = new WLAIOPut;
+  aoutput->setIndex(i);
+  aoutput->setParent(this);
+  connect(aoutput,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
+  connect(aoutput,SIGNAL(changed()),this,SLOT(updateAIOPut()));
+  Outputs+=aoutput;
+  }
+else
+    while(Outputs.size()!= sizeOutputs)
+      {
+      aoutput=Outputs.takeLast();
+      disconnect(aoutput,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
+      disconnect(aoutput,SIGNAL(changed()),this,SLOT(updateAIOPut()));
+      delete aoutput;
       }
 
 return true;
@@ -46,17 +81,42 @@ Q_ASSERT((index<getSizeInputs())&&(index<255));
 return index<getSizeInputs() ? Inputs[index]:nullptr;
 }
 
+WLAIOPut *WLModuleAIOPut::getOutput(int index)
+{
+Q_ASSERT((index<getSizeOutputs())&&(index<255));
+
+return index<getSizeOutputs() ? Outputs[index]:nullptr;
+}
+
 void WLModuleAIOPut::update()
 {
 foreach(WLAIOPut *aioput,Inputs)
        {
-       // aioput->sendGetData();
+       aioput->sendGetData();
        }
+
+foreach(WLAIOPut *aioput,Outputs)
+       {
+       aioput->sendGetData();
+       }
+}
+
+void WLModuleAIOPut::updateAIOPut()
+{
+WLAIOPut *AIOPut=static_cast<WLAIOPut*>(sender());
+
+qDebug()<<"updateAIOPut()"<<AIOPut->getIndex();
+
+if(AIOPut->isInput())
+   emit changedInput(AIOPut->getIndex());
+else
+   emit changedOutput(AIOPut->getIndex());
+
 }
 
 void  WLModuleAIOPut::readCommand(QByteArray Data)
 {
-quint8 index,ui1;
+quint8 index,ui1,ui2;
 qint32 i32;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
@@ -68,13 +128,18 @@ Stream>>ui1;
 
 switch(ui1)
 {
-case   comAIOPut_setValue:   Stream>>index;//index8
-                              if(index<getSizeInputs())
+case  comAIOPut_setDataInput:  Stream>>index;//index8
+                               if(index<getSizeInputs())
                                   Inputs[index]->setData(Stream);
                                break;
 
-case  sendModule_prop: Stream>>ui1;					                      
-					   Init(ui1);
+case  comAIOPut_setDataOutput: Stream>>index;//index8
+                               if(index<getSizeOutputs())
+                                  Outputs[index]->setData(Stream);
+                               break;
+
+case  sendModule_prop: Stream>>ui1>>ui2;
+                       Init(ui1,ui2);
                        break;
 
 case  sendModule_error:Stream>>ui1;  //Error
@@ -95,31 +160,20 @@ case  sendModule_error:Stream>>ui1;  //Error
 
 void WLModuleAIOPut::writeXMLData(QXmlStreamWriter &stream)
 {
-stream.writeAttribute("size",QString::number(getSizeInputs()));
+stream.writeStartElement("inputs");
+ stream.writeAttribute("size", QString::number(getSizeInputs()));
+stream.writeEndElement();
 
-for(int i=0;i<getSizeInputs();i++)
- {
- stream.writeStartElement("Inputs");
- stream.writeAttribute("index",QString::number(i));
-   Inputs[i]->writeXMLData(stream);
- stream.writeEndElement();
- }
+stream.writeStartElement("outputs");
+ stream.writeAttribute("size", QString::number(getSizeOutputs()));
+stream.writeEndElement();
 }
 
 
 void WLModuleAIOPut::readXMLData(QXmlStreamReader &stream)
 {
-quint8 index;
-int size=4;
+int size;
 
-if(!stream.attributes().value("size").isEmpty()) size=stream.attributes().value("size").toString().toInt();    
-
-Init(size);
-/*
-if(!stream.attributes().value("inEMGStop").isEmpty()) setInEMGStop(stream.attributes().value("inEMGStop").toString().toInt());    
-if(!stream.attributes().value("inSDStop").isEmpty())  setInSDStop(stream.attributes().value("inSDStop").toString().toInt());
-if(!stream.attributes().value("inProbe").isEmpty())   setInProbe( stream.attributes().value("inProbe").toString().toInt());	
-*/
 while(!stream.atEnd())
 {
 stream.readNextStartElement();
@@ -127,11 +181,39 @@ stream.readNextStartElement();
 if(stream.name()==metaObject()->className()) break;
 if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
 
-if(stream.name()=="Encoder")
-	   {
-	   index=stream.attributes().value("index").toString().toInt();
-       if(index<getSizeInputs())
-           Inputs[index]->readXMLData(stream);
-      }
+if(stream.name()=="inputs")
+ {
+ size=2;
+
+ if(!stream.attributes().value("size").isEmpty()) size=stream.attributes().value("size").toString().toInt();
+
+ InitInputs(size);
+
+ while(!stream.atEnd())
+  {
+  stream.readNextStartElement();
+  if(stream.name()=="inputs") break;
+  if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
+  }
+ }
+
+if(stream.name()=="outputs")
+   {
+   size=2;
+
+   if(!stream.attributes().value("size").isEmpty())    size=stream.attributes().value("size").toString().toInt();
+
+   InitOutputs(size);
+
+   while(!stream.atEnd())
+    {
+    stream.readNextStartElement();
+
+    if(stream.name()=="outputs") break;
+    if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
+
+    }
+   }
 }
+update();
 }

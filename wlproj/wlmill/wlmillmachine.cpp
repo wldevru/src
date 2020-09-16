@@ -707,14 +707,12 @@ m_motDevice->writeToFile(configMMDir+m_motDevice->getNameDevice()+".xml");
 
  QFile FileJS(mScriptFile);
  qDebug()<<"save mScriptFile";
- if(FileJS.open(QIODevice::WriteOnly)) 
+
+ if(FileJS.open(QIODevice::WriteOnly))      
       {
       FileJS.write(QTextCodec::codecForName("Windows-1251")->fromUnicode(m_EVMScript->getCode()));
       FileJS.close();
       }
-
-
-
 }
 
 bool WLMillMachine::loadConfig()
@@ -862,8 +860,7 @@ if(FileXML.isOpen())
             foreach(WLDeviceInfo info,infoList)
             {
             qDebug()<<"info"<<info.comPort<<info.UID96;
-            if(info.UID96==m_motDevice->getUID96()
-             &&info.name==m_motDevice->getNameDevice())
+            if(info.isValid(m_motDevice->getInfo()))
                {
                findOk=true;
 
@@ -2268,6 +2265,7 @@ if(ModulePlanner->isEmpty() //буфер пуст
 &&!ModulePlanner->isMoving()) 
  {
  runMScript(MillTraj.first().takeM());
+ continue;
  }
 break;
 }
@@ -2310,6 +2308,7 @@ distPos+=ePos.last()-sPos.last();
 cPos+=ME.centerPoint.get(mD->getName())/mD->dimension();
 
 indexs+=i;
+
 i++;
 }
 
@@ -2373,9 +2372,9 @@ case WLElementTraj::circ:
                           long ePosIJK[3];
                           long cPosIJ[2];
                           
-                          quint8 Ib=getDrive("X")->indexMAxis()
-                                ,Jb=getDrive("Y")->indexMAxis()
-                                ,Kb=getDrive("Z") ? getDrive("Z")->indexMAxis() :0;
+                          quint8 Ib=0;//getDrive("X")->indexMAxis()
+                          quint8 Jb=1;// getDrive("Y")->indexMAxis()
+                          quint8 Kb= getDrive("Z") ? 2 :0;
 
                           quint8 I,J,K;
 

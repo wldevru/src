@@ -4,6 +4,19 @@ WLIOPut WLIOPut::In0("In_0.-1",0);
 WLIOPut WLIOPut::In1("In_1.-1",1);
 WLIOPut WLIOPut::Out("Out.-1",0);
 
+
+WLIOPut::WLIOPut(QString _comment, bool input)
+{
+setTypeElement(input ? typeEInput : typeEOutput);
+
+setComment(_comment);
+Flags.reset();
+Flags.set(IOPF_input,input);
+setObjectName("IO");
+
+connect(this,&WLIOPut::changedInv,this,&WLIOPut::changed);
+}
+
 void WLIOPut::setData(quint8 _flags)
 {
  const auto last=Flags.m_Data;
@@ -17,7 +30,7 @@ void WLIOPut::setData(quint8 _flags)
 
  Flags.m_Data|=_flags;
 
- if(last!=Flags.m_Data)  sendChanged();
+ if(last!=Flags.m_Data)  emit changed();
 }
 
 
@@ -105,8 +118,6 @@ for(int i=0;i<size;i++)
 return  List;
 }
 
-
-
 void WLIOPut::setInv(bool _inv)
 {
 //if((Flags.get(IOPF_inv))^_inv)
@@ -125,7 +136,7 @@ void WLIOPut::setInv(bool _inv)
   Stream<<(quint8)comIOPut_setOutputInv<<getIndex()<<(quint8)_inv;
 
  emit sendCommand(data);
- emit invChanged(_inv);
+ emit changedInv(_inv);
  }
 }
 

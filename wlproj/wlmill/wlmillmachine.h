@@ -483,11 +483,11 @@ public:
 Q_INVOKABLE bool getInProbe()   {return m_motDevice->getModuleAxis()->getInput(MAXIS_inProbe)->getNow();}
 Q_INVOKABLE bool getInSDStop()  {return m_motDevice->getModuleAxis()->getInput(MAXIS_inSDStop)->getNow();}
 Q_INVOKABLE bool getInEMGStop() {return m_motDevice->getModuleAxis()->getInput(MAXIS_inEMGStop)->getNow();}
-Q_INVOKABLE bool getInput(int index)  {return m_motDevice->getModuleIOPut()->getInputV(index)->getNow();}
-Q_INVOKABLE bool getOutput(int index) {return m_motDevice->getModuleIOPut()->getOutputV(index)->getNow();}
-Q_INVOKABLE void setOutput(int index,bool set)               {m_motDevice->getModuleIOPut()->getOutputV(index)->setOut(set);}
-Q_INVOKABLE void setOutputPulse(int index,bool set,int time) {m_motDevice->getModuleIOPut()->getOutputV(index)->setOutPulse(set,time);}
-Q_INVOKABLE void setOutputTog(int index)                     {m_motDevice->getModuleIOPut()->getOutputV(index)->setTog();}
+Q_INVOKABLE bool getIn(int index)  {return m_motDevice->getModuleIOPut()->getInput(index)->getNow();}
+Q_INVOKABLE bool getOut(int index) {return m_motDevice->getModuleIOPut()->getOutput(index)->getNow();}
+Q_INVOKABLE void setOut(int index,bool set)               {m_motDevice->getModuleIOPut()->getOutput(index)->setOut(set);}
+Q_INVOKABLE void setOutPulse(int index,bool set,int time) {m_motDevice->getModuleIOPut()->getOutput(index)->setOutPulse(set,time);}
+Q_INVOKABLE void setOutTog(int index)                     {m_motDevice->getModuleIOPut()->getOutput(index)->setTog();}
 
 Q_INVOKABLE	  int getCurTool()       {return m_curTool;}
 Q_INVOKABLE  void setSOut(float S);

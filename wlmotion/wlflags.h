@@ -10,6 +10,7 @@ bool set(long,bool set=true);
 bool get(long);
 bool reset(long fl) {return set(fl,false);}
 
+void tog(long);
 void reset();
 
 long m_Data;	
