@@ -345,29 +345,24 @@ public:
 private:
     Ui::WLIOWidget *ui;
 	
-    WLIOPutViewModel    *m_inputViewModel;
-    WLIOPutViewModel    *m_outputViewModel;
-    WLAIOPutViewModel   *m_ainputViewModel;
-    WLAIOPutViewModel   *m_aoutputViewModel;
-    WLOutPWMViewModel   *m_outPWMViewModel;
+    WLIOPutViewModel    *m_inputViewModel=nullptr;
+    WLIOPutViewModel    *m_outputViewModel=nullptr;
+    WLAIOPutViewModel   *m_ainputViewModel=nullptr;
+    WLAIOPutViewModel   *m_aoutputViewModel=nullptr;
+    WLOutPWMViewModel   *m_outPWMViewModel=nullptr;
 
 
 
-    QTableView   *m_tableViewIn;
-    QTableView   *m_tableViewOut;
-    QTableView   *m_tableViewOutPWM;
+    QTableView   *m_tableViewIn=nullptr;
+    QTableView   *m_tableViewOut=nullptr;
+    QTableView   *m_tableViewOutPWM=nullptr;
 
-    QTableView   *m_tableViewAIn;
-    QTableView   *m_tableViewAOut;
-
-
-    //QTableWidget *TableIn;
-   // QTableWidget *TableOut;
-    //QTableWidget *TableOutPWM;
+    QTableView   *m_tableViewAIn=nullptr;
+    QTableView   *m_tableViewAOut=nullptr;
 
 
-    QIcon *m_IconOn;
-    QIcon *m_IconOff;
+    QIcon *m_IconOn=nullptr;
+    QIcon *m_IconOff=nullptr;
 
 
 private slots:

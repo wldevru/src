@@ -486,7 +486,7 @@ MillMachine->setEnableManualWhell(false);
 
 void WLMillControl::updateTab()
 {
-MillMachine->Stop();
+MillMachine->stop();
 
 updateWhellAxis();
 
@@ -752,7 +752,7 @@ else {
 
 void WLMillControl::on_pbStopTouch_pressed()
 {
-    MillMachine->Stop();
+    MillMachine->stop();
 }
 
 

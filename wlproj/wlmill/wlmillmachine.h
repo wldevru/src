@@ -186,26 +186,22 @@ private:
                ma_useHMap        =1<<22,               
                ma_useHPause      =1<<23,
                ma_continue       =1<<24,
+               ma_stop           =1<<25,
 			   };    
 
     WLGPoint m_nowBL;
     WLGModel m_GModel;
     WLGPoint lastMillGPoint;
 	WLFlags Flag;
-    //QMutex MutexInput;
-    SMapHeight m_mapHeight;
-    //bool updateF;
-   // int TWorkProgram;
 
-   // enum StateMMachine state;
+    SMapHeight m_mapHeight;
 
     QVector <WLMillDrive*> millDrives;
 
     quint8 m_ioutPWM;
 
-	//float outFPWM;
 public:
-    WLMillMachine(WLGProgram *_Program,WLEVScript *_EVMScript,QObject *parent=0);
+    WLMillMachine(WLGProgram *_Program,WLEVScript *_EVMScript,QObject *parent=nullptr);
 	~WLMillMachine();
 
  	      QMutex Mutex;
@@ -258,15 +254,6 @@ float m_percentSOut;
 //float percentDriveActiv;
 
 public:
-/*
-WLMillDrive  *Xd;
-WLMillDrive  *Yd;
-WLMillDrive  *Zd;
-
-WLMillDrive  *Ad;
-WLMillDrive  *Bd;
-*/
-
 
 WLGCode   m_GCode;
 
@@ -275,7 +262,6 @@ QList <SCorrectSOut> m_correctSList;
 
   float m_VG1;
   float m_VBacklash;
-  //float VManual;
   float m_VProbe;
 
 WLGPoint lastGPoint;
@@ -546,7 +532,7 @@ public:
 	public slots: 	
 
     void Start() {startMovList();}
-	void Stop();//остановка
+    void stop();//остановка
 
 	void setCurTool(int iT) {
 		                     if(iT>256) 

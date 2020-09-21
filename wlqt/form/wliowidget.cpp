@@ -5,18 +5,6 @@
 WLIOWidget::WLIOWidget(QWidget *parent)
 	: QTabWidget(parent)
 {
-//ui.setupUi(this);
-//m_moduleIOPut=nullptr;
-
-m_inputViewModel=nullptr;
-m_outputViewModel=nullptr;
-m_outPWMViewModel=nullptr;
-
-m_tableViewIn=nullptr;
-m_tableViewOut=nullptr;
-m_tableViewOutPWM=nullptr;
-
-
 m_IconOn  = new QIcon(":/data/icons/ion.png");
 m_IconOff = new QIcon(":/data/icons/ioff.png");
 }

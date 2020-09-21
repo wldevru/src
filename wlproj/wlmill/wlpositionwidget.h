@@ -57,51 +57,18 @@ private slots:
      void onPBsetA(int type) {onSetDrive("A",type);}
      void onPBsetB(int type) {onSetDrive("B",type);}
 
-	 void onPBGoTo();
-
      void onSetDrive(QString nameDrive,int type);
 
 public slots:
 
 	void onGoHome();
-
-   // void onFindX() {MillMachine->goDriveFind("X");}
-   // void onFindY() {MillMachine->goDriveFind("Y");}
-   // void onFindZ() {MillMachine->goDriveFind("Z");}
-   // void onFindA() {MillMachine->goDriveFind("A");}
-   // void onFindB() {MillMachine->goDriveFind("B");}
 	 
     void onPBRotSC();
 
-	void setEditDisabled(bool dis) 
-	                             
-	                            {
-								 disButton=dis;
-                                // setViewSC(iSC);
-								// PBsetHome->setDisabled(dis);
-                                // PBgetHome->setDisabled(dis);
-                                 }
+    void setEditDisabled(bool dis)  {disButton=dis;}
 
-	 void updatePosition();
-     void setViewSC(int index)  {
-                                Q_UNUSED(index)
-                               // MillMachine->GCode.setGCode("G"+QString::number(53+index));
-                                /*
-		                        iSC=index;
-	                            updatePosition(); 
-	                            //qDebug()<<"iSC"<<iSC;
-								ui.pbRotSK->setDisabled(iSC<2||disButton);
-								ui.pbSetP0->setDisabled(iSC<2||disButton);
-								ui.pbSetP1->setDisabled(iSC<2||disButton);
-								 
+    void updatePosition();
 
-	                            //PBsetX->setDisabled(iSC<=1||disButton); 
-								//PBsetY->setDisabled(iSC<=1||disButton); 
-								//PBsetZ->setDisabled(iSC<=1||disButton); 
-
-                                if(iSC>0) emit ChangedViewSC(iSC-1);
-                                */
-	                            }
 
 };
 

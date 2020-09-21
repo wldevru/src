@@ -256,7 +256,7 @@ if(!on)
 
 Flag.set(ma_on,on);  
 
-if(!Flag.get(ma_on)) Stop();
+if(!Flag.get(ma_on)) stop();
 
 emit changedOn(Flag.get(ma_on));
 
@@ -424,7 +424,7 @@ void WLMillMachine::setDataSOut(float per)
     }
 }
 
-void WLMillMachine::Stop() //полная остановка 
+void WLMillMachine::stop() //полная остановка
 {
 qDebug()<<"Stop MM";
 
@@ -438,10 +438,8 @@ emit changedTrajSize(MillTraj.size());
 
 setAuto(false);
 
-Flag.set(ma_runlist
-	    |ma_runprogram
-      //|ma_runscript
-       ,0);
+Flag.reset(ma_runlist
+          |ma_runprogram);
 
 WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
 
@@ -455,10 +453,13 @@ if(ModuleAxis)
 setEnableManualWhell(false);
 
 WLDrive::startStops(true);
-//if(EVMScript!=NULL) EVMScript->reset();
+
+if(!Flag.get(ma_stop))
+ {
+ Flag.set(ma_stop,runScript("STOP()"));
+ }
 
 QTimer::singleShot(0,this,SLOT(setFinished()));
-
 }
 
 
@@ -492,12 +493,10 @@ Flag.set(ma_runlist
         |ma_pause
         |ma_continue,0);
 
-if(m_EVMScript)
- {
- m_EVMScript->reset();
- }
+if(m_EVMScript) m_EVMScript->reset();
 
-Stop();
+stop();
+
 m_iProgram=0;
 
 emit changedReadyRunList(Flag.set(ma_readyRunList,false));
@@ -509,7 +508,7 @@ qDebug()<<"startListMov";
 
 QMutexLocker locker(&Mutex);
 
-if(!isOn()) {sendMessage(nameClass(),tr("is off!"),0); Stop();return;}
+if(!isOn()) {sendMessage(nameClass(),tr("is off!"),0); stop();return;}
 
 qDebug()<<isManual()<<Flag.get(ma_runlist);
 saveConfig();
@@ -1034,7 +1033,7 @@ if(FileXML.isOpen())
 
   if(ModulePlanner)
   {
-  connect(ModulePlanner,&WLModulePlanner::reset,this,&WLMillMachine::Stop,Qt::QueuedConnection);
+  connect(ModulePlanner,&WLModulePlanner::reset,this,&WLMillMachine::stop,Qt::QueuedConnection);
   connect(ModulePlanner,&WLModulePlanner::changedFree,this,&WLMillMachine::setFinished,Qt::QueuedConnection);
 
   QVector <quint8> indexsAxis;
@@ -1126,7 +1125,7 @@ else
            sendMessage("WLMillMachine",QString("\"%1\" time: %2:%3:%4 ").arg(m_Program->getName()).arg(h).arg(m).arg(ms/1000.0,1),1);
            }
 
-       Stop();
+       stop();
        emit changedReadyRunList(Flag.set(ma_readyRunList,false));
 	   }
     }	
@@ -2797,10 +2796,6 @@ return runScript("M"+QString::number(iM)+"()");
 
 bool WLMillMachine::runScript(QString txt)
 {
-if(!isOn()) {sendMessage(metaObject()->className(),tr("is off!"),0); return false;}
-
-qDebug()<<"run script"<<txt;
-
 if(m_EVMScript)
     return m_EVMScript->runFunc(txt);
 
@@ -2818,6 +2813,11 @@ if(func=="CONTINUE()") {
     m_motDevice->getModulePlanner()->startMov();
     QTimer::singleShot(0,this,SLOT(updateMovBuf()));
    }
+else
+if(func=="STOP()") {
+        Flag.reset(ma_stop);
+        setFinished();
+       }
 else
    setFinished();
 

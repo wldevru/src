@@ -458,17 +458,6 @@ addDockWidget(Qt::RightDockWidgetArea,DockMillControl);
 
 void WLMill::createDockIOPut()
 {
-	/*
-QFont font;
-font.setFamily(QString::fromUtf8("Arial"));
-font.setPointSize(12);
-font.setBold(true);
-font.setItalic(false);
-font.setUnderline(false);
-font.setWeight(75);
-font.setStrikeOut(false);
-*/
-
 qDebug()<<"createDock";
 
 DockIOPut=new QDockWidget(this);
@@ -844,35 +833,9 @@ Q_UNUSED(event)
 }
 
 
-/*
-
-void WLMill::setProgram()
-{
-
-QString	Text=Program->getTextProgram();
-
-int maxView=5000;
-long i;
-
-for(i=0;maxView!=0&&i<Text.size();i++)
-	if(Text[i]==('\n'))
-	  {
-      maxView--;
-	  }
-Text.resize(i);
-
-TextProgram->setText(Text);
-resetStarChangedProgram();
-}
-*/
 	
 void WLMill::readyMachine()
-{
-	/*
-VisualWidget=new WLVisualWidget(Program,MillMachine);
-setCentralWidget(VisualWidget);
-connect(VisualWidget,SIGNAL(ChangedEditElement(int)),ProgramWidget,SLOT(setCursorToElement(int)));
-*/
+{	
 loadConfig();
 
 createDockIOPut();
@@ -886,7 +849,6 @@ connect(MillMachine->m_motDevice,SIGNAL(changedVersion(quint32)),SLOT(updateTitl
 connect(this,SIGNAL(changedLife()),SLOT(updateTitle()));
 
 updateTitle();
-//Program->reloadFile(true);
 }
 
 void WLMill::onEditDevice()
@@ -904,20 +866,6 @@ if(DW.exec())
  if(!DevInfo.name.isEmpty())
   {
   MillMachine->m_motDevice->setInfo(DevInfo);
-  //MillMachine->motDevice->closeConnect();
-  //MillMachine->motDevice->openConnect();
-
-     /*
-  if(Dev->getNameDevice()==MillMachine->motDevice->getNameDevice())
-     {
-     MillMachine->motDevice->initSerialPort(Dev->getPortName());
-     }
-  else
-     {
-     MillMachine->motDevice->setNameDevice(Dev->getNameDevice());
-     MillMachine->motDevice->initSerialPort(Dev->getPortName());
-     }
-*/
   QMessageBox::information(this,tr("Attention"),tr("Please restart WLMill"));
   close();
   }
@@ -1012,16 +960,6 @@ File.close();
 //qDebug()<<"saveDataState ;
 }
 
- /*
-void WLMill::updateTitleDockProgram(bool edit)
-{
-QString star;
-
-if(edit) star="*"; 
-
-DockProgram->setWindowTitle(star+Program->getNameFile());
-}*/
-
 void WLMill::updateTitle()
 {
 QString title;
@@ -1050,8 +988,6 @@ setWindowTitle(title);
 
 void WLMill::showMessage(QString name,QString data,int code)
 {
-//Machine->Stop();
-//QMutexLocker locker(&lastErrorMutex);
 QString Pstr;
 QTextStream str(&Pstr);
 str<<name<<": "<<data<<tr(", code=")<<code;
@@ -1062,9 +998,6 @@ str<<name<<": "<<data<<tr(", code=")<<code;
 		QMessageBox::information(this, tr("Stop due to an error:"),Pstr,QMessageBox::Ok);
 	else
 		QMessageBox::information(this, tr("Stop: "),Pstr,QMessageBox::Ok);
-
-	//lastError=Pstr;
-	//QTimer::singleShot(500,this,SLOT(clearLastError()));
     }
 
 }
@@ -1106,7 +1039,7 @@ stream.writeStartElement("WhiteLineMillConfig");
 
  stream.writeStartElement("author");
  stream.writeAttribute("Name","BocharovSergey");
- stream.writeAttribute("e-mail","bs_info@mail.ru");
+ stream.writeAttribute("e-mail","wldev@mail.ru");
  stream.writeAttribute("phone","+79139025883");
  stream.writeEndElement();
 

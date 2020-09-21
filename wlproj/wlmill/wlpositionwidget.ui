@@ -52,6 +52,10 @@
      <property name="text">
       <string/>
      </property>
+     <property name="icon">
+      <iconset resource="image.qrc">
+       <normaloff>:/data/icons/rot.png</normaloff>:/data/icons/rot.png</iconset>
+     </property>
      <property name="iconSize">
       <size>
        <width>48</width>
@@ -281,6 +285,10 @@
      <property name="text">
       <string/>
      </property>
+     <property name="icon">
+      <iconset resource="image.qrc">
+       <normaloff>:/data/icons/home.png</normaloff>:/data/icons/home.png</iconset>
+     </property>
      <property name="iconSize">
       <size>
        <width>48</width>
@@ -337,7 +345,10 @@
    <item row="0" column="5">
     <widget class="QLabel" name="labelConnect">
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="image.qrc">:/data/icons/iong.png</pixmap>
      </property>
     </widget>
    </item>
@@ -363,6 +374,10 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="image.qrc">
+       <normaloff>:/data/icons/power_on.png</normaloff>:/data/icons/power_on.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -420,6 +435,8 @@
    <header>wllabel.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="image.qrc"/>
+ </resources>
  <connections/>
 </ui>

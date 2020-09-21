@@ -43,8 +43,6 @@ if(isBusy())
    emit sendMessage("scriptEngine","busy",-1);
 else 
  {  
- //vList=_vList;  
- //qDebug()<<"code.contains(func)"<<code.contains(_func)<<_func;
  if(code.contains(_func))
    {
    emit changedBusy(busy=true);
