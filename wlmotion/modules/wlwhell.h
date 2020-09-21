@@ -7,7 +7,8 @@
 #include <QDebug>
 
 #include "wlmodule.h"
-#include "wlencoder.h"
+#include "wlmoduleencoder.h"
+#include "wlmoduleioput.h"
 #include "wlflags.h"
 
 //Whell
@@ -54,7 +55,7 @@ class WLWhell : public WLElement
 
 public:
 	
- WLWhell(QObject *parent=0);
+ WLWhell(QObject *parent=nullptr);
 ~WLWhell(); 
 
 private:
@@ -63,6 +64,7 @@ private:
  WLFlags Flags;
 
  quint8 iEncoder;
+quint16 m_pulses;
 
  quint8 iInAxis[sizeInAxis];
  quint8 iInX[sizeInX];
@@ -72,6 +74,9 @@ private:
  quint8 curIndexAxis;
  quint8 curIndexX;
    bool curVmode;
+
+WLModuleIOPut *MIOPut;
+WLModuleEncoder *MEncoder;
 
 public:
 
@@ -122,12 +127,15 @@ public:
 
     void setData(quint8 Flag,quint8 indexA,quint8 indexX,bool Vmode);
 
+    void setPulses(const quint16 &pulses);
+ quint16 getPulses() const;
+
 public:
 
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
-};
 
+};
 
 
 #endif // WLWHELL_H

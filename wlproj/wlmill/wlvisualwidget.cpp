@@ -1374,7 +1374,6 @@ QVector4D P;
 QMatrix4x4 M=getShowMatrix();
 
  bool first=true;
- P.setW(1);
 
  m_Program->MutexShowPoint.lock();
 

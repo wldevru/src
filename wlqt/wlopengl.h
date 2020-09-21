@@ -103,7 +103,7 @@ public slots:
     void setViewLeft(void)   {setView(WLFrame(0,0,0,180,0,90));}
     void setViewRight(void)  {setView(WLFrame(0,0,0,0,0,-90));}
     void setViewFront(void)  {setView(WLFrame(0,0,0,-90,-90,0));}
-    void setViewRear(void)   {setView(WLFrame(0,0,0,90,90,0));}
+    void setViewRear(void)   {setView(WLFrame(0,0,0,90,90,0));}    
 
 virtual void setViewCenter(void) {
                                  showOffset.setX(0);

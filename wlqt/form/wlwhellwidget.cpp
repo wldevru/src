@@ -1,25 +1,24 @@
 #include "wlwhellwidget.h"
 #include "ui_wlwhellwidget.h"
 
-WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *_ModuleIOPut,QWidget *parent) :
+WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *MIOPut,WLModuleEncoder *MEncoder,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::WLWhellWidget)
 {
     Whell=_Whell;
-    ModuleIOPut=_ModuleIOPut;
 
     ui->setupUi(this);
 
-    createInputs();
+    createInputs(MIOPut);
 
     ui->cbInAbianry->setChecked(Whell->getFlag()&WHF_inAbinary);
     ui->cbInXbianry->setChecked(Whell->getFlag()&WHF_inXbinary);
 
-    ui->editOutENB->setModule(ModuleIOPut,false);
+    ui->editOutENB->setModule(MIOPut,false);
     ui->editOutENB->setLabel("outENB");
     ui->editOutENB->setValue(Whell->getOutENB());
 
-    ui->editInV->setModule(ModuleIOPut);
+    ui->editInV->setModule(MIOPut);
     ui->editInV->setLabel("inV");
     ui->editInV->setValue(Whell->getInVmode());
 
@@ -32,6 +31,11 @@ WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *_ModuleIOPut,QWidget
     ui->gbInA->setTitle(ui->gbInA->title()+" (Axis)");
     ui->gbInX->setTitle(ui->gbInX->title()+" (X1,X..)");
     ui->gbInV->setTitle(ui->gbInV->title()+" (Vmode)");
+
+    ui->encoder->setModule(MEncoder);
+    ui->encoder->setValue(Whell->getEncoder());
+
+    ui->sbPulses->setValue(Whell->getPulses());
 
     setWindowTitle(tr("Edit Whell: ") +QString::number(Whell->getIndex()));
 }
@@ -66,10 +70,11 @@ Whell->setFlag((ui->cbInAbianry->isChecked() ? WHF_inAbinary:0)
               |(ui->gbInV->isChecked() ? 0:WHF_manualV)
               |(ui->cbInv->isChecked() ? WHF_inv : 0));
 
-//Whell->setOutputENB(ui->)
+Whell->setEncoder(ui->encoder->value());
+Whell->setPulses(ui->sbPulses->value());
 }
 
-void WLWhellWidget::createInputs()
+void WLWhellWidget::createInputs(WLModuleIOPut *MIOPut)
 {
 WLEditIOWidget *EIW;
 
@@ -79,9 +84,9 @@ quint8 *iInX=Whell->getIndexInX();
 for(int i=0;i<sizeInAxis;i++)
   {
   EIW= new WLEditIOWidget(this);
-  EIW->setModule(ModuleIOPut);
+  EIW->setModule(MIOPut);
   EIW->setLabel("in"+QString::number(i));
-  EIW->setValue(iInA[i]);
+  EIW->setValue(iInA[i]);  
   ListEIWAxis+=EIW;
 
   if(i>2)
@@ -91,7 +96,7 @@ for(int i=0;i<sizeInAxis;i++)
 for(int i=0;i<sizeInX;i++)
   {
   EIW= new WLEditIOWidget(this);
-  EIW->setModule(ModuleIOPut);
+  EIW->setModule(MIOPut);
   EIW->setLabel("in"+QString::number(i));;
   EIW->setValue(iInX[i]);
    ListEIWX+=EIW;

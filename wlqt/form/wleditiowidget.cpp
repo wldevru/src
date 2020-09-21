@@ -45,6 +45,7 @@ switch(m_Module->type())
 
                    connect(ModuleIOPut,&WLModuleIOPut::changedInput,this,&WLEditIOWidget::setLatchInput);
 
+                   setLabel(m_input ? tr("input"):tr("output"));
                   break;;
                    }
 
@@ -54,11 +55,23 @@ case typeMPWM:  {
                   ui->spinBox->setRange(0,(ModulePWM->getSizeOutPWM()-1));
                   ui->spinBox->setEnabled(true);
 
+                  setLabel(m_input ? tr("in PWM"):tr("out PWM"));
+
                  break;
                  }
- default:
-             ui->spinBox->setEnabled(false);
-      break;
+
+case typeMEncoder:{
+                  WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
+
+                  ui->spinBox->setRange(0,ModuleEncoder->getSizeEncoder());
+                  ui->spinBox->setEnabled(true);
+
+                  setLabel(tr("encoder"));
+                  break;
+                  }
+default:
+            ui->spinBox->setEnabled(false);
+break;
 }
 
 
@@ -108,6 +121,11 @@ m_enLatchInput=!m_enLatchInput;
 ui->spinBox->setDisabled(m_enLatchInput);
 }
 
+void WLEditIOWidget::oActResetEncoder()
+{
+getEncoder()->setValue(0);
+}
+
 void WLEditIOWidget::setLatchInput(int index)
 {
 if(m_enLatchInput)
@@ -122,26 +140,31 @@ void WLEditIOWidget::mousePressEvent(QMouseEvent *event)
 {
     QMenu menu(this);
 
+    if(m_Module->type()==typeMIOPut)
+    {
     QAction *actTog=menu.addAction(tr("invers"),this,SLOT(onActTogInvers()));
 
-    actTog->setCheckable(true);
+     actTog->setCheckable(true);
+     actTog->setChecked(getIOPut()->isInv());
 
-    if(m_Module->type()==typeMIOPut)
-      {
-      actTog->setChecked(getIOPut()->isInv());
-      }
+     if(m_input)
+       {
+       QAction *actLatchIn=menu.addAction(tr("latch input"),this,SLOT(onActLatchInput()));;
 
-    if(m_Module->type()==typeMIOPut
-     &&m_input)
-      {
-      QAction *actLatchIn=menu.addAction(tr("latch input"),this,SLOT(onActLatchInput()));;
+       actLatchIn->setCheckable(true);
+       actLatchIn->setChecked(m_enLatchInput);
+       }
+     }
 
-      actLatchIn->setCheckable(true);
-      actLatchIn->setChecked(m_enLatchInput);
-      }
+
+     if(m_Module->type()==typeEEncoder
+      &&m_input)
+       {
+       QAction *actCount=menu.addAction(QString::number(getEncoder()->getValue()),this,SLOT(oActResetEncoder()));
+
+       }
 
     menu.exec(event->globalPos());
-
 }
 
 

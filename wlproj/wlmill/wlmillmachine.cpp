@@ -91,10 +91,6 @@ m_percentManual=100;
 m_percentSpeed=100;
 
 
-
-m_whellSize=200;
-
-
 m_minS=300;
 m_maxS=24000;
 
@@ -267,6 +263,7 @@ emit changedOn(Flag.get(ma_on));
 if(on)
   {
   runScript("ON()");
+
   WLDrive::setMainPads();
 
   WLWhell *Whell=getWhell();
@@ -274,7 +271,7 @@ if(on)
   if(Whell)
    {
    for(quint8 i=0;i<millDrives.size();i++)
-     Whell->setDataAxis(i,millDrives[i]->indexMAxis(),1.0f/whellSize()/millDrives[i]->dimension());
+     Whell->setDataAxis(i,millDrives[i]->indexMAxis(),1.0f/Whell->getPulses()/millDrives[i]->dimension());
    }
   }
 
@@ -606,7 +603,6 @@ stream.writeStartDocument("1.0");
 stream.writeStartElement("WhiteLineMillConfig");
 
 
-//stream.writeAttribute("VCP",motDevice->portName());	
 stream.writeAttribute("usePWMS",QString::number(isUsePWMS()));
 stream.writeAttribute("useCorrectSOut",QString::number(isUseCorrectSOut()));
 
@@ -616,15 +612,12 @@ stream.writeAttribute("correctSOut",correctSOut());
 stream.writeAttribute("MinMaxS",QString::number(m_minS)+","+QString::number(m_maxS));
 stream.writeAttribute("MinMaxOutS",QString::number(m_minSOut)+","+QString::number(m_maxSOut));
 stream.writeAttribute("iCurTool",QString::number(m_curTool));
-//stream.writeAttribute("outFPWM",QString::number(getOutFPWM()));
+
 
 
 if(isUseHPause())
  stream.writeAttribute("hPause",QString::number(HPause()));
-//stream.writeAttribute("feedVManual",  QString::number(getFeedVManual()));
 
-//stream.writeAttribute("feedVG1",      QString::number(getFeedVG1()));
-//stream.writeAttribute("feedVManual",  QString::number(getFeedVManual()));
 stream.writeAttribute("feedVBacklash",  QString::number(VBacklash()));
 stream.writeAttribute("feedVProbe",     QString::number(VProbe()));
 
@@ -632,21 +625,17 @@ stream.writeAttribute("iSOutPWM",   QString::number(getIndexSOutPWM()));
 
 stream.writeAttribute("hProbeData",QString::number(hProbeData.hTablet)
 	                          +","+QString::number(hProbeData.zPos));
-//stream.writeAttribute("invInput",motDevice->getInputInvStr());
-//stream.writeAttribute("invOutput",motDevice->getOutputInvStr());
 
-stream.writeAttribute("WhellSize",QString::number(m_whellSize));
-//stream.writeAttribute("BufSize",QString::number(bufSize));
 
 stream.writeAttribute("ContinueMov",QString::number(isContinueMov()));
 stream.writeAttribute("BacklashNextMov",QString::number(isBLNextMov()));
-//stream.writeAttribute("SpeedSmax",QString::number(speedSmax));
+
 stream.writeAttribute("SmoothDist",QString::number(m_smoothDist));
 stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
 
  stream.writeStartElement("Device");
      stream.writeAttribute("WLMotion",m_motDevice->getNameDevice());
-   //stream.writeAttribute("VCP",motDevice->getPortName());   
+
  stream.writeEndElement();
 
  stream.writeStartElement("Drive");
@@ -656,9 +645,6 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
     WLDrive::driveList[i]->writeXMLData(stream);
   stream.writeEndElement();
   }
- stream.writeEndElement();
-
-
  stream.writeEndElement();
 
  stream.writeStartElement("HomePos");
@@ -721,7 +707,7 @@ QFile FileXML(configMMFile);
 QXmlStreamReader stream;
 QStringList List;
 int i=0;
-//QList<QSerialPortInfo> portList=QSerialPortInfo::availablePorts();
+
 qDebug()<<"load config MillMachine";
 
 if(!FileXML.open(QIODevice::ReadOnly))    {
@@ -779,24 +765,13 @@ if(FileXML.isOpen())
 	 if(!stream.attributes().value("BacklashNextMov").isEmpty()) 
 		 setBLNextMov(stream.attributes().value("BacklashNextMov").toString().toInt());
 
-	 if(!stream.attributes().value("WhellSize").isEmpty()) 
-		 setWhellSize(stream.attributes().value("WhellSize").toString().toInt());
-
-	// if(!stream.attributes().value("BufSize").isEmpty()) 
-	//	 bufSize=qBound(1,(stream.attributes().value("BufSize").toString().toInt()),20);
 
      if(!stream.attributes().value("hPause").isEmpty())
          {
          setEnableHPause(true);
          setHPause(stream.attributes().value("hPause").toString().toFloat());
          }
-    /*
-     if(!stream.attributes().value("feedVG1").isEmpty())
-         setFeedVG1(stream.attributes().value("feedVG1").toString().toFloat());
 
-	 if(!stream.attributes().value("feedVManual").isEmpty()) 
-		 setFeedVManual(stream.attributes().value("feedVManual").toString().toFloat());
-    */
 	 if(!stream.attributes().value("feedVBacklash").isEmpty()) 
 		 setFeedVBacklash(stream.attributes().value("feedVBacklash").toString().toFloat());
 
@@ -838,13 +813,7 @@ if(FileXML.isOpen())
 	  if(stream.name()=="Device"
 	  &&stream.tokenType()==QXmlStreamReader::StartElement)
 	   {
-	   /*while(!stream.atEnd())
-       {
-       stream.readNextStartElement();
-       qDebug()<<stream.name();
-       if(stream.name()=="Device") break;
-       if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
-       */
+
 
        if(!stream.attributes().value("WLMotion").isEmpty())
             {
@@ -969,7 +938,7 @@ if(FileXML.isOpen())
 		    }
 	    }
 	   }
-     }
+
 
 	if(stream.name()=="HomePos")
 		 {
@@ -988,7 +957,7 @@ if(FileXML.isOpen())
          continue;
          }
 
-		if(stream.name()=="SC")
+    if(stream.name()=="SC")
 		 {
 		 qDebug()<<"loadSC";
 		 WL3DPoint SC;
@@ -1052,7 +1021,7 @@ if(FileXML.isOpen())
      
      }
 	}
-
+   }
 
   if(m_motDevice->getModuleAxis())
     {

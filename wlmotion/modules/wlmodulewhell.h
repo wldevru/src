@@ -9,9 +9,8 @@
 #include "wlwhell.h"
 
 
+
 //Whell
-
-
 class WLModuleWhell : public WLModule
 {
 	Q_OBJECT

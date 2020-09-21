@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include "wlmoduleioput.h"
 #include "wlmodulepwm.h"
+#include "wlmoduleencoder.h"
 
 namespace Ui {
 class WLEditIOWidget;
@@ -35,6 +36,16 @@ public:
                                return nullptr;
                         }
 
+
+    WLEncoder *getEncoder() {if(m_Module->type()==typeMEncoder)
+                               {
+                               WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
+                               return  m_input ? ModuleEncoder->getEncoder(value()): nullptr;
+                               }
+                            else
+                               return nullptr;
+                        }
+
 private:
     Ui::WLEditIOWidget *ui;
 
@@ -50,6 +61,7 @@ private slots:
 
    void onActTogInvers();
    void onActLatchInput();
+   void oActResetEncoder();
 
    void setLatchInput(int);
 

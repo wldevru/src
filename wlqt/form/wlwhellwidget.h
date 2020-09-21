@@ -17,22 +17,21 @@ class WLWhellWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *_ModuleIOPut, QWidget *parent = nullptr);
+    explicit WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *_MIOPut,WLModuleEncoder *_MEncoder, QWidget *parent = nullptr);
     ~WLWhellWidget();
 
     void saveData();
 private:
     Ui::WLWhellWidget *ui;
 
-    WLModuleIOPut *ModuleIOPut;
-    WLWhell       *Whell;
+     WLWhell       *Whell;
 
     QList <WLEditIOWidget*> ListEIWAxis;
     QList <WLEditIOWidget*> ListEIWX;
 
 private:
 
-void createInputs();
+void createInputs(WLModuleIOPut *MIOPut);
 };
 
 #endif // WLWHELLWIDGET_H

@@ -144,23 +144,6 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 		
     updateTab();
 	updateFeedTouch();
-/*
-    if(!MillMachine->getDrive("Z"))
-        {
-        delete ui.pbPlusZ;
-        ui.pbPlusZ=nullptr;
-        delete ui.pbMinusZ;
-        ui.pbMinusZ=nullptr;
-        }
-
-    if(!MillMachine->getDrive("A"))
-        {
-        delete ui.pbPlusA;
-        ui.pbPlusA=nullptr;
-        delete ui.pbMinusA;
-        ui.pbMinusA=nullptr;
-        }
-*/
 
     ui.labelTimeLeft->setPrefix(tr("Left: "));
     ui.labelTimeEnd->setPrefix(tr("End: "));
@@ -542,15 +525,9 @@ return 0.0;
 
 float WLMillControl::calcWhellTurn()
 {
-return 0;//turnSize[ui.hScrollBarWhellX->value()];
+return 0;
 }
 
-/*
-void WLMillControl::updateStepMov()
-{
-ui.labelSizeStep->setData(calcStepMov(),3);
-}
-*/
 void WLMillControl::updateFSLabel()
 {
 ui.labelF->setData(MillMachine->getCurSpeed()*60);
@@ -598,40 +575,25 @@ if(EnterNum.exec())
  }
 
 }
-/*
-void WLMillControl::updateSizeWhellTurn()
-{
-ui.labelSizeWhell->setData(calcWhellTurn());
-}
-*/
+
 
 void WLMillControl::focusInEvent ( QFocusEvent * event )
 {
 Q_UNUSED(event)
-//ui.comboBoxWhellAxis->setEnabled(true);
-ui.gbDirManualKey->setEnabled(true);
 
-//qDebug()<<event->gotFocus();
+ui.gbDirManualKey->setEnabled(true);
 }
 
 void WLMillControl::focusOutEvent ( QFocusEvent * event )
 {
 Q_UNUSED(event)
 	
-//if(!ui.groupBoxStepMov->hasFocus())
-  {
- //ui.comboBoxWhellAxis->setEnabled(false);
-  ui.pbFast->setDown(false);
-  ui.gbDirManualKey->setEnabled(false);
-  }
+ui.pbFast->setDown(false);
+ui.gbDirManualKey->setEnabled(false);
 }
 
 void WLMillControl::keyPressEvent ( QKeyEvent * event )
 {
-//qDebug()<<"ch press manual"<<(QApplication::keyboardModifiers()&Qt::ShiftModifier)<<event->isAutoRepeat();
-
-//bool const fast=QApplication::keyboardModifiers()&Qt::ShiftModifier;
-//qDebug()<<"keyPressEvent";
 if(!event->isAutoRepeat())
 {
 if(ui.tabWidget->currentIndex()==1)
@@ -651,25 +613,6 @@ case 0 :
    case Qt::Key_PageDown:ui.pbMinusZ->setDown(true); onChangedPBMinusZ(); break;
    case Qt::Key_PageUp:  ui.pbPlusZ->setDown(true);  onChangedPBPlusZ();break;
 
-  // case Qt::Key_4:   ui.pbMinusA->setDown(true); onChangedPBMinusA(); break;
-  // case Qt::Key_7:    ui.pbPlusA->setDown(true);  onChangedPBPlusA();break;
-   
-/*
-
-   case Qt::Key_Plus:    if(ui.hScrollBarSizeStep->value()==ui.hScrollBarSizeStep->maximum())
-                            ui.cbStepMov->setChecked(false);
-                              else
-                           ui.hScrollBarSizeStep->setSliderPosition(ui.hScrollBarSizeStep->value()+ui.hScrollBarSizeStep->singleStep());
-	                     break;  
-
-   case Qt::Key_Minus:  if(ui.hScrollBarSizeStep->value()==ui.hScrollBarSizeStep->maximum()
-                         &&!ui.cbStepMov->isChecked())
-                             {}
-                       else
-                           ui.hScrollBarSizeStep->setSliderPosition(ui.hScrollBarSizeStep->value()-ui.hScrollBarSizeStep->singleStep());
-
-                       ui.cbStepMov->setChecked(true);
-                        break;*/
    case Qt::Key_A:     ui.tabWidget->setCurrentIndex(0);break;
    case Qt::Key_M:     ui.tabWidget->setCurrentIndex(1);break;
 
@@ -683,13 +626,7 @@ case 1:
    case Qt::Key_1:
    case Qt::Key_2:
    case Qt::Key_3:       ui.comboBoxWhellAxis->setCurrentIndex(event->key()-Qt::Key_0); updateWhellAxis();break;
-/*
-   case Qt::Key_Plus:    ui.hScrollBarWhellX->setSliderPosition(ui.hScrollBarWhellX->value()+ui.hScrollBarWhellX->singleStep());
-	                     break;  
 
-   case Qt::Key_Minus:   ui.hScrollBarWhellX->setSliderPosition(ui.hScrollBarWhellX->value()-ui.hScrollBarWhellX->singleStep());
-	                     break;
-*/
    }
    break;
 }
@@ -701,32 +638,7 @@ if(ui.tabWidget->currentIndex()==3)
    case Qt::Key_Shift:    //ui.pbFast->setDown(true);
 	                      break;
    }
-}  
-/*
-if(Tab->currentIndex()==0)
-{
-// if(chBoxArrowEn->isChecked())
-/*	qDebug()<<"+"<<event->key();
- switch(event->key())
- {
- case Qt::Key_4:  MillMachine->goDriveManual(XDrive,-1,fast);break;
- case Qt::Key_6:  MillMachine->goDriveManual(XDrive,1,fast); break;
- 
- case Qt::Key_8:  MillMachine->goDriveManual(YDrive,1,fast); break;
- case Qt::Key_2:  MillMachine->goDriveManual(YDrive,-1,fast);break;
- 
- case Qt::Key_9:  MillMachine->goDriveManual(ZDrive,1,fast); break;
- case Qt::Key_3:  MillMachine->goDriveManual(ZDrive,-1,fast); break;
- }
- else*/
-/*
- switch(event->key())
- {
- case Qt::Key_Plus:  ButtonInc->setDown(true);   on_ButtonInc(); break;
- case Qt::Key_Minus: ButtonDec->setDown(true);   on_ButtonDec(); break;
- }
 }
-*/
 }
 
 event->accept();
@@ -734,24 +646,10 @@ event->accept();
 
 void WLMillControl::keyReleaseEvent ( QKeyEvent * event )
 {
-//qDebug()<<"keyReleaseEvent";
 if(!event->isAutoRepeat())
 {
-//if(Tab->currentIndex()==0)
-{
-// /*//if(chBoxArrowEn->isChecked())
-/* switch(event->key())
- {
- case Qt::Key_4: 
- case Qt::Key_6:     MillMachine->goDriveManual(XDrive,0); break;
- 
- case Qt::Key_8:    
- case Qt::Key_2:     MillMachine->goDriveManual(YDrive,0); break;
- 
- case Qt::Key_9:   
- case Qt::Key_3:     MillMachine->goDriveManual(ZDrive,0); break;
- }
-/* else*/
+
+
 if(ui.tabWidget->currentIndex()==1)
 if(ui.tabWidgetManual->currentIndex()==0)
 switch(event->key())
@@ -763,15 +661,12 @@ case Qt::Key_Down:    ui.pbMinusY->setDown(false); onChangedPBMinusY(); break;
 case Qt::Key_Up:      ui.pbPlusY->setDown(false);  onChangedPBPlusY();break;
 case Qt::Key_PageDown:ui.pbMinusZ->setDown(false); onChangedPBMinusZ(); break;
 case Qt::Key_PageUp:  ui.pbPlusZ->setDown(false);  onChangedPBPlusZ();break;
-//case Qt::Key_4:       ui.pbMinusA->setDown(false); onChangedPBMinusA(); break;
-//case Qt::Key_7:       ui.pbPlusA->setDown(false);  onChangedPBPlusA();break;
+
 case Qt::Key_Shift:   ui.pbFast->setDown(false);
-                     // ui.sbFman->setDisabled(false);
-                      //MillMachine->setPercentManual(ui.sbFman->value());
-                      on_pbFast_released();
+                     on_pbFast_released();
                       break;
  
- }
+
 }    
 }
 else
@@ -779,8 +674,7 @@ if(ui.tabWidget->currentIndex()==3)
 {
    switch(event->key())
    {
-   case Qt::Key_Shift:    //ui.pbFast->setDown(true);
-	                      break;
+   case Qt::Key_Shift:     break;
    }
 } 
 event->accept();
@@ -808,7 +702,6 @@ if(drive)
 
 void WLMillControl::on_pbPlusFman_pressed()
 {
-  //ui.sbFper->stepUp();
 int index=ListFper.indexOf(ui.sbFman->value());
 
 if(index!=-1)
@@ -832,7 +725,7 @@ else {
 
 void WLMillControl::on_pbMinusFman_pressed()
 {
-//  ui.sbFper->stepDown();
+
 
 int index=ListFper.indexOf(ui.sbFman->value());
 

@@ -36,16 +36,18 @@ public:
 
 private:
 
-    long posNow;
+    long m_value;
  quint16 scale;
 
  quint8 error;
  quint8 flag;
 
 public:
-   void setData(long pos) {posNow=pos;};  
+   void setData(long pos) {m_value=pos;}
 
-   void setError(quint8 err)  {emit changedError(error=err);}
+   void setError(quint8 err)  {emit changedError(error=err);}                               
+
+   long getValue() {return m_value;}
 
 signals:
  
@@ -54,7 +56,7 @@ signals:
 
 public:
 
-	bool setPos(long cnt);	
+    bool setValue(long cnt);
     bool setEnable(bool enable);
 	bool setScale(quint16 _scale);	
 

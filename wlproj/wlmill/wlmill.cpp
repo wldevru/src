@@ -36,7 +36,6 @@ WLMill::WLMill(QWidget *parent)
     timerLifeM->start(60*1000);
 
     MessManager =new WLMessManager(this);
-
     connect(this,SIGNAL(sendMessage(QString)),MessManager,SLOT(setMessage(QString)),Qt::QueuedConnection);
 
     Program = new WLGProgram(nullptr);
@@ -932,6 +931,7 @@ if(!MillMachine->m_motDevice->getModuleWhell()) return;
 
 WLWhellWidget WhellWidget(MillMachine->m_motDevice->getModuleWhell()->getWhell(0)
                          ,MillMachine->m_motDevice->getModuleIOPut()
+                         ,MillMachine->m_motDevice->getModuleEncoder()
                          ,this);
 
 WhellWidget.show();

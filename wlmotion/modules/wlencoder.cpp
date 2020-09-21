@@ -4,7 +4,7 @@ WLEncoder::WLEncoder(QObject *parent)
 	: WLElement(parent)
 {
 setTypeElement(typeEEncoder);
-posNow=0;
+m_value=0;
 flag=0;
 error=0;
 }
@@ -14,9 +14,9 @@ WLEncoder::~WLEncoder()
 
 }
 
-bool WLEncoder::setPos(long pos)
+bool WLEncoder::setValue(long pos)
 {
-posNow=pos;
+m_value=pos;
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -24,7 +24,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comEnc_setPos<<(quint8)getIndex()<<(qint32)posNow;
+Stream<<(quint8)comEnc_setPos<<(quint8)getIndex()<<(qint32)m_value;
 
 emit sendCommand(data);
 return true;

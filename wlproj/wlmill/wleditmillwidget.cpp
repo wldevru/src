@@ -36,19 +36,11 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
     ui.editInProbe->setValue(ModuleAxis->getInput(MAXIS_inProbe)->getIndex());
 
 	ui.sbSmoothAng->setValue(MillMachine->m_motDevice->getModulePlanner()->getSmoothAng());
-	ui.sbWhellSize->setValue(MillMachine->whellSize());
 
     ui.cbHPause->setChecked(MillMachine->isUseHPause());
     ui.sbHPause->setValue(MillMachine->HPause());
     ui.sbHPause->setEnabled(ui.cbHPause->isChecked());
-   // dataPad Pad=MillMachine->getPad("base");
 
-   //ui.sbFg0 ->setRange(0.1,Pad.Vma*60);
-   // ui.sbFman->setRange(0.1,Pad.Vma*60);
-   // ui.sbFbls->setRange(0.1,Pad.Vma*60);
-
-    //ui.sbFg1 ->setValue(MillMachine->getFeedVG1());
-    //ui.sbFman->setValue(MillMachine->getFeedVManual());
 	ui.sbFbls->setValue(MillMachine->VBacklash());
 
 	ui.sbTabletHProbe->setValue(MillMachine->getHProbeData().hTablet);
@@ -57,17 +49,6 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 	ui.gbPWMOut->setChecked(MillMachine->isUsePWMS());
 
 	initTableCorrectS();
-
-
-	if(MillMachine->m_motDevice->getModuleWhell()
-	 &&MillMachine->m_motDevice->getModuleWhell()->getWhell(0))
-	 {	 
-	// ui.gbWhell->setChecked(MillMachine->motDevice->getModuleWhell()->getWhell(0)->getFlag()&WHF_enable);
-	 ui.sbWEncoder->setRange(0,MillMachine->m_motDevice->getModuleEncoder()->getSizeEncoder()-1);
-	 ui.sbWEncoder->setValue(MillMachine->m_motDevice->getModuleWhell()->getWhell(0)->getEncoder());
-	 }
-	else
-	 ui.gbWhell->setEnabled(false);
 
     connect(ui.buttonBox,SIGNAL(accepted()),SLOT(onAccept()));
 	connect(ui.buttonBox,SIGNAL(rejected()),SLOT(onReject()));
@@ -195,8 +176,6 @@ ModuleAxis->setInSDStop (ui.editInSD->value());
 ModuleAxis->setInProbe  (ui.editInProbe->value());
 
 MillMachine->m_motDevice->getModulePlanner()->setSmoothAng(ui.sbSmoothAng->value());
-MillMachine->setWhellSize(ui.sbWhellSize->value());
-
 MillMachine->setFeedVBacklash(ui.sbFbls->value());
 //MillMachine->setFeedVManual(ui.sbFman->value());
 //MillMachine->setFeedVG1(ui.sbFg1->value());
@@ -214,13 +193,4 @@ MillMachine->setHPause(ui.sbHPause->value());
 
 MillMachine->setCorrectSList(getCorrectSList());
 MillMachine->setEnableUseCorrectSOut(ui.gbCorrectSOut->isChecked());
-
-if(MillMachine->m_motDevice->getModuleWhell()
- &&MillMachine->m_motDevice->getModuleWhell()->getWhell(0))
-	 {	 
-	 //MillMachine->motDevice->getModuleWhell()->getWhell(0)->setEnable(ui.gbWhell->isChecked());
-	 MillMachine->m_motDevice->getModuleWhell()->getWhell(0)->setEncoder(ui.sbWEncoder->value());
-     }
-
-
 }

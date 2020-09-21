@@ -279,9 +279,6 @@ QList <SCorrectSOut> m_correctSList;
   float m_VProbe;
 
 WLGPoint lastGPoint;
-    int m_whellSize;
-	//  int bufSize;  
-    //float speedSmax;
 
     float m_minS;
     float m_maxS;
@@ -299,9 +296,6 @@ WLGPoint lastGPoint;
     double m_mainDim; 
 	int m_curTool;
 
-    //int iSOutPWM;
-	//WLMillTool Tools[sizeTool];
-
     WLGProgram *m_Program;
     QString m_MScriptCode;
 
@@ -315,15 +309,11 @@ public:
 
     QString correctSOut();
 	void setStringCorrectSOut(QString str);
-    //WLMillTool Tools[sizeTool];
-	//QList <int> mScriptList;
+
  public:
     WLEVScript *m_EVMScript;
     WLEVScript *m_EVLScript;
 
-    //WLIOPut *outSpindleCW;
-    //WLIOPut *outCoolS;
-    //WLIOPut *outCoolM;
 
 private:
   void setEVMScript();
@@ -376,8 +366,6 @@ float getVMax() {WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
 
 WLPWM *getOutPWM() {return m_motDevice->getModulePWM()->getOutPWM(getIndexSOutPWM());}
 
- //void setFeedVG1(float _VG1) {if(_VG1>=0) VG1=_VG1;}
-//float getFeedVG1() {return VG1;}
 
  void setFeedVBacklash(float _VBacklash) {if(_VBacklash>=0) m_VBacklash=_VBacklash;}
 float VBacklash() {return m_VBacklash;}
@@ -385,13 +373,6 @@ float VBacklash() {return m_VBacklash;}
  void setFeedVProbe(float _VProbe) {if(_VProbe>0) m_VProbe=_VProbe;}
 float VProbe() {return m_VProbe;}
 
-// void setFeedVManual(float _VManual) {if(_VManual>0) VManual=_VManual;}
-//float getFeedVManual() {return VManual;}
-
-void setWhellSize(int scale) {m_whellSize=qBound(10,scale,10000);}
-long whellSize() {return m_whellSize;}
-
-//void  setEVScript(WLEVScript *_EVScript); 
 float maxSOut() {return m_maxSOut;}
 float minSOut() {return m_minSOut;}
 
@@ -411,8 +392,6 @@ WLGPoint getAxisPosition();
 WLGPoint getCurrentPosition(bool real=0);
 WLGPoint getCurrentPositionActivSC();
 
-//bool getRotAxis(int index) {return MDrives[qBound(0,index,3)]->getRot();}
-
 void setAuto(bool en=true) {Flag.set(ma_auto,en);}
 bool isAuto() {return Flag.get(ma_auto);}
 bool updateAuto();
@@ -421,9 +400,6 @@ bool updateHProbe();
 bool updateProgram();
 
 void updateMainDimXYZ();
-
-//dataPad getPad(QString name) {return DPad->getData(name);}
-//void setPad(dataPad Pad)     {DPad->Save(Pad);}
 
 private:
    int  iOperation;
@@ -446,10 +422,7 @@ private:
 
 private slots:
   void init();
- 
- // void verifyMotDevice(bool);
- // void buildTraj();
-  
+
 public:
    void setHPause(float _hPause) {if(_hPause>=0) m_hPause=_hPause;}
    float HPause() {return m_hPause;}
@@ -464,9 +437,6 @@ public:
   bool isEmptyMotion();
 
   bool isActivDrive()  {return   WLDrive::isActivs();}
-
-//Q_INVOKABLE   bool isActiv()  {return  Flag.get(ma_activ);}
-
 
    float getCurSpeed() {return sqrt(pow(getDrive("X")->Vnow(),2)
                                    +pow(getDrive("Y")->Vnow(),2)
@@ -520,20 +490,9 @@ public:
   void goOn();
   void goOff();
 
-  // bool goYdFind()   {if(flag(ma_manual)) return Yd->goFind();  return false;}; 
-  // bool goXdTeach()  {if(flag(ma_manual)) return Xd->goTeach(); return false;};
-
-
-
    void resetALM(QString name) {WLDrive::getDrive(name)->resetAlarm();}
 
    void addElementTraj(QList<WLElementTraj>  ListTraj);
-   //void setElementTraj(WLElementTraj ME);
-
-  //   void goOn();
-          
- //bool saveData(QString name_file);
-// bool loadData(QString name_file);
 
    bool loadConfig();
 
@@ -543,9 +502,7 @@ public:
    float percentSOut() {return m_percentSOut;}
 
  private:	   
-	  // bool loadLastState();
-	  //void saveLastState();
-	 
+
     void sendPause(QString msg,int code=-1) {setMessage(metaObject()->className(),msg,code);}
 public:
     bool runMScript(int iM);
@@ -553,21 +510,14 @@ public:
 
  private slots:
 
-  //void updatePosition() {emit ChangedPosition(getPosition());};
     void setCompleteScript(QString);
     void setFinished();
-//	void setMotion();
-
 
    void updateInput();
 
-  // void updateInEMG();
- //  void updateInRDY();
-
    void callDataSOut();
    void setDataSOut(float per);
- //void updateEnableMoving() {emit ChangedEnableMoving(!MillTraj.isEmpty());};   
-  
+
  public slots: 
 
 
@@ -576,27 +526,14 @@ public:
 	void setMessage(QString name,QString data,int code) {qDebug()<<"setMessageMM"<<code;
 	                                                     if(code<0)
 														  {
-														  emit error(); 
-														 //if(Flag.get(ma_runlist))*/ 
-                                                          //Stop();/*Pause(1);*/
+                                                          emit error();
                                                           reset();
 														  } 
 														  else
                                                           if(code==0) Pause(1);
 														 emit sendMessage(name,data,code);}
 
-    /*
-	void setManual(bool en=true) {qDebug()<<"setManual"<<en;
 
-		                          if(isActivDrive()) Stop();								  
-
-		                          if(en)
-	                                  {Flag.set(ma_manual,en);
-                                       setEnableManualWhell(false);}
-								  else
-                                      {setEnableManualWhell(false);
-                                       Flag.set(ma_manual,en);}	}
-*/
     void Pause() {Pause(true);emit changedPause(true);}//плавная остановка
 
 	void reset();
@@ -648,17 +585,17 @@ Q_INVOKABLE	void goDriveHProbe(float F,bool sd);
     bool isPause() {return Flag.get(ma_pause);}
     void Pause(bool en);//плавная остановка
 	
-	void setBLNextMov(bool enable)  {qDebug()<<"setBLNextMov "<<enable; Flag.set(ma_blnextmov,enable);}
-	void setContinueMov(bool enable){qDebug()<<"setContinueMov "<<enable; Flag.set(ma_continuemov,enable);}
+    void setBLNextMov(bool enable)  {Flag.set(ma_blnextmov,enable);}
+    void setContinueMov(bool enable){Flag.set(ma_continuemov,enable);}
 	
 
 
-	void setSimpli(bool enable) {qDebug()<<"setSimpli "<<enable; Flag.set(ma_simpli,enable);}		
-	void setSimpliDist(double val)  {qDebug()<<"simpliDist "<<val; m_simpliDist=val;}
+    void setSimpli(bool enable) {Flag.set(ma_simpli,enable);}
+    void setSimpliDist(double val)  {m_simpliDist=val;}
 
-	void setSmooth(bool enable)     {qDebug()<<"setSmooth "<<enable; Flag.set(ma_smooth,enable);}
-    void setSmoothDist(double val)  {qDebug()<<"smoothDist "<<val; m_smoothDist=val;}
-	void setDetPlasmaOn(bool on)   {qDebug()<<"setDetPlasmaOn "<<on; Flag.set(ma_detplasma,on);}
+    void setSmooth(bool enable)     {Flag.set(ma_smooth,enable);}
+    void setSmoothDist(double val)  {m_smoothDist=val;}
+    void setDetPlasmaOn(bool on)   { Flag.set(ma_detplasma,on);}
 
     void setPercentSpeed(double per) {if(0.1<=per&&per<=300)   {emit changedPercentSpeed(m_percentSpeed=per);}
                                       m_motDevice->getModulePlanner()->setKF(m_percentSpeed/100);}
@@ -681,7 +618,6 @@ signals:
     void changedRDY(bool);
 
     void changedSValue(int);
-    //void changedFmanual(float);
 
     void changedSK();
 
@@ -716,7 +652,7 @@ signals:
     void changedTrajSize(int);
 
 private slots:
-    void runLoopPLC() {qDebug()<<"runLoopPLC"; if(m_EVLScript!=NULL) m_EVLScript->runFunc("loopPLC()"); }
+    void runLoopPLC() {qDebug()<<"runLoopPLC"; if(m_EVLScript!=nullptr) m_EVLScript->runFunc("loopPLC()"); }
 
     void on_changedStatusMPlanner(int status);
 

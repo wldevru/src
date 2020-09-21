@@ -2,9 +2,13 @@
 
 WLWhell::WLWhell(QObject *parent)
 	: WLElement(parent)
-{
+{    
 setTypeElement(typeEWhell);
+
 error=0;
+iEncoder=0;
+
+m_pulses=200;
 
 iOutENB=0;
 
@@ -21,10 +25,21 @@ WLWhell::~WLWhell()
 {
 
 }
+
+quint16 WLWhell::getPulses() const
+{
+return m_pulses;
+}
+
+void WLWhell::setPulses(const quint16 &pulses)
+{
+    m_pulses = pulses;
+}
+
 bool WLWhell::setEnable(bool enable)
 {
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
+    QByteArray data;
+    QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
@@ -256,6 +271,9 @@ stream.writeAttribute("inVmode",QString::number(getInVmode()));
 stream.writeAttribute("outENB",QString::number(getOutENB()));
 
 stream.writeAttribute("flag",QString::number(getFlag()));
+
+stream.writeAttribute("pulses",QString::number(getPulses()));
+stream.writeAttribute("encoder",QString::number(getEncoder()));
 }
 
 void WLWhell::readXMLData(QXmlStreamReader &stream)
@@ -298,4 +316,10 @@ if(!stream.attributes().value("outENB").isEmpty())
 
 if(!stream.attributes().value("flag").isEmpty())
     setFlag(stream.attributes().value("flag").toInt());
+
+if(!stream.attributes().value("encoder").isEmpty())
+    setEncoder(stream.attributes().value("encoder").toInt());
+
+if(!stream.attributes().value("pulses").isEmpty())
+    setPulses(stream.attributes().value("pulses").toInt());
 }
