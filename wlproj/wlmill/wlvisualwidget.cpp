@@ -1351,17 +1351,27 @@ QMatrix4x4 M=getShowMatrix();
 
  m_Program->MutexShowPoint.unlock();
 
- Zoom=qMin(qAbs(vport[2]/(maxP.x-minP.x)),qAbs(vport[3]/(maxP.y-minP.y)));
+ if(m_Program->showPoints.isEmpty())
+  {
+  Zoom=1;
+
+  showOffset.setX(0);
+  showOffset.setY(0);
+  }
+ else
+  {
+  Zoom=qMin(qAbs(vport[2]/(maxP.x-minP.x)),qAbs(vport[3]/(maxP.y-minP.y)));
 
 
- if(m_typeOffset==Model)   {
- showOffset.setX(-(minP.x+maxP.x)/2*Zoom);
- showOffset.setY(-(minP.y+maxP.y)/2*Zoom);
- }
- else if(m_typeOffset==Tool) {
- showOffset.setX(0);
- showOffset.setY(0);
- }
+  if(m_typeOffset==Model)   {
+  showOffset.setX(-(minP.x+maxP.x)/2*Zoom);
+  showOffset.setY(-(minP.y+maxP.y)/2*Zoom);
+  }
+  else if(m_typeOffset==Tool) {
+    showOffset.setX(0);
+    showOffset.setY(0);
+    }
+  }
 
 }
 
