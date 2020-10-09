@@ -385,7 +385,7 @@ public:
 	bool setValue(char name,double data);
 	void resetGValue();
 
-   WLGPoint getPointGCode(WLGPoint lastGPoint);
+   WLGPoint getPointGCode(WLGPoint lastGPoint,bool scale=true);
    //WLGPoint getPointG(WLGPoint lastGPoint) {return getPointActivSC(getPointGCode(lastGPoint));}
    WLGPoint getPointG28(WLGPoint lastGPoint);
    WLGPoint getPointG53(WLGPoint lastGPoint);
@@ -397,12 +397,13 @@ public:
 
    static WLGPoint convertPlane(WLGPoint Point,int plane,bool front);
 
-   int getActivSC(WLGPoint *P=nullptr) {if(P!=nullptr) *P=getSC(m_data.iSC); return m_data.iSC;}
+   int getActivSC(WLGPoint *P=nullptr);
    
    double getDrillPlaneValue(char);
 
    WLGPoint getSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetSC(int i,bool *ok=nullptr);
+   WLGPoint getOffsetActivSC(bool *ok=nullptr) {return getOffsetSC(m_data.iSC,ok);}
    WLGPoint getRefPoint0SC(int i,bool *ok=nullptr);
    WLGPoint getRefPoint1SC(int i,bool *ok=nullptr);
 

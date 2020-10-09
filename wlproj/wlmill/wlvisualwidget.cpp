@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QFont>
+#include <QMenu>
 #include <QStringList>
 #include <QTextStream>
 
@@ -39,18 +40,15 @@ m_viewLimits=true;
 
 m_MillMachine=_MillMachine;
 
-//connect(MillMachine,SIGNAL(ChangedSK()),this,SLOT(buildTraj()));
 
 connect(m_Program,SIGNAL(ChangedShowTraj()),this,SLOT(updateTrajProgram()),Qt::QueuedConnection);
 connect(m_Program,SIGNAL(changedActivElement(int)),this,SLOT(setEditElement(int)),Qt::QueuedConnection);
 
 connect(m_Program,SIGNAL(startedBuildShow()),this,SLOT(resetProgramBuffer()),Qt::DirectConnection);
-//connect(MillMachine,SIGNAL(changedTrajSize(int)),this,SLOT(updateTrajMill(int)),Qt::QueuedConnection);
-//connect(MillMachine,SIGNAL(ChangedSK()),this,SLOT(updateTrajProgram()),Qt::QueuedConnection);
 
 connect(m_MillMachine,SIGNAL(changedReadyRunList(bool)),this,SLOT(setEnRotTool(bool)));
-enRotTool=false;
-//GLProgramElemnts=0;
+
+
 GLMillElemnts=0;
 GLlastMillElemnts=0;
 
@@ -59,8 +57,6 @@ m_viewMillF=true;
 m_viewBacklash=false;
 m_viewRotPointF=false;
 m_zoomDir=false;
-
-viewSC=1;
 
 lastSizeSPsize=0;
 //GLTool=0;
@@ -73,28 +69,122 @@ setFocusPolicy(Qt::ClickFocus);
 
 EditElement=0;
 
-rotTool=0;
+m_rotTool=0;
 
-m_tbCenterView = new QToolButton(this);
-m_tbCenterView -> setText("Center");
-connect(m_tbCenterView,&QToolButton::clicked,this,&WLVisualWidget::setViewCenter);
-m_tbCenterView->setVisible(false);
+m_tbViewRot = new QToolButton(this);
+m_tbViewRot -> setIcon(QPixmap(":/data/icons/viewMov.png"));
+m_tbViewRot -> setIconSize(QSize(32,32));
+m_tbViewRot -> setToolTip(tr("Rot or move view"));
+connect(m_tbViewRot,&QToolButton::clicked,this,&WLVisualWidget::on_TButtonRot);
 
-m_tbToolView = new QToolButton(this);
-m_tbToolView -> setText("ToolView");
-m_tbToolView -> setCheckable(true);
-//connect(m_tbCenterView,&QToolButton::toggle,this,&WLVisualWidget::setViewCenter);
-m_tbToolView->setVisible(false);
+m_tbViewCenter = new QToolButton(this);
+m_tbViewCenter -> setIcon(QPixmap(":/data/icons/viewCenter.png"));
+m_tbViewCenter -> setIconSize(QSize(32,32));
+m_tbViewCenter -> setToolTip(tr("view to window"));
+connect(m_tbViewCenter,&QToolButton::clicked,this,&WLVisualWidget::setViewCenter);
 
-m_tbGModelView = new QToolButton(this);
-m_tbGModelView -> setText("GModel");
-m_tbGModelView -> setCheckable(true);
-m_tbGModelView->setVisible(false);
-//qw = new QQuickWidget(this);
-//qw->setSource(QUrl("qrc:/AxisPosLabel.qml"));
+///----View Button
+m_tbView = new QToolButton(this);
+m_tbView -> setIcon(QPixmap(":/data/icons/viewModel.png"));
+m_tbView -> setIconSize(QSize(32,32));
+m_tbView -> setToolTip(tr("view orientation"));
+//m_tbToolView->setVisible(false);
+
+QMenu *menuView = new QMenu;
+
+menuView->addAction(tr("Top"),   this,SLOT(setViewUp()));
+menuView->addAction(tr("Bottom"),this,SLOT(setViewDown()));
+menuView->addAction(tr("Left")  ,this,SLOT(setViewLeft()));
+menuView->addAction(tr("Right") ,this,SLOT(setViewRight()));
+menuView->addAction(tr("Front"), this,SLOT(setViewFront()));
+menuView->addAction(tr("Rear")  ,this,SLOT(setViewRear()));
+
+m_tbView->setMenu(menuView);
+m_tbView->setPopupMode(QToolButton::InstantPopup);
+
+///----ViewShow Button
+m_tbViewShow = new QToolButton(this);
+m_tbViewShow -> setIcon(QPixmap(":/data/icons/viewShow.png"));
+m_tbViewShow -> setIconSize(QSize(32,32));
+m_tbViewShow -> setToolTip(tr("list show"));
+
+QMenu *menuViewShow = new QMenu;
+QAction *Action;
+
+Action=menuViewShow->addAction(tr("Program"),   this,SLOT(setViewProgram()));
+Action->setCheckable(true);
+Action->setChecked(true);
+
+Action=menuViewShow->addAction(tr("Trajectory"),this,SLOT(setViewMill()));
+Action->setCheckable(true);
+Action->setChecked(true);
+
+Action=menuViewShow->addAction(tr("Limits"),    this,SLOT(setViewLimits()));
+Action->setCheckable(true);
+Action->setChecked(true);
+
+Action=menuViewShow->addAction(tr("Rot"),this,SLOT(setViewRotPoint()));
+Action->setCheckable(true);
+
+m_tbViewShow->setMenu(menuViewShow);
+m_tbViewShow->setPopupMode(QToolButton::InstantPopup);
+
+///----ViewType Button
+
+m_tbViewType = new QToolButton(this);
+m_tbViewType -> setIcon(QPixmap(":/data/icons/viewType.png"));
+m_tbViewType -> setIconSize(QSize(32,32));
+m_tbViewType -> setToolTip(tr("type show"));
+QMenu *menuViewType = new QMenu;
+QActionGroup *actionGroup = new QActionGroup(this);
+
+Action=menuViewType->addAction(tr("XYZ"),this,SLOT(setViewXYZ()));
+Action->setCheckable(true);
+Action->setChecked(true);
+actionGroup->addAction(Action);
+
+Action=menuViewType->addAction(tr("GModel"),this,SLOT(setViewGModel()));
+Action->setCheckable(true);
+Action->setChecked(false);
+actionGroup->addAction(Action);
+
+actionGroup = new QActionGroup(this);
+
+menuViewType->addSeparator();
+
+Action=menuViewType->addAction(tr("Model"),this,SLOT(setViewOffsetModel()));
+Action->setCheckable(true);
+Action->setChecked(true);
+actionGroup->addAction(Action);
+
+Action=menuViewType->addAction(tr("Tool"),this,SLOT(setViewOffsetTool()));
+Action->setCheckable(true);
+Action->setChecked(false);
+actionGroup->addAction(Action);
+
+m_tbViewType->setMenu(menuViewType);
+m_tbViewType->setPopupMode(QToolButton::InstantPopup);
+
+m_tbZoomIn = new QToolButton(this);
+m_tbZoomIn -> setIcon(QPixmap(":/data/icons/zoomIn.png"));
+m_tbZoomIn -> setIconSize(QSize(32,32));
+m_tbZoomIn -> setToolTip(tr("zoom in"));
+m_tbZoomIn -> setAutoRepeat(true);
+connect(m_tbZoomIn,&QToolButton::clicked,this,&WLVisualWidget::on_tbZoomIn);
+
+m_tbZoomOut = new QToolButton(this);
+m_tbZoomOut -> setIcon(QPixmap(":/data/icons/zoomOut.png"));
+m_tbZoomOut -> setIconSize(QSize(32,32));
+m_tbZoomOut -> setToolTip(tr("zoom out"));
+m_tbZoomOut -> setAutoRepeat(true);
+connect(m_tbZoomOut,&QToolButton::clicked,this,&WLVisualWidget::on_tbZoomOut);
+
+
 
 m_timerView=new QTimer;
 m_timerView->setSingleShot(true);
+
+
 
 connect(m_timerView,SIGNAL(timeout()),this,SLOT(updateRotTool()));
 connect(m_timerView,SIGNAL(timeout()),this,SLOT(update()));
@@ -102,10 +192,7 @@ connect(m_timerView,SIGNAL(timeout()),this,SLOT(update()));
 QTimer::singleShot(300,this,SLOT(update()));
 
 QTimer *timer = new QTimer;
-//connect(timer1,SIGNAL(timeout()),this,SLOT(updateTrajProgram()));
 timer->start(300);
-
-
 }
 
 
@@ -258,80 +345,32 @@ void WLVisualWidget::updateRotTool()
 //#ifdef MILL3D 
 QMutexLocker locker(&Mutex); 
 
-if(enRotTool)
+if(m_enRotToolF)
 	{
-	rotTool-=4;
-	if(rotTool>0) rotTool-=360;
+    m_rotTool-=4;
+    if(m_rotTool>0) m_rotTool-=360;
     }
 
 //#endif
 
 }
 
-/*
-WL3DPoint WLVisualWidget::getRotPointXYZ(WL3DPoint Point)
-{
-WL3DPoint bPoint;
 
-bPoint=Point;
-
-Point.x=bPoint.x*RotI.x+bPoint.y*RotJ.x+bPoint.z*RotK.x;
-Point.y=bPoint.x*RotI.y+bPoint.y*RotJ.y+bPoint.z*RotK.y;
-Point.z=bPoint.x*RotI.z+bPoint.y*RotJ.z+bPoint.z*RotK.z;
-
-
-Point.x+=PointOld.x+MovX;
-Point.y+=PointOld.y+MovY;
-Point.z+=PointOld.z+MovZ;
-
-
-return Point;
-}
-
-WL3DPoint WLVisualWidget::getMovPointXYZ(WL3DPoint Point)
-{
-Point=getRotPointXYZ(Point);
-
-Point.x*=Zoom;
-Point.y*=Zoom;
-Point.z*=Zoom;
-
-return Point;
-}
-*/
-/*
-void WLVisualWidget::buildTool()
-{
-
-
-
-}
-*/
 void WLVisualWidget::paintGL()
 {
     // Clear color and depth buffer
     setGLClearColor();
-    //program.bind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Calculate model view transformation
-    /*
-    {
-    glTranslated(showOffset.x(),showOffset.y(),0);
-    glScalef(Zoom,Zoom,Zoom);
+    int activSC=m_MillMachine->GCode()->getActivSC();
 
-    #if QT_VERSION >= 0x050000
-      glMultMatrixf(showMatrix.data());
-    #else
-      glMultMatrixd(showMatrix.data());
-    #endif
-    }*/
-    //showTool(MillMachine->getCurrentPosition().to3D(),true,10,QVector3D(0,1,0));
+    WL6DPoint  SC=m_MillMachine->GCode()->getOffsetSC(activSC).to6D();
 
+    SC.a=m_MillMachine->GCode()->getRefPoint0SC(activSC).a;
 
-    showSC("G"+QString::number(viewSC+53));
-
+    showSC("G"+QString::number(activSC+53),SC.toM());
+    showSC("G53",WL6DPoint().toM(),1.5);
 
     if(m_viewProgramF)  showProgramTraj();
     if(m_viewMillF)     showMillTraj();
@@ -340,7 +379,7 @@ void WLVisualWidget::paintGL()
 
     if(m_typeView==XYZ)
      {
-     showHome(m_MillMachine->m_GCode.getHomePosition().to3D());
+     showHome(m_MillMachine->GCode()->getHomePosition().to3D());
      showTool(m_MillMachine->getCurrentPosition().to3D(),true,10,QVector3D(0,1,0));
 
      if(m_viewRotPointF) showRotPoint();
@@ -363,22 +402,10 @@ void WLVisualWidget::paintGL()
                       ,QVector3D(.75,0,0));
      }
     else {
-         showHome(m_MillMachine->getGModel()->getFrame(m_MillMachine->m_GCode.getHomePosition()));
+         showHome(m_MillMachine->getGModel()->getFrame(m_MillMachine->GCode()->getHomePosition()));
          showTool(m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D(),true,10,QVector3D(0,1,0));
     }
-    //showTool(MillMachine->getAxisPosition(),true);
 
-    /*
-   glDrawElements(GL_LINES,4,GL_UNSIGNED_BYTE,indices+4);
-    */
-    /*
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_DOUBLE, 0,Points);
-
-    glDrawElements(GL_LINE_LOOP,4,GL_UNSIGNED_BYTE,indices);
-    glDrawElements(GL_LINES,4,GL_UNSIGNED_BYTE,indices+4);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    */
 
     m_timerView->start(25);
 
@@ -582,7 +609,7 @@ QMatrix4x4 matrix,rotM;
 rotM.setToIdentity();
 
 if(rot)
- rotM.rotate(rotTool,0,0,1.);
+ rotM.rotate(m_rotTool,0,0,1.);
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
@@ -610,46 +637,6 @@ glDrawArrays(GL_LINE_LOOP, 1,toolPointsSize);
 }
 
 
-
-/*
-void WLVisualWidget::showLimit()
-{
-float M[16];	
-
-M[0]=RotI.x;
-M[1]=RotI.y;
-M[2]=RotI.z;
-M[3]=0;
-
-M[4]=RotJ.x;
-M[5]=RotJ.y;
-M[6]=RotJ.z;
-M[7]=0;
-
-M[8]= RotK.x;
-M[9]= RotK.y;
-M[10]=RotK.z;
-M[11]=0;
-
-M[12]=0;
-M[13]=0;
-M[14]=0;
-M[15]=1;
-
-
-
-glScalef(Zoom,Zoom,Zoom);    
-glTranslated(PointOld.x+MovX
-			,PointOld.y+MovY
-			,PointOld.z+MovZ);
-
-
-glMultMatrixf(M);
-
-//WL3DPoint toolPosition=Program->Machine->getCurrentPosition();
-}
-*/
-
 void WLVisualWidget::showHome(WLFrame Fr)
 {
 int vertexLocation;
@@ -674,13 +661,11 @@ progOneColor.setAttributeBuffer(vertexLocation,GL_FLOAT,0,3);
 glDrawElements(GL_LINE_LOOP,8,GL_UNSIGNED_BYTE,0);
 }
 
-void WLVisualWidget::showSC(QString nameSC,int f)
+void WLVisualWidget::showSC(QString nameSC,WLFrame pos,float scale)
 {
 int vertexLocation;
 
-QMatrix4x4 matrix,rotM;
-
-rotM.setToIdentity();
+QMatrix4x4 matrix;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
@@ -688,15 +673,15 @@ matrix.scale(Zoom);
 
 glLineWidth(3);
 
+
 vGLBufSC.bind();
 progOneColor.bind();
 progOneColor.setUniformValue("mpv_matrix",projection
                                          *matrix
                                          *getShowMatrix()
-                                         *m_MillMachine->m_GCode.getOffsetSC(viewSC).to3D().toM()
-                                         *rotM);
+                                         *pos.toM());
 
-progOneColor.setUniformValue("u_scale",(50.0f/Zoom));
+progOneColor.setUniformValue("u_scale",(scale*50.0f/Zoom));
 
 vertexLocation = progOneColor.attributeLocation("a_position");
 progOneColor.enableAttributeArray(vertexLocation);
@@ -708,45 +693,6 @@ progOneColor.setUniformValue("u_color",QVector3D(0,1,0));
 glDrawArrays(GL_LINES, 2,2);
 progOneColor.setUniformValue("u_color",QVector3D(0,0,1));
 glDrawArrays(GL_LINES, 4,2);
-
-/*
-glEnableClientState(GL_VERTEX_ARRAY);
-glVertexPointer(3, GL_FLOAT, 0,Points);
-//qDebug()<<"ToolIndices.size()"<<ToolIndices.size();
-
-
-
-if(f==1||f==0)
-{
-glColor3f(1,0,0);
-glDrawElements(GL_LINES,2,GL_UNSIGNED_BYTE,iX);
-//renderText(Points[3],Points[4],Points[5],"X",font);
-}
-
-if(f==2||f==0)
-{
-glColor3f(0,1,0);
-glDrawElements(GL_LINES,2,GL_UNSIGNED_BYTE,iY);
-//renderText(Points[6],Points[7],Points[8],"Y",font);
-}
-
-if(f==3||f==0)
-{
-glColor3f(0,0,1);
-glDrawElements(GL_LINES,2,GL_UNSIGNED_BYTE,iZ);
-//renderText(Points[9],Points[10],Points[11],"Z",font);
-}
-
-if(nameSC!=" ")
- {
- font.setPointSize(10);
- glColor3f(1,1,1);
- //renderText(0,0,0,nameSC,font);
- }
-
-glDisableClientState(GL_VERTEX_ARRAY);
-
-*/
 }
 
 void WLVisualWidget::showMillTraj()
@@ -900,16 +846,17 @@ void WLVisualWidget::showRotPoint()
 {
 WLFrame frRefP0,frRefP1;
 WL6DPoint SCPoint;
+int activSC=m_MillMachine->GCode()->getActivSC();
 
-SCPoint=m_MillMachine->m_GCode.getOffsetSC(viewSC).to3D();
-frRefP0.fromM(SCPoint.toM()*m_MillMachine->m_GCode.getRefPoint0SC(viewSC).to3D().toM());
+SCPoint=m_MillMachine->GCode()->getOffsetSC(activSC).to3D();
+frRefP0.fromM(SCPoint.toM()*m_MillMachine->GCode()->getRefPoint0SC(activSC).to3D().toM());
 showTool(frRefP0.to6D(),false,5,QVector3D(0.8f,0.8f,0.0f));
 
-SCPoint.a=m_MillMachine->m_GCode.getRefPoint0SC(viewSC).a;
+SCPoint.a=m_MillMachine->GCode()->getRefPoint0SC(activSC).a;
 
-frRefP0=m_MillMachine->m_GCode.getRefPoint0SC(viewSC).to3D();
+frRefP0=m_MillMachine->GCode()->getRefPoint0SC(activSC).to3D();
 
-frRefP1.fromM(frRefP0.toM()*SCPoint.toM()*frRefP0.toM().inverted()*m_MillMachine->m_GCode.getRefPoint1SC(viewSC).to3D().toM());
+frRefP1.fromM(frRefP0.toM()*SCPoint.toM()*frRefP0.toM().inverted()*m_MillMachine->GCode()->getRefPoint1SC(activSC).to3D().toM());
 showTool(frRefP1.to6D(),false,2,QVector3D(0.8f,0.8f,0.0f));
 }
 
@@ -1045,7 +992,7 @@ void WLVisualWidget::mousePressEvent(QMouseEvent *event)
 {
 event->accept();
 //qDebug()<<"press";
-LastMousePos=event->pos();
+m_lastMousePos=event->pos();
 
 //QList<WLElementTraj>  ListTraj=Program->getTraj();
 
@@ -1129,9 +1076,9 @@ int WLVisualWidget::selectElement(int x,int y)
  void WLVisualWidget::mouseMoveEvent(QMouseEvent *event)
  {
  event->accept();
-//qDebug()<<"mov mouse";
-     int dx = event->x() - LastMousePos.x();
-     int dy = event->y() - LastMousePos.y();
+
+     int dx = event->x() - m_lastMousePos.x();
+     int dy = event->y() - m_lastMousePos.y();
 
      if (event->buttons() & Qt::MidButton)
      {
@@ -1139,26 +1086,16 @@ int WLVisualWidget::selectElement(int x,int y)
 	    movView(dx,-dy);
       else
         rotView(dy/3,dx/3);
-	 
-     //QTimer::singleShot(0,this,SLOT(updateGL()));
-	 }
+     }
      else if (event->buttons() & Qt::LeftButton)
          {
-         if(LastMousePos.x()>(width()*0.85f)
-          ||LastMousePos.x()<(width()*0.15f))
-           {
-           zoomView(QPoint(width()/2,height()/2),zoomDir()? -dy:dy);
-           }
-          else
-           {
-           if(m_timePress.elapsed()<500)
-             movView(dx,-dy);
-            else
+         if(m_rotViewF)
              rotView(dy/3,dx/3);
-           }
+         else
+             movView(dx,-dy);
          }
 
-     LastMousePos = event->pos();
+     m_lastMousePos = event->pos();
  }
 
 void WLVisualWidget::mouseDoubleClickEvent(QMouseEvent *event)
@@ -1168,14 +1105,7 @@ setViewCenter();
 }
 
 void WLVisualWidget::keyPressEvent ( QKeyEvent * event )
-{/*
-event->accept();
-switch(event->key())
 {
-case Qt::Key_Plus:  EditElement++; updateGL();break;
-case Qt::Key_Minus: EditElement--; updateGL();break;
-}
-*/
 
 }
 
@@ -1332,6 +1262,8 @@ else {
  }
 }
 
+qDebug()<<"Psum"<<Psum.to3D().toString();
+
 setPointRot(QVector4D(Psum.x,Psum.y,Psum.z,0));
 }
 
@@ -1360,10 +1292,25 @@ return ret;
 
 void WLVisualWidget::placeVisualElements()
 {
-m_tbCenterView    -> move(this->width()-m_tbCenterView->width()-8,8);
-m_tbToolView  -> move(this->width()-m_tbCenterView->width()-8,m_tbCenterView->geometry().bottom()+8);
-m_tbGModelView-> move(this->width()-m_tbCenterView->width()-8,m_tbToolView->geometry().bottom()+8);
-//qw->move(this->width()/2,this->height()/2);
+m_tbViewRot-> move(this->width()/2-m_tbViewRot->width()/2,5);
+
+m_tbZoomIn -> move(m_tbViewRot->geometry().x()-m_tbZoomIn->width()-10,5);
+m_tbZoomOut-> move(m_tbViewRot->geometry().x()+m_tbViewRot->width()+10,5);
+
+m_tbView  -> move(5,m_tbZoomOut->geometry().bottom()+3);
+m_tbViewShow -> move(5,m_tbView->geometry().bottom()+3);
+m_tbViewType -> move(5,m_tbViewShow->geometry().bottom()+3);
+m_tbViewCenter->move(5,m_tbViewType->geometry().bottom()+10);
+}
+
+void WLVisualWidget::on_TButtonRot()
+{
+m_rotViewF=!m_rotViewF;
+
+m_tbViewRot->setIcon(m_rotViewF ?
+                     QPixmap(":/data/icons/viewRot.png")
+                    :QPixmap(":/data/icons/viewMov.png"));
+
 }
 
 void WLVisualWidget::setViewCenter()

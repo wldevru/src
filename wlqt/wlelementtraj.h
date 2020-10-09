@@ -114,13 +114,10 @@ float movDistance;
 
 float movDistanceIJ;
 float movDistanceK;
-//private:
-//int SC;
 
 TypeElement Type;
 
 int plane;
-//QList <WL6DPoint> Points;
 
 WLGPoint  startPoint;
 WLGPoint    midPoint; //ULine
@@ -142,20 +139,11 @@ float speedS;
 
 
 quint32  index;
-//int   ipos;
 int   iTool;
-//GLuint  GLElemnt;
 
 QList <int> MList;
-private:
 
-/*
-WL6DPoint getStartVector();
-WL6DPoint getEndVector();
-*/
 public:
-//void calcGLElement();
-//WLElementTraj::removeNoMov(ListET);
 
 static void addBacklah(QList<WLElementTraj> &Traj,WL3DPoint lastBL,bool nextMov);
 static void removeNoMov(QList<WLElementTraj> &Traj);

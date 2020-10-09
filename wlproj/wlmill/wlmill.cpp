@@ -51,7 +51,7 @@ WLMill::WLMill(QWidget *parent)
 
     MillMachine = new WLMillMachine(Program,EVMScript);
 
-    Program->setShowGCode(&MillMachine->m_GCode);
+    Program->setShowGCode(MillMachine->GCode());
 
     connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
     connect(MillMachine,SIGNAL(changedSK()),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
@@ -71,7 +71,6 @@ WLMill::WLMill(QWidget *parent)
 	qDebug()<<" createDockProgram";
     createDockProgram();	
 
-	createTBView();
 	createTBMcode();
 	createTBMessage();
 
@@ -79,54 +78,13 @@ WLMill::WLMill(QWidget *parent)
     connect(autoSaveTimer,SIGNAL(timeout()),SLOT(saveConfig()));
     autoSaveTimer->start(5*60*1000);
 
-  //EVLScript=new WLEVScript(this);
-  //EVLScript->start();
-  //EVLScript->moveToThread(EVLScript);
-
-    
-
-	/*
-	EVLScript=new WLEVScript(0);
-	EVLScript->moveToThread(EVLScript);
-    EVLScript->start();
-
-	
-	//QScriptValue objectMM2 = EVMScript->engine->newQObject(MillMachine);
-    EVLScript->engine->globalObject().setProperty("MACHINE",objectMM);
-*/
-	//createTBScript();
-	/*
-	ES=new WLEVScript(0);
-	ES->start();
-	ES->moveToThread(ES);
-
-	//connect(ES,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
-	 
-	QScriptValue objectDOUT = ES->engine->newQObject(MillMachine->motDevice->DOUT);
-    ES->engine->globalObject().setProperty("DOUT",objectDOUT);
-
-	QScriptValue objectDIN = ES->engine->newQObject(MillMachine->motDevice->DIN);
-    ES->engine->globalObject().setProperty("DIN",objectDIN);
-
-	MillMachine->setEVScript(ES);
-
-	ESLoop=new WLEVScript(0);
-	ESLoop->start();
-	ESLoop->moveToThread(ES);
-
-	connect(ESLoop,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
-	 
-
-    ES->engine->globalObject().setProperty("DOUT",objectDOUT);
-    ES->engine->globalObject().setProperty("DIN",objectDIN);
-	
-	MillMachine->setEVScript(ES);*/
-	//MillMachine->setEVMScript(EVMScript);
-    //MillMachine->setEVLScript(EVLScript);
-
-	//MillMachine->start();
     setWindowTitle("WLMill");
-	qDebug()<<"End Init WHITE LINE";
+
+    setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::East);
+    setTabPosition(Qt::RightDockWidgetArea,QTabWidget::West);
+    setTabPosition(Qt::TopDockWidgetArea,QTabWidget::South);
+    setTabPosition(Qt::BottomDockWidgetArea,QTabWidget::North);
+
 	createMenuBar();
 }
 
@@ -168,114 +126,6 @@ TBMCode->setObjectName("tbMCode");
 addToolBar(TBMCode);
 }
 
-void WLMill::createTBView()
-{/*
-QFont font;
-font.setFamily(QString::fromUtf8("Arial"));
-font.setPointSize(12);
-font.setBold(true);
-font.setItalic(false);
-font.setUnderline(false);
-font.setWeight(75);
-font.setStrikeOut(false);
-*/
-TBView = new QToolBar(tr("View"));
-
-//TBView->setFont(font);
-//TBView->addAction(tr("Построить"),this,SLOT(buildView()));
-QToolButton *toolButton = new QToolButton(this);
-
-QMenu *menuView = new QMenu;
-
-menuView->addAction(tr("Top"),VisualWidget,SLOT(setViewUp()));
-menuView->addAction(tr("Bottom")  ,VisualWidget,SLOT(setViewDown()));
-menuView->addAction(tr("Left")  ,VisualWidget,SLOT(setViewLeft()));
-menuView->addAction(tr("Right") ,VisualWidget,SLOT(setViewRight()));
-menuView->addAction(tr("Front"),VisualWidget,SLOT(setViewFront()));
-menuView->addAction(tr("Rear")  ,VisualWidget,SLOT(setViewRear()));
-
-toolButton->setMenu(menuView);
-toolButton->setPopupMode(QToolButton::InstantPopup);
-toolButton->setText(tr("View"));
-
-TBView->addWidget(toolButton);
-
-TBView->addAction(tr("Center")  ,VisualWidget,SLOT(setViewCenter()));
-TBView->addSeparator();
-
-
-QAction *Action;
-QMenu *showView = new QMenu;
-
-toolButton = new QToolButton(this);
-
-Action=showView->addAction(tr("Program"),VisualWidget,SLOT(setViewProgram()));
-Action->setCheckable(true);
-Action->setChecked(true);
-
-Action=showView->addAction(tr("Trajectory"),VisualWidget,SLOT(setViewMill()));
-Action->setCheckable(true);
-Action->setChecked(true);
-
-Action=showView->addAction(tr("Limits"),VisualWidget,SLOT(setViewLimits()));
-Action->setCheckable(true);
-Action->setChecked(true);
-
-Action=showView->addAction(tr("Rot"),VisualWidget,SLOT(setViewRotPoint()));
-Action->setCheckable(true);
-
-toolButton->setMenu(showView);
-toolButton->setPopupMode(QToolButton::InstantPopup);
-toolButton->setText(tr("Show"));
-
-TBView->addWidget(toolButton);
-
-
-QMenu *typeView = new QMenu;
-toolButton = new QToolButton(this);
-QActionGroup *actionGroup = new QActionGroup(this);
-
-Action=typeView->addAction(tr("XYZ"),VisualWidget,SLOT(setViewXYZ()));
-Action->setCheckable(true);
-Action->setChecked(true);
-actionGroup->addAction(Action);
-
-Action=typeView->addAction(tr("GModel"),VisualWidget,SLOT(setViewGModel()));
-Action->setCheckable(true);
-Action->setChecked(false);
-actionGroup->addAction(Action);
-
-actionGroup = new QActionGroup(this);
-
-Action=typeView->addAction(tr("Model"),VisualWidget,SLOT(setViewOffsetModel()));
-Action->setCheckable(true);
-Action->setChecked(true);
-actionGroup->addAction(Action);
-
-Action=typeView->addAction(tr("Tool"),VisualWidget,SLOT(setViewOffsetTool()));
-Action->setCheckable(true);
-Action->setChecked(false);
-actionGroup->addAction(Action);
-
-toolButton->setMenu(typeView);
-toolButton->setPopupMode(QToolButton::InstantPopup);
-toolButton->setText(tr("Type"));
-
-TBView->addWidget(toolButton);
-
-#ifdef DEF_5D
-QComboBox *tView=new QComboBox(this);
-tView->addItems(QString(tr("Head/Head,Head/Table")).split(","));
-
-TBView->addWidget(tView);
-TBView->addSeparator();
-
-connect(tView,SIGNAL(currentIndexChanged(int)),VisualWidget,SLOT(setTypeView(int)));
-#endif
-
-TBView->setObjectName("tbView");
-addToolBar(TBView);
-}
 
 
 void WLMill::createTBScript()
@@ -330,13 +180,25 @@ MEdit->addAction((tr("Drive")+" Z"),this,SLOT(onEditDriveZ()));
 MEdit->addAction((tr("Drive")+" A"),this,SLOT(onEditDriveA()));
 MEdit->addAction((tr("Drive")+" B"),this,SLOT(onEditDriveB()));
 
-
-MFile->addSeparator();
+MEdit->addSeparator();
 MEdit->addAction(("WLMill"),this,SLOT(onEditWLMill()));
-MEdit->addAction(tr("Colors"),this,SLOT(onSetColors()));
 MEdit->addAction(tr("Whell"),this,SLOT(onEditWhell()));
 MEdit->addAction(tr("Device"),this,SLOT(onEditDevice()));
-MFile->addSeparator();
+
+
+
+QMenu *MView= new QMenu(tr("View"));
+MView->addAction(tr("Colors"),this,SLOT(onSetColors()));
+MView->addSeparator();
+MView->addAction(tr("set  State 1"),this,SLOT(restoreState1()));
+MView->addAction(tr("set  State 2"),this,SLOT(restoreState2()));
+MView->addSeparator();
+MView->addAction(tr("save State 1"),this,SLOT(saveState1()));
+MView->addAction(tr("save State 2"),this,SLOT(saveState2()));
+MenuBar->addMenu(MView);
+
+
+
 //MEdit->addAction(("WLMotion"),this,SLOT(onLoadConfigDevice()));
 //MFile->addSeparator();
 //MEdit->addAction(tr("Motion param"),this,SLOT(onEditPam()));
@@ -361,7 +223,7 @@ setMenuBar(MenuBar);
 
 void WLMill::createDockProgram()
 {
-DockProgram=new QDockWidget(this);
+dockProgram=new QDockWidget(this);
 
 ProgramWidget = new WLGProgramWidget(Program,this);
 
@@ -374,35 +236,26 @@ connect(VisualWidget,&WLVisualWidget::changedEditElement,ProgramWidget,&WLGProgr
 connect(ProgramWidget,&WLGProgramWidget::changedEditElement,VisualWidget,&WLVisualWidget::setEditElement);
 connect(MillMachine,&WLMillMachine::changedReadyRunList,ProgramWidget,&WLGProgramWidget::setEditDisabled);
 
-DockProgram->setWindowTitle(tr("Program"));
-DockProgram->setWidget(ProgramWidget);
+dockProgram->setWindowTitle(tr("Program"));
+dockProgram->setWidget(ProgramWidget);
 
-DockProgram->setObjectName("DProgram");
-DockProgram->setFeatures(QDockWidget::DockWidgetFloatable
+dockProgram->setObjectName("DProgram");
+dockProgram->setFeatures(QDockWidget::DockWidgetFloatable
                         |QDockWidget::DockWidgetMovable
                         |QDockWidget::DockWidgetClosable);
 
-addDockWidget(Qt::RightDockWidgetArea,DockProgram);
+addDockWidget(Qt::RightDockWidgetArea,dockProgram);
 
+qDebug()<<"createDockPosition";
 }
 
 void WLMill::createDockPosition()
 {
-/*
-QFont font;
-font.setFamily(QString::fromUtf8("Arial"));
-font.setPointSize(12);
-font.setBold(true);
-font.setItalic(false);
-font.setUnderline(false);
-font.setWeight(75);
-font.setStrikeOut(false);
-*/
 
-DockPosition=new QDockWidget(this);
+dockPosition=new QDockWidget(this);
 
-DockPosition->setWindowTitle(tr("Positions"));
-DockPosition->setObjectName("DPosition");
+dockPosition->setWindowTitle(tr("Positions"));
+dockPosition->setObjectName("DPosition");
 
 PositionWidget=new WLPositionWidget(MillMachine,Program,this);
 
@@ -410,48 +263,34 @@ connect(PositionWidget,SIGNAL(changedViewSC(int)),VisualWidget,SLOT(setViewSC(in
 
 PositionWidget->show();
 
-//DockPosition->setFont(font);
-
-DockPosition->setWidget(PositionWidget);
-DockPosition->setFeatures(QDockWidget::DockWidgetFloatable
+dockPosition->setWidget(PositionWidget);
+dockPosition->setFeatures(QDockWidget::DockWidgetFloatable
                          |QDockWidget::DockWidgetMovable
                          |QDockWidget::DockWidgetClosable);
 
-addDockWidget(Qt::RightDockWidgetArea,DockPosition);
+addDockWidget(Qt::RightDockWidgetArea,dockPosition);
 
 }
 
 
 void WLMill::createDockMillControl()
 {
+dockMillControl=new QDockWidget(this);
 
-/*
-QFont font;
-font.setFamily(QString::fromUtf8("Arial"));
-font.setPointSize(12);
-font.setBold(true);
-font.setItalic(false);
-font.setUnderline(false);
-font.setWeight(75);
-font.setStrikeOut(false);
-*/
-
-DockMillControl=new QDockWidget(this);
-
-DockMillControl->setWindowTitle(tr("Mill Control"));
-DockMillControl->setObjectName("DMillControl");
+dockMillControl->setWindowTitle(tr("Mill Control"));
+dockMillControl->setObjectName("DMillControl");
 
 MillControl = new WLMillControl(MillMachine,Program,this);
 MillControl->show();
 
 
-DockMillControl->setWidget(MillControl);
+dockMillControl->setWidget(MillControl);
 
-DockMillControl->setFeatures(QDockWidget::DockWidgetFloatable
+dockMillControl->setFeatures(QDockWidget::DockWidgetFloatable
                             |QDockWidget::DockWidgetMovable
                             |QDockWidget::DockWidgetClosable);
 
-addDockWidget(Qt::RightDockWidgetArea,DockMillControl);
+addDockWidget(Qt::LeftDockWidgetArea,dockMillControl);
 
 }
 
@@ -460,10 +299,10 @@ void WLMill::createDockIOPut()
 {
 qDebug()<<"createDock";
 
-DockIOPut=new QDockWidget(this);
+dockIOPut=new QDockWidget(this);
 
-DockIOPut->setWindowTitle("In/Out");
-DockIOPut->setObjectName("DIOPut");
+dockIOPut->setWindowTitle("In/Out");
+dockIOPut->setObjectName("DIOPut");
 
 IOWidget =new WLIOWidget();
 
@@ -471,12 +310,12 @@ IOWidget->setDevice(MillMachine->m_motDevice);
 
 IOWidget->Init();
 
-DockIOPut->setWidget(IOWidget);
-DockIOPut->setFeatures(QDockWidget::DockWidgetFloatable
+dockIOPut->setWidget(IOWidget);
+dockIOPut->setFeatures(QDockWidget::DockWidgetFloatable
                       |QDockWidget::DockWidgetMovable
                       |QDockWidget::DockWidgetClosable);
 
-addDockWidget(Qt::LeftDockWidgetArea,DockIOPut);
+addDockWidget(Qt::LeftDockWidgetArea,dockIOPut);
 }
 
 void WLMill::updateEnableMoved(bool en)
@@ -587,9 +426,9 @@ stream.writeStartElement("WhiteLineSC");
  stream.writeStartElement("SC");
  stream.writeAttribute("i",QString::number(i));
 
- stream.writeAttribute("Frame",MillMachine->m_GCode.getOffsetSC(i).toString());
- stream.writeAttribute("refPoint0",MillMachine->m_GCode.getRefPoint0SC(i).toString());
- stream.writeAttribute("refPoint1",MillMachine->m_GCode.getRefPoint1SC(i).toString());
+ stream.writeAttribute("Frame",MillMachine->GCode()->getOffsetSC(i).toString());
+ stream.writeAttribute("refPoint0",MillMachine->GCode()->getRefPoint0SC(i).toString());
+ stream.writeAttribute("refPoint1",MillMachine->GCode()->getRefPoint1SC(i).toString());
  stream.writeEndElement();
  }
 
@@ -851,6 +690,26 @@ connect(this,SIGNAL(changedLife()),SLOT(updateTitle()));
 updateTitle();
 }
 
+void WLMill::restoreState1()
+{
+restoreState(m_state1);
+}
+
+void WLMill::restoreState2()
+{
+restoreState(m_state2);
+}
+
+void WLMill::saveState1()
+{
+m_state1=saveState();
+}
+
+void WLMill::saveState2()
+{
+m_state2=saveState();
+}
+
 void WLMill::onEditDevice()
 {
 WLDeviceWidget DW;
@@ -914,50 +773,24 @@ else
 
 void WLMill::loadDataState()
 {
-
-QSettings settings("FileState",QSettings::IniFormat);
+QSettings settings(configMMDir+"state",QSettings::IniFormat);
 settings.setIniCodec("UTF-8");
 restoreGeometry(settings.value("geometry").toByteArray());
 restoreState(settings.value("windowState").toByteArray());
-
-    /*
-QSettings settings("WLDev", "WLMill");
-
-restoreGeometry(settings.value("geometry").toByteArray());
-restoreState(settings.value("windowState").toByteArray());
-*/
-
-    /*
-QFile File(FileState);
-
-if(!File.open(QIODevice::ReadOnly)) return;//emit messageError()return false;
-
-QByteArray ByteArray;
-
-ByteArray=File.readAll();
-
-File.close();
-
-qDebug()<<"loadDataState "<<restoreState(ByteArray);*/
+m_state1=settings.value("state1").toByteArray();
+m_state2=settings.value("state2").toByteArray();
 }
 
 void WLMill::saveDataState()
 {
 if(!MillMachine->isReady()) return;
 
-QSettings settings("FileState",QSettings::IniFormat);
+QSettings settings(configMMDir+"state",QSettings::IniFormat);
 settings.setIniCodec("UTF-8");
 settings.setValue("geometry", saveGeometry());
 settings.setValue("windowState", saveState());
-/*
-
-QFile File(FileState);
-if(!File.open(QIODevice::WriteOnly)) return;//emit messageError()return false;
-
-File.write(saveState());
-File.close();
-*/
-//qDebug()<<"saveDataState ;
+settings.setValue("state1",m_state1);
+settings.setValue("state2",m_state2);
 }
 
 void WLMill::updateTitle()

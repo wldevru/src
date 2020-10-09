@@ -41,23 +41,17 @@ private:
     WLGCodeData m_showGCodeData;
 
 	QString FileName;
-    //QString textProgram;
-	//QStringList ListProgram;
 
     long m_totalKadr;
     long m_buildElement;
 
 	long time;
-  
-	//QList<WLElementProgram>
 
     bool m_build;
     bool m_buildShow;
 	bool updateF;
 	QFile File;
 
-	//float smoothDist;
-	//WLFrame homePosition;
 	QThread *threadProg;
 
 	long iActivElement;
@@ -73,9 +67,7 @@ private:
     WLGModel    *m_GModel;
     WLGModel  defGModel;
 public:
-	//QList<WLElementTraj>  ListTraj;	
     QList <WLElementGProgram> indexData;
-    //QVector <WL3DPointf>       pointShow;
     QList <WLShowPointProgram>  showPoints;
 
 	QMutex Mutex;	
@@ -98,14 +90,13 @@ public:
     ~WLGProgram();
 
 void setGModel(WLGModel *_GModel) {m_GModel= _GModel!=nullptr? _GModel: &defGModel; updateShowTraj();}
-//QList <WLElementTraj> buildListTraj();
 
 long getActivElement()   {return iActivElement;}
 long getLastMovElement() {return iLastMovElement;}
 void setLastMovElement(long val) {iLastMovElement=val;}
 
 void setTextProgram(QString txt);
-//const QString getTextProgram() {return Program;}							
+
 const QString getNameFile()    {return FileName;}
 const QString getName()        {QFileInfo FI(FileName); return FI.baseName();}
 
@@ -125,8 +116,6 @@ void saveFile(QString file);
     void setShowGCode(WLGCode *GCode) {m_showGCode=GCode;}
 
    QList <WLElementTraj> buildListTraj(WLGCodeData GData);
-                   
-  // void rebuildTraj() {build=0;QTimer::singleShot(0,this,SLOT(buildTraj()));};
 
 static bool translate(QString dataStr,QList <WLElementTraj> &curListTraj,WLGPoint &lastGPoint,WLGCode *GCode,qint32 _index,bool GCodeOnly=false);
 
@@ -141,7 +130,6 @@ static bool calcDrill(WLElementTraj ElementTraj,QList <WLElementTraj> &curListTr
 public slots:
 
 	void saveFile() {saveFile(FileName);}
-   // void stopUpdateShowTraj() {buildShow=false;qDebug()<<" stopUpdateShowTraj()";}
 
     void updateShowTraj() {
                           m_buildShow=false;
@@ -155,8 +143,6 @@ private slots:
    void updateShowTraj_p() {qDebug()<<"updateShowTraj()";
                             if(m_showGCode)
                                  {
-                                // WLGCode GCode(m_showGCode);
-                                 //WLGCode GCode=*showGCode;
                                  m_buildShow=true;
 
                                  m_showGCodeData=m_showGCode->getData();

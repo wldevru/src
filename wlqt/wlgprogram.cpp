@@ -63,14 +63,6 @@ nFile.write(QTextCodec::codecForName("Windows-1251")->fromUnicode(txt));;
 nFile.close();
 
 reloadFile(true);
-
-//QMutexLocker locker(&Mutex);
-//textProgram=txt;
-
-//emit ChangedProgram();
-//emit ChangedTrajSize(0);
-
-//rebuildTraj();
 }
 
 
@@ -89,8 +81,6 @@ EP.offsetPoint=0;
 
 Mutex.lock();
 
-//if(FileName!=file
-//&&!FileName.isEmpty())
 iLastMovElement=0;
 
 FileName=file;
@@ -256,9 +246,9 @@ for(qint32 index=0;(index<indexData.size())
 
     if(istart==-1)
 	   {
-       if(!qIsInf(lastGPoint.x)
-        &&!qIsInf(lastGPoint.y)
-        &&!qIsInf(lastGPoint.z))
+       if((!qIsInf(lastGPoint.x))&&(!qIsNaN(lastGPoint.x))
+        &&(!qIsInf(lastGPoint.y))&&(!qIsNaN(lastGPoint.y))
+        &&(!qIsInf(lastGPoint.z))&&(!qIsNaN(lastGPoint.z)))
                   {
                   istart=showPoints.size()-1;
                   for(int j=0;j<istart;j++)
@@ -457,20 +447,20 @@ int pos = 0;
 WLGPoint curGPoint;
 
 curListTraj.clear();
+
+int iLastSC=GCode->getActivSC();
+
 GCode->resetGValue();
 
 data.remove(QRegExp("[(].*[)]"));
 data.remove(QRegExp("(\\/).*"));
 data.remove(QRegExp("(\\;).*"));
 
-
 ok=true;
 
 QRegExp RegExp("[A-Z]{1}[\\s]*[-]?(?:([\\d]+[.]?[\\d]*)|([\\d]?[.]?[\\d]+))");
 
 RegExp.indexIn(data);
-
-int iLastSC=GCode->getActivSC();
 
 
 QTextStream str(&data,QIODevice::ReadOnly);
@@ -525,11 +515,20 @@ switch(a)
 
 }
 
-GCode->movPointToActivSC(iLastSC,lastGPoint);
-
 GCode->verifyG51();
 
-curGPoint=GCode->getPointGCode(lastGPoint);
+if(GCode->isGCode(53))
+{
+GCode->resetGCode(53);
+
+curGPoint=GCode->getPointG53(lastGPoint);
+}
+else
+ {
+ GCode->movPointToActivSC(iLastSC,lastGPoint);
+
+ curGPoint=GCode->getPointGCode(lastGPoint);
+ }
 
 ElementTraj.index=_index;
 ElementTraj.str+=dataStr;
@@ -538,9 +537,7 @@ if(GCode->isValid('T')) ElementTraj.iTool=GCode->getValue('T');
 
 ElementTraj.setF(GCode->getValue('F'));
 ElementTraj.setS(GCode->getValue('S'));
-//qDebug()<<"ElementTraj.speedS="<<ElementTraj.speedS;
 ElementTraj.setSpindleCW(GCode->isMCode(3));
-//ElementTraj.speedS=GCode.getValue('S');
 ElementTraj.setCoolM(GCode->isMCode(8));
 ElementTraj.setCoolS(GCode->isMCode(7));
 
@@ -550,14 +547,6 @@ if(GCode->isValid('R') //Если R для круга то перещитываем в I и J
                       }
 
 if(!ok) return ok;
-
-
-
-if(GCode->isGCode(53))
-{
-curGPoint=GCode->getPointG53(lastGPoint);
-GCode->resetGCode(53);
-}
 
 if(GCode->isGCode(28))
 {
@@ -646,7 +635,7 @@ return ok;
 bool WLGProgram::calcDrill(WLElementTraj ElementTraj,QList <WLElementTraj> &curListTraj,WLGPoint &lastGPoint,WLGCode *GCode)
 {	
 WLGPoint Point;
-//qDebug()<<"calcDrill";
+
 float F=ElementTraj.getF();
 
 Point=GCode->getPointGCode(lastGPoint);

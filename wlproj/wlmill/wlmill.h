@@ -100,6 +100,7 @@
 #define VERSION_BCD_MIN   (16U * VERSION_MIN0 + VERSION_MIN1)
 #define VERSION_BCD_SEC   (16U * VERSION_SEC0 + VERSION_SEC1)
 
+#define defDockStateS "\x00\x00\x00\xFF\x00\x00\x00\x00\xFD\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x01X\x00\x00\x03\xAB\xFC\x02\x00\x00\x00\x01\xFB\x00\x00\x00\x18\x00""D\x00M\x00i\x00l\x00l\x00""C\x00o\x00n\x00t\x00r\x00o\x00l\x01\x00\x00\x00O\x00\x00\x03\xAB\x00\x00\x01\x92\x00\x00'%\x00\x00\x00\x01\x00\x00\x01m\x00\x00\x03\xAB\xFC\x02\x00\x00\x00\x01\xFC\x00\x00\x00O\x00\x00\x03\xAB\x00\x00\x01\x83\x00\x01\x86\xB5\xFA\x00\x00\x00\x02\x01\x00\x00\x00\x04\xFB\x00\x00\x00\x12\x00""D\x00P\x00o\x00s\x00i\x00t\x00i\x00o\x00n\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x01&\x00\x00\x03\xE7\xFB\x00\x00\x00\f\x00""D\x00I\x00O\x00P\x00u\x00t\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x7F\x00\xFF\xFF\xFF\xFB\x00\x00\x00\x10\x00""D\x00P\x00r\x00o\x00g\x00r\x00""a\x00m\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x01""1\x00\xFF\xFF\xFF\xFB\x00\x00\x00\x10\x00""D\x00P\x00r\x00o\x00g\x00r\x00""a\x00m\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xB3\x00\x00\x03\xAB\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\b\x00\x00\x00\b\xFC\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00\x0E\x00t\x00""b\x00M\x00""C\x00o\x00""d\x00""e\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12\x00t\x00""b\x00M\x00""e\x00s\x00s\x00""a\x00g\x00""e\x01\x00\x00\x02i\x00\x00\x05\x17\x00\x00\x00\x00\x00\x00\x00\x00"
 
 class WLMill : public QMainWindow
 {
@@ -119,12 +120,18 @@ void leaveEvent ( QEvent * event );
 void    connectManual();
 void disconnectManual();*/
 
+
+
 void UpdateFileName();
 
 QString getLastProgram();
 
 private:
 bool m_bclose;
+
+private:
+QByteArray m_state1;
+QByteArray m_state2;
 
 private:
 //HANDLE mx;
@@ -155,40 +162,21 @@ QPixmap PixR;
 QPixmap PixY;	
 QPixmap PixG;	
 //DockProgram
-QDockWidget *DockProgram;
-QDockWidget *DockPosition;
-QDockWidget *DockManual;
-QDockWidget *DockIOPut;
-QDockWidget *DockMillControl;
+QDockWidget *dockProgram;
+QDockWidget *dockPosition;
+QDockWidget *dockIOPut;
+QDockWidget *dockMillControl;
 
+QDockWidget *dockManual;
 //WLSpindleWidget *DockSpindle;
-/*
-QTextEdit   *TextProgram;
 
-QPushButton *PButtonCreate;
-QPushButton *PButtonBackup;
-QPushButton *PButtonReload;
-*/
-//bool fEditProgram;
-//DockPam
-QDockWidget *DockPam;
 QTextEdit *TextPam;
 //TBControls
 QToolBar    *TBControls;
 
-QDockWidget *DockControls;
-
-//QToolButton *TButtonGo;
-//QToolButton *TButtonPause;
-//QToolButton *TButtonStop;
-
 QPushButton *ButtonGo;
 QPushButton *ButtonConv;
 QPushButton *ButtonReset;
-
-
-QSlider     *DialPercent;
-QSlider     *DialSmooth;
 
 QPushButton *PButtonSetTraj;
 QPushButton *PButtonGoHome;
@@ -262,7 +250,6 @@ private:
  
  void createTBControls();
 
- void createTBView();
  void createTBMcode();
  void createTBMessage();
  void createTBScript();
@@ -290,6 +277,12 @@ signals:
 	void sendMessage(QString);
 
 private slots:
+
+    void restoreState1();
+    void restoreState2();
+
+    void saveState1();
+    void saveState2();
 
     void onEditDevice();
     void onEditWhell();

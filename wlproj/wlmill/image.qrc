@@ -29,5 +29,13 @@
         <file>data/icons/plus2.png</file>
         <file>data/icons/100.png</file>
         <file>data/icons/inf.png</file>
+        <file>data/icons/zoomIn.png</file>
+        <file>data/icons/zoomOut.png</file>
+        <file>data/icons/viewRot.png</file>
+        <file>data/icons/viewShow.png</file>
+        <file>data/icons/viewModel.png</file>
+        <file>data/icons/viewType.png</file>
+        <file>data/icons/viewCenter.png</file>
+        <file>data/icons/viewMov.png</file>
     </qresource>
 </RCC>

@@ -21,6 +21,7 @@ int count;
 
 };
 
+
 class WLMessManager : public QWidget
 {
 	Q_OBJECT

@@ -1410,7 +1410,6 @@ newSCG.x=newOffsetSC.x;
 newSCG.y=newOffsetSC.y;
 newSCG.z=newOffsetSC.z;
 
-
 m_GCode.setOffsetSC(iSC,newSCG);
 
 emit changedSK();
@@ -1868,6 +1867,7 @@ QList <WLElementTraj> curListTraj;
 QList <WLElementTraj>    ListTraj;
 
 if(Flag.get(ma_runprogram)
+ ||Flag.get(ma_runscript)
  ||MillTraj.size()>=50) return false;
 
 const float simpliD=Flag.get(ma_simpli)? qMax(m_simpliDist,(float)m_mainDim*(1<<xPD)):m_mainDim*(1<<xPD);
@@ -2688,6 +2688,8 @@ if(ETraj.isSpiral()
 
    Ast*=180/M_PI;
    Aen*=180/M_PI;
+
+   if(qAbs(Aen-Ast)>300) addPointXAxis=true;
 
    int iAst=qRound(Ast);
    int iAen=qRound(Aen);

@@ -82,6 +82,7 @@ const QString errorElementPlanner("0,no error\
 ,5,error Line calc\
 ,6,wrong Line count");
 
+
 #define PLF_enable    (1<<0)
 #define PLF_empty     (1<<2)
 #define PLF_moving    (1<<3)

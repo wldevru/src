@@ -40,7 +40,7 @@ showOffset.setZ(showOffset.y()+Zd);
 }
 
 void WLOpenGL::setPointRot(QVector4D pR)
-{
+{    
 pR.setW(0); //устанавливаем в ноль 
 
 QVector4D P=showMatrix*pR;//находим наши коорд на экран
@@ -73,6 +73,13 @@ projection.ortho(-wf/2,wf/2,-hf/2,hf/2,-50000,50000);
 
 void WLOpenGL::zoomView(QPoint MousePos,int delta)
 {
+if(MousePos.x()<=0||MousePos.x()>=vport[2]
+ ||MousePos.y()<=0||MousePos.y()>=vport[3])
+  {
+  MousePos.setX(vport[2]/2);
+  MousePos.setY(vport[3]/2);
+  }
+
 QVector4D P0(MousePos.x()-vport[2]/2-showOffset.x()
 	       ,-MousePos.y()+vport[3]/2-showOffset.y()
 		   ,0

@@ -161,6 +161,9 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 
     ui.stackedWidget->setContentsMargins(0,0,0,0);
 
+    ui.stackedWidget->setCurrentIndex(0);
+    ui.tabWidget->setCurrentIndex(0);
+
 }
 
 WLMillControl::~WLMillControl()
@@ -192,7 +195,7 @@ for(int i=0;i<ui.tableTools->rowCount();i++)
   D=ui.tableTools->item(i,0)->data(0).toString().toDouble();
   L=ui.tableTools->item(i,1)->data(0).toString().toDouble();
 
-  MillMachine->m_GCode.setDataTool(i+1,D,L);
+  MillMachine->GCode()->setDataTool(i+1,D,L);
   }
 
 ui.pbAcceptTool->setEnabled(false);
@@ -207,8 +210,8 @@ ui.tableTools->setHorizontalHeaderLabels(QString("D,L").split(","));
 
 for(int i=0;i<ui.tableTools->rowCount();i++)
   {
-  ui.tableTools->setItem(i,0,new QTableWidgetItem(QString::number(MillMachine->m_GCode.getTool(i+1).d)));
-  ui.tableTools->setItem(i,1,new QTableWidgetItem(QString::number(MillMachine->m_GCode.getTool(i+1).l)));
+  ui.tableTools->setItem(i,0,new QTableWidgetItem(QString::number(MillMachine->GCode()->getTool(i+1).d)));
+  ui.tableTools->setItem(i,1,new QTableWidgetItem(QString::number(MillMachine->GCode()->getTool(i+1).l)));
   }
 
 ui.pbAcceptTool->setEnabled(false);

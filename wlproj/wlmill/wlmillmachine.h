@@ -255,9 +255,10 @@ float m_percentSOut;
 
 public:
 
+private: 	
+
 WLGCode   m_GCode;
 
-private: 	
 QList <SCorrectSOut> m_correctSList;
 
   float m_VG1;
@@ -296,6 +297,7 @@ public:
     QString correctSOut();
 	void setStringCorrectSOut(QString str);
 
+    WLGCode   *GCode() {return &m_GCode;}
  public:
     WLEVScript *m_EVMScript;
     WLEVScript *m_EVLScript;
@@ -441,6 +443,7 @@ Q_INVOKABLE bool getInSDStop()  {return m_motDevice->getModuleAxis()->getInput(M
 Q_INVOKABLE bool getInEMGStop() {return m_motDevice->getModuleAxis()->getInput(MAXIS_inEMGStop)->getNow();}
 Q_INVOKABLE bool getIn(int index)  {return m_motDevice->getModuleIOPut()->getInput(index)->getNow();}
 Q_INVOKABLE bool getOut(int index) {return m_motDevice->getModuleIOPut()->getOutput(index)->getNow();}
+Q_INVOKABLE void setOutput(int index,bool set)            {setOut(index,set);} //old command
 Q_INVOKABLE void setOut(int index,bool set)               {m_motDevice->getModuleIOPut()->getOutput(index)->setOut(set);}
 Q_INVOKABLE void setOutPulse(int index,bool set,int time) {m_motDevice->getModuleIOPut()->getOutput(index)->setOutPulse(set,time);}
 Q_INVOKABLE void setOutTog(int index)                     {m_motDevice->getModuleIOPut()->getOutput(index)->setTog();}

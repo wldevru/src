@@ -73,6 +73,8 @@ for(int i=0;i<List.size();i++)
   else															
 	ui.comboBox->addItem(time+" >MSG "+List[i].name+":"+List[i].mess+"("+QString::number(List[i].code)+")"+contSTR);
   }
+
+
 }
 
 void WLMessManager::setMessage(QString name,QString mess,int code)

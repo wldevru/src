@@ -36,12 +36,16 @@ private:
     TypeViewModel  m_typeView;
     TypeViewOffest m_typeOffset;
 
-
 //	int manualAxis;
 
-    QToolButton *m_tbCenterView;
-    QToolButton *m_tbToolView;
-    QToolButton *m_tbGModelView;
+    QToolButton *m_tbViewCenter;
+    QToolButton *m_tbViewRot;
+    QToolButton *m_tbViewType;
+    QToolButton *m_tbViewShow;
+    QToolButton *m_tbView;
+
+    QToolButton *m_tbZoomIn;
+    QToolButton *m_tbZoomOut;
 
 
     QQuickWidget *qw;
@@ -84,8 +88,6 @@ private:
      int EditElement;
 
      QMutex Mutex;
-
-	 int viewSC;
 
      QList <WL3DPointf> trackTraj;
 
@@ -140,7 +142,7 @@ private:
 	void showTrackTraj();
     void showRotPoint();
 
-   	void showSC(QString,int f=0);
+    void showSC(QString,WLFrame pos,float scale=1);
     void showHome(WLFrame);
 	void showLimit();
     void showTool(WL6DPoint showPoint,bool rot=false,float scale=1,QVector3D color=QVector3D(1,1,1));
@@ -156,31 +158,26 @@ private:
     void createGLListTraj();
 
     int selectElement(int x,int y);
-   //индекс элемента и производить ли переход 
+
      void WLDrawArrow(WL3DPoint Vec,WL3DPoint O,float s=1); 
 	 void WLDrawArrow1(WL3DPoint Vec,WL3DPoint O,float s=1);
 
    void updatePointRot();
    void updatePointRotAll(float *X,float *Y,float *Z);
-public:  
-   //bool isCorrect() {/*if(nowTypeWork==Correct) return true; else */return false;};
-   ///bool isEdit()    {/*if(nowTypeWork==Edit)    return true; else */return false;};
- //  bool isMovie()   {/*if(nowTypeWork==Movie)   return true; else */return false;};
+
 private:
 
    bool ShowCorF;
 
-   float rotTool;  
-   bool  enRotTool;
-   
-   QPoint LastMousePos;
+   float m_rotTool;
+   bool  m_enRotToolF=false;
+   bool  m_rotViewF=false;
+
+   QPoint m_lastMousePos;
 
    QMatrix4x4 getShowMatrix();
 
 signals:
-  // void ChangedEditElement(int i);
-   //void ChangediEditElement(int i);
-   //void ChangedEditElementLine(int l);
    
    void changedDataElement(int ik,WL3DPoint st,WL3DPoint en,bool g0,float F);
 
@@ -188,9 +185,15 @@ signals:
    void changedEditElement(int);
 
 private slots :
-	void  setEnRotTool(bool en) {enRotTool=en;}
+    void  setEnRotTool(bool en) {m_enRotToolF=en;}
     void  resetProgramBuffer() {lastSizeSPsize=0;}
     void  placeVisualElements();
+
+
+    void on_tbZoomIn()  {zoomView(m_lastMousePos,-50);}
+    void on_tbZoomOut() {zoomView(m_lastMousePos,50);}
+
+    void on_TButtonRot();
 
 public slots:
 		
@@ -198,19 +201,13 @@ public slots:
     void setViewCenter();
 
     void updateTrajProgram();
-    //void updateTrajMill(int index=-1);
 
     void updateRotTool();
-
-	void setViewSC(int _viewSC) {viewSC=_viewSC;}
-  //  void buildTraj();
-
 
     void setEditElement(int);
 
     void setToolDiametr(float d);	
 	void setToolHeight(float h);	
-//	void setManualAxis(int a) {manualAxis=a;}
 
     void setViewProgram() {m_viewProgramF=!m_viewProgramF;  update();}
     void setViewMill()    {m_viewMillF=!m_viewMillF;        update();}
@@ -226,7 +223,6 @@ public slots:
 protected:
    void showEvent(QShowEvent *event);
 
-    // QWidget interface
 protected:
     void resizeEvent(QResizeEvent *event);
 };

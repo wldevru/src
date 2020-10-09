@@ -423,10 +423,18 @@ case 19: ret.y=Point.x;
 return ret;
 }
 
+int WLGCode::getActivSC(WLGPoint *P)
+{
+ if(P!=nullptr)
+    *P=isGCode(53) ? WLGPoint():getSC(m_data.iSC);
+
+return isGCode(53) ? 0 : m_data.iSC;
+}
+
 double WLGCode::getValue(char name)
 {
-switch(name)
- {
+  switch(name)
+  {
   case 'X': return m_data.gX.value;
   case 'Y': return m_data.gY.value;
   case 'Z': return m_data.gZ.value;
@@ -506,7 +514,7 @@ switch(name)
 
 
 
-WLGPoint WLGCode::getPointGCode(WLGPoint lastPoint)
+WLGPoint WLGCode::getPointGCode(WLGPoint lastPoint,bool scale)
 { 
 WLGPoint newPoint=lastPoint;
 /*
@@ -516,9 +524,9 @@ else
     */
 if(isGCode(91))
 	{
-    if(isValid('X')) newPoint.x+=getValue('X')*m_data.G51Scale.x;
-    if(isValid('Y')) newPoint.y+=getValue('Y')*m_data.G51Scale.y;
-    if(isValid('Z')) newPoint.z+=getValue('Z')*m_data.G51Scale.z;
+    if(isValid('X')) newPoint.x+=getValue('X')*(scale ? m_data.G51Scale.x:1.0);
+    if(isValid('Y')) newPoint.y+=getValue('Y')*(scale ? m_data.G51Scale.y:1.0);
+    if(isValid('Z')) newPoint.z+=getValue('Z')*(scale ? m_data.G51Scale.z:1.0);
 
 	if(isValid('A')) newPoint.a+=getValue('A');   
 	if(isValid('B')) newPoint.b+=getValue('B');   
@@ -526,12 +534,12 @@ if(isGCode(91))
     }
 else
     {
-    if(isValid('X')) newPoint.x=getValue('X')*m_data.G51Scale.x;
-    if(isValid('Y')) newPoint.y=getValue('Y')*m_data.G51Scale.y;
+    if(isValid('X')) newPoint.x=getValue('X')*(scale ? m_data.G51Scale.x:1.0);
+    if(isValid('Y')) newPoint.y=getValue('Y')*(scale ? m_data.G51Scale.y:1.0);
 
     if(isValid('Z'))
     {
-    newPoint.z=getValue('Z')*m_data.G51Scale.z;
+    newPoint.z=getValue('Z')*(scale ? m_data.G51Scale.z:1.0);
 
     if(getValue('H')<sizeTools)
      {
@@ -586,8 +594,7 @@ if(!back) GPoint=GPoint+SC;
 return GPoint;
 }
 else
-
-return back? GPoint-SC:GPoint+SC;
+ return back? GPoint-SC:GPoint+SC;
 
 }
 
@@ -598,14 +605,11 @@ return getPointSC(getActivSC(),GPoint,back);
 }
 
 WLGPoint WLGCode::movPointToActivSC(int iLastSC, WLGPoint &lastGPoint)
-{
-
+{      
 if(iLastSC!=m_data.iSC)
  {
- WLGPoint lastSC=getSC(iLastSC);
- WLGPoint activSC=getSC(m_data.iSC);
-
- lastGPoint=lastGPoint+lastSC-activSC;
+ lastGPoint=getPointSC(iLastSC,lastGPoint);
+ lastGPoint=getPointActivSC(lastGPoint,true);
  }
 
 return lastGPoint;
@@ -651,9 +655,9 @@ return getPointActivSC(newPoint,true);
 
 WLGPoint WLGCode::getPointG53(WLGPoint lastGPoint)
 {
-WLGPoint newPoint=getPointActivSC(lastGPoint);//getPointActivSC(lastPoint,1);
+WLGPoint newPoint=getPointActivSC(lastGPoint);
 
-newPoint=getPointGCode(newPoint);
+newPoint=getPointGCode(newPoint,false);
 
 return getPointActivSC(newPoint,true);
 }
@@ -662,24 +666,6 @@ return getPointActivSC(newPoint,true);
 
 void  WLGCode::rotAboutRotPointSC(int i,float a)
 {
-    /*
-WLFrame Fr(refPoint0SC[i].x,refPoint0SC[i].y,refPoint0SC[i].z,0,0,0);
-WLFrame frSC(refPoint0SC[i].a,);
-
-Fr.fromM(getRotMatrix(0,0,-refPoint0SC[i].a)*Fr.toM());
-
-frSC.x=Fr.x;
-frSC.y=Fr.y;
-frSC.z=Fr.z;
-//Mov.fromM(offsetSC[i].toM().inverted()*Mov.toM());
-
-frSC.fromM(getRotMatrix(0,0,a)*frSC.toM());
-
-offsetSC[i].x-=frSC.x-refPoint0SC[i].x;
-offsetSC[i].y-=frSC.y-refPoint0SC[i].y;
-offsetSC[i].z-=frSC.z-refPoint0SC[i].z;
-*/
-//refPoint0SC[i].a=Fr.a;
 m_data.refPoint0SC[i].a=a;
 
 emit changedSK(i);
@@ -692,10 +678,6 @@ WLGPoint  WLGCode::getSC(int i,bool *ok)
 if(0<=i&&i<sizeSC) 
   {
   if(ok) *ok=true;
-  /*
-  WLFrame Mov(rotPointSC[i].x,rotPointSC[i].y,rotPointSC[i].z,0,0,0);
-
-  return offsetSC[i].toM()*Mov.toM()*getRotMatrix(0,0,rotPointSC[i].a)*Mov.toM().inverted();*/
   return m_data.offsetSC[i];
   } 
 else 
@@ -748,10 +730,10 @@ return 0;
 
 WLGPoint  WLGCode::getOffsetSC(int i,bool *ok)
 {
-    if(0<=i&&i<sizeSC)
-    {
-        if(ok) *ok=true;
-        return m_data.offsetSC[i];
+ if(0<=i&&i<sizeSC)
+  {
+  if(ok) *ok=true;
+  return m_data.offsetSC[i];
   } 
 else 
   {
@@ -878,14 +860,6 @@ absIJK=false;
 
 iCurTool=1;
 
-/*
-for(int i=0;i<7;i++)
- {
- offsetSC[i].reset();
- refPoint0SC[i].reset();
- refPoint1SC[i].reset();
- }
-*/
 gF.value=200;
 gS.value=0;
 gT.value=0;

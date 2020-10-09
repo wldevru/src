@@ -95,11 +95,15 @@ return true;//startPoint!=endPoint;
 bool WLElementTraj::setLineXYZ(WLGPoint _startPoint,WLGPoint _endPoint)
 {
  startPoint=_startPoint;
-   endPoint=_endPoint;  
+   endPoint=_endPoint;
+
+qDebug()<<"line";
+qDebug()<<startPoint.toString();
+qDebug()<<endPoint.toString();
 
 if(startPoint==endPoint) Type=nomov;   else	 Type=line;
 
-return true;//startPoint!=endPoint;
+return true;
 }
 
 QList <WL6DPoint> WLElementTraj::calcLinePoints(bool *ok,WLGModel *GModel,double delta)
