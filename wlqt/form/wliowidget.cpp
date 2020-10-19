@@ -81,41 +81,7 @@ if(m_aoutputViewModel)
   connect(m_aoutputViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewAOut,SLOT(update(QModelIndex)));
   }
 
-/*
-if(m_moduleAIOPut)
-  {
-  m_tableViewAIn=new QTableView();
-  m_tableViewAIn->setModel(m_aoutPWMViewModel);
-
-  addTab(m_tableViewOutPWM,"OUTPWM");
-
-  connect(m_tableViewOutPWM,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableOutPWM(QModelIndex)));
-  connect(m_outPWMViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewOutPWM,SLOT(update(QModelIndex)));
-  }
-
-QTimer *timer = new QTimer;
-connect(timer,SIGNAL(timeout()),SLOT(updateData()));
-timer->start(100);
-*/
 }
-
-/*
-void WLIOWidget::initDOUT()
-{
-QStringList label;
-
-if(DOUT!=NULL)
-  {
-  TableOut->setRowCount(DOUT->getSize());TableOut->setColumnCount(1);
-
-  label.clear();
-  for(int i=0;i<DOUT->getSize();i++)
-	label+=QString::number(i);
-
-  TableOut->setVerticalHeaderLabels(label);
-  }
-
-}*/
 
 void WLIOWidget::setDCTableInput(QModelIndex mindex)
 {
@@ -124,13 +90,6 @@ int row=mindex.row();
 qDebug()<<"setDClick In"<<row;
 switch(mindex.column())
 {
-//case 0: if(index<DOUT->getSize()) DOUT->tog(index); break;
-	/*
-case 1: if(QMessageBox::question(this,tr("Question"),tr("invert input")+" PC "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
-		{
-		DIN->togInv(index);
-		}
-		break;*/
 case 1: if(QMessageBox::question(this,tr("Question"),tr("invert input")+" WLMotion "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
 		{
         m_inputViewModel->moduleIOPut()->getInput(row)->togInv();
@@ -143,17 +102,11 @@ void WLIOWidget::setDCTableOutput(QModelIndex mindex)
 {
 int row=mindex.row();
 
-qDebug()<<"setDClick Out"<<row;
 switch(mindex.column())
 {
 case 0: m_outputViewModel->moduleIOPut()->getOutput(row)->setTog();
         break;
-/*
-case 1: if(QMessageBox::question(this,tr("Question"),tr("invert output")+" PC "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
-		{
-		DOUT->togInv(index);
-		}
-		break;*/
+
 case 1: if(QMessageBox::question(this,tr("Question"),tr("invert output")+" WLMotion "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
           {
           m_outputViewModel->moduleIOPut()->getOutput(row)->togInv();
@@ -169,20 +122,9 @@ void WLIOWidget::setDCTableOutPWM(QModelIndex mindex)
 int row=mindex.row();
 
 WLEnterNum EN;
-qDebug()<<"setDClick OutPWM"<<row;
+
 switch(mindex.column())
 {
-//case 0: if(index<DOUT->getSize()) DOUT->tog(index); break;
-/*
-case 0: EN.setMinMaxNow(0.1,300,ModulePWM->getOutPWM(index)->getKOut()*100);
-        EN.setLabel(tr("Eneter value:"));
-
-        if(EN.exec())
-          {
-          ModulePWM->getOutPWM(index)->setKOut(EN.getNow()/100);
-          }
-        break;
-*/
 case 1: EN.setMinMaxNow(0,100, m_outPWMViewModel->modulePWM()->getOutPWM(row)->power()*100.0);
         EN.setLabel(tr("Eneter value:"));
         EN.setSuffix(tr("%"));
@@ -216,7 +158,6 @@ void WLIOWidget::setDCTableAOutput(QModelIndex mindex)
 int row=mindex.row();
 
 WLEnterNum EN;
-qDebug()<<"setDClick AOut"<<row;
 
 EN.setMinMaxNow(0,1,m_aoutputViewModel->moduleAIOPut()->getOutput(row)->value());
 EN.setLabel(tr("Value (0-1):"));
@@ -226,7 +167,5 @@ if(EN.exec())
         {
         m_aoutputViewModel->moduleAIOPut()->getOutput(row)->setValue(EN.getNow());
         }
-
-
 }
 

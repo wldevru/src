@@ -15,21 +15,39 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
     connect(timer,SIGNAL(timeout()),this,SLOT(updatePosition()));
     timer->start(100);
 
+    ui.gALabelX->setDrive(MillMachine->getDrive("X"));
+    ui.gALabelY->setDrive(MillMachine->getDrive("Y"));
+    ui.gALabelZ->setDrive(MillMachine->getDrive("Z"));
+    ui.gALabelA->setDrive(MillMachine->getDrive("A"));
+    ui.gALabelB->setDrive(MillMachine->getDrive("B"));
+
+    ui.gALabelX->setGCode(MillMachine->GCode());
+    ui.gALabelY->setGCode(MillMachine->GCode());
+    ui.gALabelZ->setGCode(MillMachine->GCode());
+    ui.gALabelA->setGCode(MillMachine->GCode());
+    ui.gALabelB->setGCode(MillMachine->GCode());
+
+    connect(ui.gALabelX,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
+    connect(ui.gALabelY,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
+    connect(ui.gALabelZ,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
+    connect(ui.gALabelA,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
+    connect(ui.gALabelB,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
+/*
     ui.qwAxisLabelPosX->rootObject()->setProperty("p_name","X:");
     ui.qwAxisLabelPosY->rootObject()->setProperty("p_name","Y:");
     ui.qwAxisLabelPosZ->rootObject()->setProperty("p_name","Z:");
     ui.qwAxisLabelPosA->rootObject()->setProperty("p_name","A:");
     ui.qwAxisLabelPosB->rootObject()->setProperty("p_name","B:");
+    */
 	connect(ui.pbOnMachine,SIGNAL(toggled(bool)),MillMachine,SLOT(setOn(bool)));
 
-
-    ui.pbHome->setPopupMode(QToolButton::DelayedPopup);
-	connect(ui.pbHome,SIGNAL(clicked()),SLOT(onGoHome()));
+    ui.pbG28->setPopupMode(QToolButton::DelayedPopup);
+    connect(ui.pbG28,SIGNAL(clicked()),SLOT(onGoHome()));
 	
-	QMenu *menuPBHome = new QMenu();
-    menuPBHome->addAction((tr("set home")),this,SLOT(onPBsetHome()));
-    menuPBHome->addAction((tr("get home")),this,SLOT(onPBgetHome()));
-    ui.pbHome->setMenu(menuPBHome);	
+    QMenu *menuPBG28 = new QMenu();
+    menuPBG28->addAction((tr("set G28 position")),this,SLOT(onPBsetG28()));
+    menuPBG28->addAction((tr("get G28 position")),this,SLOT(onPBgetG28()));
+    ui.pbG28->setMenu(menuPBG28);
 		
 	ui.pbRotSC->setPopupMode(QToolButton::DelayedPopup);
     connect(ui.pbRotSC,SIGNAL(clicked()),SLOT(onPBRotSC()));
@@ -39,17 +57,19 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
 	menuPBRot->addAction((tr("set verify postion")),this,SLOT(onPBsetP1()));
 	menuPBRot->addAction((tr("rotation correction")),this,SLOT(onPBRotSK()));
     ui.pbRotSC->setMenu(menuPBRot);	
-
+/*
     connect(ui.qwAxisLabelPosX->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetX(int)));
     connect(ui.qwAxisLabelPosY->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetY(int)));
-
+*/
     connect(ui.cbExGCode->lineEdit(),SIGNAL(returnPressed()),this,SLOT(onExGCode()));
+
+    connect(ui.pbFindDrivePos,SIGNAL(clicked()),this,SLOT(oPBFindDrivePos()));
 
     connect(ui.pbReset,SIGNAL(clicked()),MillMachine,SLOT(reset()),Qt::DirectConnection);
 
     connect(MillMachine,SIGNAL(changedReadyRunList(bool)),SLOT(updateEnableMoved(bool)));
 
-
+/*
     if(!MillMachine->getDrive("Z"))
         {
         ui.qwAxisLabelPosZ->setVisible(false);
@@ -73,7 +93,7 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
     else {
          connect(ui.qwAxisLabelPosB->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetB(int)));
          }
-
+*/
     ui.cbExGCode->setToolTip(
                  tr(
                 "<b>GCode:</font></b>"
@@ -95,6 +115,11 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
 WLPositionWidget::~WLPositionWidget()
 {
 
+}
+
+void WLPositionWidget::oPBFindDrivePos()
+{
+MillMachine->goFindDrivePos();
 }
 
 void WLPositionWidget::onExGCode()
@@ -139,7 +164,8 @@ void WLPositionWidget::updateEnableMoved(bool en)
 {
 disButton=en;
 
-ui.pbHome->setDisabled(en);
+ui.pbG28->setDisabled(en);
+ui.pbFindDrivePos->setDisabled(en);
 ui.pbRotSC->setDisabled(en);
 
 if(MillMachine->isRunProgram())
@@ -162,7 +188,7 @@ QPalette blckPalette,redPalette;
 
 blckPalette.setColor(QPalette::WindowText, Qt::black);
  redPalette.setColor(QPalette::WindowText, Qt::red);
-
+/*
 ui.qwAxisLabelPosX->rootObject()->setProperty("p_data53",QString("%1").arg((GP53.x),0,'f',2));
 ui.qwAxisLabelPosY->rootObject()->setProperty("p_data53",QString("%1").arg((GP53.y),0,'f',2));
 
@@ -200,7 +226,13 @@ ui.qwAxisLabelPosB->rootObject()->setProperty("p_data",QString("%1").arg((GP.b),
 ui.qwAxisLabelPosB->rootObject()->setProperty("p_data53",QString("%1").arg((GP53.b),0,'f',2));
 ui.qwAxisLabelPosB->rootObject()->setProperty("p_feed",QString("%1").arg(MillMachine->getDrive("B")->Vnow()*60,0,'f',0));
 
-}
+}*/
+
+ui.gALabelX->update();
+ui.gALabelY->update();
+ui.gALabelZ->update();
+ui.gALabelA->update();
+ui.gALabelB->update();
 
 ui.rotSK->setData(MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).a);
 
@@ -229,15 +261,15 @@ void WLPositionWidget::onSetDrive(QString nameDrive,int type)
 {
 if(disButton) return;
 
-if(type==3)
+if(type==WLGAxisLabel::typeName)
  {
- MillMachine->goDriveFind(nameDrive);
  return;
  }
 
 WLEnterNum  EnterNum (this);
 
 EnterNum.setLabel(nameDrive+"=");
+
 
 if(EnterNum.exec())  setPosition(nameDrive,EnterNum.getNow(),type);
 }
@@ -247,10 +279,10 @@ void WLPositionWidget::setPosition(QString nameDrive,float pos,int type)
 {
 switch(type)
 {
-case 0:   MillMachine->setCurPositionSC(nameDrive,pos);
-          break;
-case 1:   MillMachine->getDrive(nameDrive)->setPosition(pos);
-          break;
+case WLGAxisLabel::typeOfst:  MillMachine->setCurPositionSC(nameDrive,pos);
+                              break;
+case WLGAxisLabel::typePos:   MillMachine->getDrive(nameDrive)->setPosition(pos);
+                              break;
 }
 
 }
@@ -314,7 +346,7 @@ if(EP.exec())
     }
 };
 
-void WLPositionWidget::onPBsetHome()
+void WLPositionWidget::onPBsetG28()
 {
 WLGPoint GP;
 WLEditPoint EP;
@@ -324,10 +356,10 @@ EP.setNameData("X,Y,Z,A,B,C");
 
 QList <double> List;
 
-GP=MillMachine->m_GCode.getHomePosition();
+GP=MillMachine->m_GCode.getG28Position();
 
 
-EP.setLabel(tr("enter Home position"));
+EP.setLabel(tr("enter G28 position"));
 
 EP.setValueStr(GP.toString());
 
@@ -336,15 +368,14 @@ EP.show();
 if(EP.exec())
     {
     GP.fromString(EP.getValueStr());
-
-     MillMachine->m_GCode.setHomePosition(GP);
+    MillMachine->m_GCode.setG28Position(GP);
     }
 	///emit ChangedHomePosition(Program->GCode.getSC(iSC-1).toM()*EP.getFrame().toM());
 
 }
 
-void WLPositionWidget::onPBgetHome()
+void WLPositionWidget::onPBgetG28()
 {
 if(QMessageBox::question(this, tr("Question:"),tr("are you sure?"),QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
-                   MillMachine->m_GCode.setHomePosition(MillMachine->getCurrentPosition(1));
+                   MillMachine->m_GCode.setG28Position(MillMachine->getCurrentPosition(1));
 }

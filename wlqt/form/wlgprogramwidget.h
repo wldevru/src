@@ -19,7 +19,8 @@ public:
     ~WLGProgramWidget();
 
 private:
-	void showListProgram(int iCenter);
+	void showListProgram(int iCenter);    
+
 private:
     Ui::WLGProgramWidget ui;
 	
@@ -44,6 +45,8 @@ public slots:
 	void loadTextProgram();
 
 private slots:
+
+    void saveTextProgram();
 
 	void onUpdate();
 	void onAccept();

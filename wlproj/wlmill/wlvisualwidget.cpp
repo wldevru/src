@@ -379,7 +379,7 @@ void WLVisualWidget::paintGL()
 
     if(m_typeView==XYZ)
      {
-     showHome(m_MillMachine->GCode()->getHomePosition().to3D());
+     showHome(m_MillMachine->GCode()->getG28Position().to3D());
      showTool(m_MillMachine->getCurrentPosition().to3D(),true,10,QVector3D(0,1,0));
 
      if(m_viewRotPointF) showRotPoint();
@@ -402,7 +402,7 @@ void WLVisualWidget::paintGL()
                       ,QVector3D(.75,0,0));
      }
     else {
-         showHome(m_MillMachine->getGModel()->getFrame(m_MillMachine->GCode()->getHomePosition()));
+         showHome(m_MillMachine->getGModel()->getFrame(m_MillMachine->GCode()->getG28Position()));
          showTool(m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D(),true,10,QVector3D(0,1,0));
     }
 
@@ -704,8 +704,8 @@ if(!m_MillMachine->isReady()) return;
 //#ifdef MILL3D
 bool ok;
 
-qint32 curId=m_MillMachine->m_motDevice->getModulePlanner()->getCurIdElement();
-qint32 indexMPlanner=curId+m_MillMachine->m_motDevice->getModulePlanner()->getCountBuf();
+qint32 curId=m_MillMachine->getMotionDevice()->getModulePlanner()->getCurIdElement();
+qint32 indexMPlanner=curId+m_MillMachine->getMotionDevice()->getModulePlanner()->getCountBuf();
 
 int pointsCountBuf=0;
 

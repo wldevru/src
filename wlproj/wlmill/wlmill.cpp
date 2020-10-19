@@ -306,7 +306,7 @@ dockIOPut->setObjectName("DIOPut");
 
 IOWidget =new WLIOWidget();
 
-IOWidget->setDevice(MillMachine->m_motDevice);
+IOWidget->setDevice(MillMachine->getMotionDevice());
 
 IOWidget->Init();
 
@@ -552,8 +552,13 @@ if(FileXML.open(QIODevice::ReadOnly))
 void WLMill::onLoadProgram()
 {
 QString fileName = QFileDialog::getOpenFileName(this, tr("Load program"),Program->getNameFile(),("g-code (*.ncc *.nc *.tap);;all type(*.*)"));
+
 if(!fileName.isEmpty())
-      Program->loadFile(fileName,true); 
+      {
+      if(Program->loadFile(fileName,true))
+                Program->setLastMovElement(0);
+
+      }
 //updateTitleDockProgram(1);
 }
 
@@ -684,10 +689,13 @@ createDockPosition();
 loadDataState();
 
 
-connect(MillMachine->m_motDevice,SIGNAL(changedVersion(quint32)),SLOT(updateTitle()));
+connect(MillMachine->getMotionDevice(),SIGNAL(changedVersion(quint32)),SLOT(updateTitle()));
 connect(this,SIGNAL(changedLife()),SLOT(updateTitle()));
 
 updateTitle();
+
+if(MillMachine->getMotionDevice()->getUID96().isEmpty())
+    QTimer::singleShot(1000,this,SLOT(onEditDevice()));
 }
 
 void WLMill::restoreState1()
@@ -724,7 +732,7 @@ if(DW.exec())
 
  if(!DevInfo.name.isEmpty())
   {
-  MillMachine->m_motDevice->setInfo(DevInfo);
+  MillMachine->getMotionDevice()->setInfo(DevInfo);
   QMessageBox::information(this,tr("Attention"),tr("Please restart WLMill"));
   close();
   }
@@ -734,11 +742,11 @@ if(DW.exec())
 
 void WLMill::onEditWhell()
 {
-if(!MillMachine->m_motDevice->getModuleWhell()) return;
+if(!MillMachine->getMotionDevice()->getModuleWhell()) return;
 
-WLWhellWidget WhellWidget(MillMachine->m_motDevice->getModuleWhell()->getWhell(0)
-                         ,MillMachine->m_motDevice->getModuleIOPut()
-                         ,MillMachine->m_motDevice->getModuleEncoder()
+WLWhellWidget WhellWidget(MillMachine->getMotionDevice()->getModuleWhell()->getWhell(0)
+                         ,MillMachine->getMotionDevice()->getModuleIOPut()
+                         ,MillMachine->getMotionDevice()->getModuleEncoder()
                          ,this);
 
 WhellWidget.show();
@@ -804,11 +812,13 @@ title=QString("WLMill %1h ver=%2").arg((float)getLifeM()/60.0,0,'f',1).arg(verWL
  title+=QString(" (demo)");
 #endif
 
+WLMotion *MD=MillMachine->getMotionDevice();
+
  if(MillMachine
-  &&MillMachine->m_motDevice)
+  &&MD)
  {
- if(!MillMachine->m_motDevice->isReady())
-  title+=" / "+MillMachine->m_motDevice->getNameDevice()+" ver="+QString::number(MillMachine->m_motDevice->getVersion());
+ if(!MD->isReady())
+  title+=" / "+MD->getNameDevice()+" ver="+QString::number(MD->getVersion());
 else
   title+=QString(" /noDevice");
  }

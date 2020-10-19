@@ -9,7 +9,6 @@
 #include <QMutex>
 #include <QThread>
 #include <QToolButton>
-#include <QQuickWidget>
 
 #include "wlgprogram.h"
 #include "wlmillmachine.h"
@@ -46,9 +45,6 @@ private:
 
     QToolButton *m_tbZoomIn;
     QToolButton *m_tbZoomOut;
-
-
-    QQuickWidget *qw;
 
     WLGProgram *m_Program;
 	int lastIndexProgram;

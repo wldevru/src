@@ -158,7 +158,7 @@ class WLMillMachine : public QThread
 	
 private:
     enum StateMMachine{noInit,Init,Ready};
-    enum TypeAutoMMachine{AUTO_ProbeEMG,AUTO_ProbeSD,AUTO_HProbeEMG,AUTO_HProbeSD};
+    enum TypeAutoMMachine{AUTO_ProbeEMG,AUTO_ProbeSD,AUTO_HProbeEMG,AUTO_HProbeSD,AUTO_FindDrivePos};
 	enum FlagMMachine 
 	          {
                ma_busy=      1<<0,     //занят
@@ -253,7 +253,14 @@ float m_percentSpeed;
 float m_percentSOut;
 //float percentDriveActiv;
 
+private: //for find position
+
+QString m_strFindDrivePos="Z,X,Y";
+QList<QString> m_listFindDrivePos;
+
 public:
+QString getStrFindDrivePos()            {return m_strFindDrivePos;}
+   void setStrFindDrivePos(QString str) {m_strFindDrivePos=str;}
 
 private: 	
 
@@ -311,8 +318,11 @@ private:
 
   float calcCorrectSOut(float);
 
+
+   WLMotion *m_motDevice;
 public:
- WLMotion *m_motDevice;
+   WLMotion* getMotionDevice() {return m_motDevice;}
+
  public:
 
   WLWhell *getWhell();
@@ -382,10 +392,12 @@ WLGPoint getCurrentPositionActivSC();
 
 void setAuto(bool en=true) {Flag.set(ma_auto,en);}
 bool isAuto() {return Flag.get(ma_auto);}
+
 bool updateAuto();
 bool updateProbe();
 bool updateHProbe();
 bool updateProgram();
+bool updateFindDrivePos();
 
 void updateMainDimXYZ();
 
@@ -426,11 +438,11 @@ public:
 
   bool isActivDrive()  {return   WLDrive::isActivs();}
 
-   float getCurSpeed() {return sqrt(pow(getDrive("X")->Vnow(),2)
-                                   +pow(getDrive("Y")->Vnow(),2)
-                                   +pow(getDrive("Z")->Vnow(),2));}
+  float getCurSpeed() {return sqrt(pow(getDrive("X")->Vnow(),2)
+                                  +pow(getDrive("Y")->Vnow(),2)
+                                  +pow(getDrive("Z")->Vnow(),2));}
 
-   float getCurSOut() {return curSOut;}
+  float getCurSOut() {return curSOut;}
 
 
 public:
@@ -509,6 +521,7 @@ public:
 
  public slots: 
 
+    void goFindDrivePos();
 
 
 	void saveConfig();
@@ -566,7 +579,7 @@ Q_INVOKABLE void goDriveFind(QString name);
 Q_INVOKABLE void goDriveTeach(QString nameDrive);
 Q_INVOKABLE void goDriveTouch(QString nameDrive,int dir,float F);
 Q_INVOKABLE	void goDriveProbe(QString nameDrive,int dir,float F,int type);
-Q_INVOKABLE	void goDriveHProbe(float F,bool sd);
+Q_INVOKABLE	void goHProbe(float F,bool sd);
 	
 
     void setPercentManual(float per);
@@ -580,7 +593,7 @@ Q_INVOKABLE	void goDriveHProbe(float F,bool sd);
 
 
     void setSimpli(bool enable) {Flag.set(ma_simpli,enable);}
-    void setSimpliDist(double val)  {m_simpliDist=val;}
+    void setSimpliDist(float val)  {m_simpliDist=qBound(0.0f,val,5.0f);}
 
     void setSmooth(bool enable)     {Flag.set(ma_smooth,enable);}
     void setSmoothDist(double val)  {m_smoothDist=val;}

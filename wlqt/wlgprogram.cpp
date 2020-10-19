@@ -66,8 +66,10 @@ reloadFile(true);
 }
 
 
-void WLGProgram::loadFile(QString file,bool build)
+bool WLGProgram::loadFile(QString file,bool build)
 {
+bool ret=false;
+
 stopBuildShow();
 
 QMutexLocker loker(&MutexShowBuild);
@@ -80,8 +82,6 @@ EP.offsetInFile=0;
 EP.offsetPoint=0;
 
 Mutex.lock();
-
-iLastMovElement=0;
 
 FileName=file;
 
@@ -97,6 +97,8 @@ File.setFileName(QCoreApplication::applicationDirPath()+"//prog.bkp");
 
 if(File.open(QIODevice::ReadOnly))
  {
+ ret=true;
+
   while(!File.atEnd()) 
       {
 	  File.getChar(&buf);
@@ -118,6 +120,7 @@ if(build) QTimer::singleShot(0,this,SLOT(updateShowTraj()));
 emit ChangedProgram();
 emit ChangedTrajSize(getElementCount());
 
+return ret;
 }
 
 

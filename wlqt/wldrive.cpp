@@ -778,12 +778,12 @@ if((0.0f<per)&&(per<=100.0f))
 
 void WLDrive::toSetKSpeed(float k)
 {
-    getAxis()->setKF(k);
+   getAxis()->setKF(k);
 }
 
 void WLDrive::toStartDecel()   
 {
-    getAxis()->dec();
+   getAxis()->dec();
 }
 
 void WLDrive::toStartStop()   
@@ -854,12 +854,28 @@ void WLDrive::updateInputs()
 {
 }
 
+void WLDrive::resets()
+{
+for(int i=0;i<driveList.size();i++)
+        driveList[i]->reset();
+}
+
 bool WLDrive::isActivs()
 {
 bool ret=false;
 
 for(int i=0;i<driveList.size();i++)
     if(driveList[i]->isActiv()) ret=true;
+
+return ret;
+}
+
+bool WLDrive::isMotions()
+{
+bool ret=false;
+
+for(int i=0;i<driveList.size();i++)
+    if(driveList[i]->isMotion()) ret=true;
 
 return ret;
 }

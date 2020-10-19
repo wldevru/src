@@ -255,8 +255,8 @@ void WLMillControl::updateLabelBuffer()
                                                            .arg((float)(MillMachine->getIProgram())
                                                                /(float)(Program->getElementCount())*100.0,0,'f',3)));
 	ui.labelBufPC-> setText(tr("PC     :")+QString::number(MillMachine->getTrajSize()));
-    ui.labelBufDev->setText(tr("Device :")+QString::number(MillMachine->m_motDevice->getModulePlanner()->getSizeBuf()
-                                                          -MillMachine->m_motDevice->getModulePlanner()->getFree()));
+    ui.labelBufDev->setText(tr("Device :")+QString::number(MillMachine->getMotionDevice()->getModulePlanner()->getSizeBuf()
+                                                          -MillMachine->getMotionDevice()->getModulePlanner()->getFree()));
 }
 
 void WLMillControl::updateLabelTime()
@@ -265,7 +265,7 @@ void WLMillControl::updateLabelTime()
     long          order=Program->getElementCount();
     double timeElement=MillMachine->getTimeElement()/1000;
 
-    long time_s=timeElement*(order-made+MillMachine->m_motDevice->getModulePlanner()->getCountBuf()
+    long time_s=timeElement*(order-made+MillMachine->getMotionDevice()->getModulePlanner()->getCountBuf()
                                        +MillMachine->getTrajIProgramSize());
 
     long h,m,s,d;
@@ -324,7 +324,7 @@ if(ret==QMessageBox::Ok)
 }
 void WLMillControl::updateLabelInProbe()
 {
-WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->m_motDevice->getModule(typeMAxis));
+WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->getMotionDevice()->getModule(typeMAxis));
 
 if(ModuleAxis->getInput(MAXIS_inProbe)->getNow())
     ui.labelInProbe->setPixmap(QPixmap(":/data/icons/ion.png"));
@@ -423,7 +423,7 @@ if(name=="pbPlusProbeA") MillMachine->goDriveProbe("A",1,calcFtouch(),ui.rbProbe
 else	
 if(name=="pbMinusProbeA") MillMachine->goDriveProbe("A",0,calcFtouch(),ui.rbProbeSD->isChecked());
 else	
-if(name=="pbMinusProbeH") MillMachine->goDriveHProbe(calcFtouch(),ui.rbProbeSD->isChecked());
+if(name=="pbMinusProbeH") MillMachine->goHProbe(calcFtouch(),ui.rbProbeSD->isChecked());
 
 }
 

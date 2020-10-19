@@ -100,7 +100,7 @@ void setTextProgram(QString txt);
 const QString getNameFile()    {return FileName;}
 const QString getName()        {QFileInfo FI(FileName); return FI.baseName();}
 
-void loadFile(QString file,bool m_build=false);
+bool loadFile(QString file,bool m_build=false);
 void reloadFile(bool build=false) {loadFile(FileName,build);}
 void saveFile(QString file);
 

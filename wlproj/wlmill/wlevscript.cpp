@@ -40,7 +40,7 @@ bool WLEVScript::runFunc(QString _func)
 bool ret = false;
 
 if(isBusy()) 
-   emit sendMessage("scriptEngine","busy",-1);
+   emit sendMessage("scriptEngine","busy:"+func+"/"+_func,-1);
 else 
  {  
  if(code.contains(_func))

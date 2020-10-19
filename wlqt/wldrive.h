@@ -234,7 +234,11 @@ protected:
 
 public:
 
+static void resets();
+
 static bool isActivs();
+static bool isMotions();
+
 static WLDrive *getDrive(QString name);
 static QList<WLDrive*> driveList;
 static void  startStops(bool reset=false);

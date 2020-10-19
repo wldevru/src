@@ -32,8 +32,8 @@ void WLModulePlanner::setSizeBuf(int value)
 
 void WLModulePlanner::sendGetDataBuf()
 {
-    QByteArray data;
-    QDataStream Stream(&data,QIODevice::WriteOnly);
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);

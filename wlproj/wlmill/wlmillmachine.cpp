@@ -1,6 +1,5 @@
 #include "wlmillmachine.h"
 
-//WLMillMachine::WLMillMachine(QObject *parent)
 
 #include <QTimer>
 #include <QFile>
@@ -251,8 +250,7 @@ return MDrive;
 
 void WLMillMachine::setOn(bool on)   
 {
-if(!on)  
-  runScript("OFF()");
+if(!on) runScript("OFF()");
 
 Flag.set(ma_on,on);  
 
@@ -424,6 +422,27 @@ void WLMillMachine::setDataSOut(float per)
     }
 }
 
+void WLMillMachine::goFindDrivePos()
+{
+if(!isOn()) {sendMessage(metaObject()->className(),tr("is off!"),0); return;}
+
+if(isAuto())
+   {
+   stop();
+   }
+else
+ {
+ WLDrive::resets();
+
+ m_listFindDrivePos=m_strFindDrivePos.split(",");
+
+ typeAuto=AUTO_FindDrivePos;
+
+ setAuto();
+ updateAuto();
+ }
+}
+
 void WLMillMachine::stop() //полная остановка
 {
 qDebug()<<"Stop MM";
@@ -454,7 +473,8 @@ setEnableManualWhell(false);
 
 WLDrive::startStops(true);
 
-if(!Flag.get(ma_stop))
+if(!Flag.get(ma_stop)
+ &&isOn())
  {
  Flag.set(ma_stop,runScript("STOP()"));
  }
@@ -604,7 +624,7 @@ stream.writeStartElement("WhiteLineMillConfig");
 
 stream.writeAttribute("usePWMS",QString::number(isUsePWMS()));
 stream.writeAttribute("useCorrectSOut",QString::number(isUseCorrectSOut()));
-
+stream.writeAttribute("strFindDrivePos",getStrFindDrivePos());
 
 stream.writeAttribute("correctSOut",correctSOut());
 
@@ -647,7 +667,7 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
  stream.writeEndElement();
 
  stream.writeStartElement("HomePos");
- stream.writeAttribute("GPoint",m_GCode.getHomePosition().toString());
+ stream.writeAttribute("GPoint",m_GCode.getG28Position().toString());
  stream.writeEndElement();
 
  stream.writeStartElement("GModel");
@@ -771,6 +791,15 @@ if(FileXML.isOpen())
          setHPause(stream.attributes().value("hPause").toString().toFloat());
          }
 
+     if(!stream.attributes().value("strhPause").isEmpty())
+         {
+         setEnableHPause(true);
+         setHPause(stream.attributes().value("hPause").toString().toFloat());
+         }
+
+     if(!stream.attributes().value("strFindDrivePos").isEmpty())
+         setStrFindDrivePos(stream.attributes().value("strFindDrivePos").toString());
+
 	 if(!stream.attributes().value("feedVBacklash").isEmpty()) 
 		 setFeedVBacklash(stream.attributes().value("feedVBacklash").toString().toFloat());
 
@@ -796,10 +825,7 @@ if(FileXML.isOpen())
 
 	 if(!stream.attributes().value("SimpliDist").isEmpty()) 
 		 {
-         m_simpliDist=stream.attributes().value("SimpliDist").toString().toFloat();
-         if(m_simpliDist<0) m_simpliDist=0;
-		   else
-             if(m_simpliDist>5) m_simpliDist=5;
+         setSimpliDist(stream.attributes().value("SimpliDist").toString().toFloat());
          }
 
 	 while(!stream.atEnd())
@@ -837,11 +863,11 @@ if(FileXML.isOpen())
 
                if(m_motDevice->getModuleConnect())
                                 m_motDevice->getModuleConnect()->setEnableHeart(true);
-
                }
             }
 
-            if(!findOk)
+            if(!findOk
+             &&!m_motDevice->getUID96().isEmpty())
                 emit sendMessage("WLMillMachine",tr("device %1 not found.").arg(m_motDevice->getNameDevice())+" ("+m_motDevice->getUID96()+")",0);
             }
 
@@ -945,7 +971,7 @@ if(FileXML.isOpen())
 
          WLGPoint GP;
          GP.fromString(stream.attributes().value("GPoint").toString());
-         m_GCode.setHomePosition(GP);
+         m_GCode.setG28Position(GP);
 
 		 continue;
 		 }
@@ -1122,6 +1148,7 @@ else
 
            ms=time_s;
 
+           m_Program->setLastMovElement(0);
            sendMessage("WLMillMachine",QString("\"%1\" time: %2:%3:%4 ").arg(m_Program->getName()).arg(h).arg(m).arg(ms/1000.0,1),1);
            }
 
@@ -1145,9 +1172,10 @@ if(isAuto())
 switch(typeAuto)
  {
  case AUTO_ProbeEMG:
- case AUTO_ProbeSD:  return updateProbe();
+ case AUTO_ProbeSD:        return updateProbe();
  case AUTO_HProbeEMG:
- case AUTO_HProbeSD: return updateHProbe();
+ case AUTO_HProbeSD:       return updateHProbe();
+ case  AUTO_FindDrivePos:  return updateFindDrivePos();
  //case AUTO_Program: return updateProgram();
  }
 
@@ -1278,6 +1306,29 @@ if(Drive) return Drive->isActiv();
 return 0;
 }
  
+
+bool WLMillMachine::updateFindDrivePos()
+{
+
+if(m_listFindDrivePos.isEmpty())
+ {
+ setAuto(false);
+ return 0;
+ }
+
+if(!isActivDrive())
+{
+QString curAxisFind=(m_listFindDrivePos.takeFirst()).toUpper();
+
+for(int i=0;i<curAxisFind.size();i++)
+  {
+  goDriveFind(curAxisFind.at(i));
+  }
+}
+
+return 1;
+}
+
 
 bool WLMillMachine::updateHProbe()
 {
@@ -1495,7 +1546,7 @@ updateAuto();
 
 
 
-void WLMillMachine::goDriveHProbe(float F,bool sd)
+void WLMillMachine::goHProbe(float F,bool sd)
 {
 if(!isOn()) {sendMessage(metaObject()->className(),tr("is off!"),0); return;}
 
@@ -1556,12 +1607,11 @@ if(!isOn()) {sendMessage(nameClass(),tr("is off!"),0); return;}
 WLMillDrive *Drive=static_cast<WLMillDrive*> (getDrive(nameDrive));
 
 if(Drive)
-{
-Drive->reset();
-Drive->setMovTeach();
-Drive->startTask();
-}
-
+ {
+ Drive->reset();
+ Drive->setMovTeach();
+ Drive->startTask();
+ }
 }
 
 void WLMillMachine::goDriveTouch(QString nameDrive,int dir,float F)
@@ -1795,7 +1845,7 @@ ETraj.index=m_iProgram;
 
 ETraj.setFast();
 ETraj.endPoint=curPos;
-ETraj.endPoint.z=m_GCode.getHomePosition().z;
+ETraj.endPoint.z=m_GCode.getG28Position().z;
 ETraj.setLineXYZ(curPos,ETraj.endPoint);
 
 if(curTraj.isEmpty())
@@ -1820,7 +1870,7 @@ curTraj+=ETraj;
 
 if(!startETraj.isFast())
  {
- if((startETraj.endPoint.z+20)<m_GCode.getHomePosition().z)
+ if((startETraj.endPoint.z+20)<m_GCode.getG28Position().z)
   {
   ETraj.setFast();
   ETraj.startPoint=ETraj.endPoint;
@@ -2206,8 +2256,10 @@ if(!ModulePlanner)
  }
 
 if(Flag.get(ma_runprogram))
-  {
-  m_Program->setLastMovElement(ModulePlanner->getCurIdElement());
+  {    
+  if(!ModulePlanner->isEmpty())
+      m_Program->setLastMovElement(ModulePlanner->getCurIdElement());
+  qDebug()<<"lastElemnt"<<ModulePlanner->getCurIdElement();
   updateMovProgram();
   }
 

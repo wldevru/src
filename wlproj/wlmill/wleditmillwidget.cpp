@@ -7,7 +7,7 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 
 	MillMachine=_MillMachine;
 
-    ui.sbIndexOutPWM->setRange(0,MillMachine->m_motDevice->getModulePWM()->getSizeOutPWM()-1);
+    ui.sbIndexOutPWM->setRange(0,MillMachine->getMotionDevice()->getModulePWM()->getSizeOutPWM()-1);
     ui.sbIndexOutPWM->setValue(MillMachine->getIndexSOutPWM());
 
 	ui.sbFreqPWM->setValue(MillMachine->getOutPWM()->freq());
@@ -19,9 +19,9 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 	ui.sbSmaxOut->setValue(MillMachine->maxSOut());
     ui.sbSminOut->setValue(MillMachine->minSOut());
 
+    ui.leStrFindDrivePos->setText(MillMachine->getStrFindDrivePos());
 
-
-	WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->m_motDevice->getModule(typeMAxis));
+    WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->getMotionDevice()->getModule(typeMAxis));
 
     ui.editInEMG->  setModule(ModuleAxis->getModuleIOPut());
     ui.editInSD->   setModule(ModuleAxis->getModuleIOPut());
@@ -35,7 +35,7 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
     ui.editInSD->   setValue(ModuleAxis->getInput(MAXIS_inSDStop)->getIndex());
     ui.editInProbe->setValue(ModuleAxis->getInput(MAXIS_inProbe)->getIndex());
 
-	ui.sbSmoothAng->setValue(MillMachine->m_motDevice->getModulePlanner()->getSmoothAng());
+    ui.sbSmoothAng->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getSmoothAng());
 
     ui.cbHPause->setChecked(MillMachine->isUseHPause());
     ui.sbHPause->setValue(MillMachine->HPause());
@@ -74,48 +74,19 @@ QString str;
 if(ui.sbBackZHProbe->value()<ui.sbTabletHProbe->value())
 str+=tr("Back Z is under height probe")+"\n";
 
+WLMillDrive *ZD=MillMachine->getDrive("Z");
+
+ if(ui.cbHPause->isChecked()
+ &&!ZD->isInfinity()
+&&((ZD->maxPosition()>ui.sbHPause->value())||(ZD->minPosition()>ui.sbHPause->value())))
+    str+=tr("Pause height off-axis position")+"\n";
+
 if(str.isEmpty())
 	str=tr("No error!!!");
 
 QMessageBox::information(this, tr("Verify error"),str,QMessageBox::Ok);
 }
 
-/*
-void WLEditMillWidget::updatePort()
-{
-QList<QSerialPortInfo> portList=QSerialPortInfo::availablePorts(); 
-QStringList namePortList;
-
-for(int i=0;i<portList.size();i++)
-	namePortList+=portList[i].portName();
-
-ui.cbPorts->clear();
-ui.cbPorts->addItems(namePortList);
-
-#if QT_VERSION >= 0x050000
-  ui.cbPorts->setCurrentText(MillMachine->motDevice->getPortName());
-#else
- ui.cbPorts->setCurrentIndex(ui.cbPorts->findText(MillMachine->motDevice->getPortName()));
-#endif
-
-}
-*/
-/*
-void WLEditMillWidget::onSetPort()
-{
-if(ui.cbPorts->currentText().isEmpty())
- {
-
- }
-else
- {
- //MillMachine->motDevice->closeConnect();
- MillMachine->motDevice->initSerialPort(ui.cbPorts->currentText());
-// MillMachine->motDevice->openConnect();
- QMessageBox::information(this,tr("Message"),tr("you need to exit the program to accept changes"));
- }
-}
-*/
 
 QList <SCorrectSOut> WLEditMillWidget::getCorrectSList()
 {
@@ -167,7 +138,7 @@ MillMachine->getOutPWM()->setInv(ui.cbInvPWM->isChecked());
 MillMachine->setRangeS(ui.sbSmin->value(),ui.sbSmax->value());
 MillMachine->setRangeSOut(ui.sbSminOut->value(),ui.sbSmaxOut->value());
 
-WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->m_motDevice->getModule(typeMAxis));
+WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->getMotionDevice()->getModule(typeMAxis));
 
 MillMachine->setHPause(ui.sbHPause->value());
 
@@ -175,10 +146,8 @@ ModuleAxis->setInEMGStop(ui.editInEMG->value());
 ModuleAxis->setInSDStop (ui.editInSD->value());
 ModuleAxis->setInProbe  (ui.editInProbe->value());
 
-MillMachine->m_motDevice->getModulePlanner()->setSmoothAng(ui.sbSmoothAng->value());
+MillMachine->getMotionDevice()->getModulePlanner()->setSmoothAng(ui.sbSmoothAng->value());
 MillMachine->setFeedVBacklash(ui.sbFbls->value());
-//MillMachine->setFeedVManual(ui.sbFman->value());
-//MillMachine->setFeedVG1(ui.sbFg1->value());
 
 SHProbeData hPData;
 hPData.hTablet=ui.sbTabletHProbe->value();
@@ -193,4 +162,6 @@ MillMachine->setHPause(ui.sbHPause->value());
 
 MillMachine->setCorrectSList(getCorrectSList());
 MillMachine->setEnableUseCorrectSOut(ui.gbCorrectSOut->isChecked());
+
+MillMachine->setStrFindDrivePos(ui.leStrFindDrivePos->text());
 }

@@ -640,15 +640,15 @@ WLGPoint WLGCode::getPointG28(WLGPoint lastGPoint)
 { 
 WLGPoint newPoint=getPointActivSC(lastGPoint);//getPointActivSC(lastPoint,1);
 
-if(isValid('X')) {newPoint.x=m_data.homePosition.x; getValue('X');}
-if(isValid('Y')) {newPoint.y=m_data.homePosition.y; getValue('Y');}
-if(isValid('Z')) {newPoint.z=m_data.homePosition.z; getValue('Z');}
-if(isValid('A')) {newPoint.a=m_data.homePosition.a; getValue('A');}
-if(isValid('B')) {newPoint.b=m_data.homePosition.b; getValue('B');}
-if(isValid('C')) {newPoint.c=m_data.homePosition.c; getValue('C');}
-if(isValid('U')) {newPoint.u=m_data.homePosition.u; getValue('U');}
-if(isValid('V')) {newPoint.v=m_data.homePosition.v; getValue('V');}
-if(isValid('W')) {newPoint.w=m_data.homePosition.w; getValue('W');}
+if(isValid('X')) {newPoint.x=m_data.G28Position.x; getValue('X');}
+if(isValid('Y')) {newPoint.y=m_data.G28Position.y; getValue('Y');}
+if(isValid('Z')) {newPoint.z=m_data.G28Position.z; getValue('Z');}
+if(isValid('A')) {newPoint.a=m_data.G28Position.a; getValue('A');}
+if(isValid('B')) {newPoint.b=m_data.G28Position.b; getValue('B');}
+if(isValid('C')) {newPoint.c=m_data.G28Position.c; getValue('C');}
+if(isValid('U')) {newPoint.u=m_data.G28Position.u; getValue('U');}
+if(isValid('V')) {newPoint.v=m_data.G28Position.v; getValue('V');}
+if(isValid('W')) {newPoint.w=m_data.G28Position.w; getValue('W');}
 
 return getPointActivSC(newPoint,true);
 }

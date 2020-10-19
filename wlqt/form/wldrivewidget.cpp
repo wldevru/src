@@ -62,7 +62,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 
     connect(ui.comboBoxLogicFind,SIGNAL(currentIndexChanged(int)),SLOT(updateFindLogic(int)));
 
-    ui.comboBoxLogicFind->setCurrentIndex(m_Drive->getLogicFindPos());
+    updateFindLogic(m_Drive->getLogicFindPos());
 
     ui.sbOrgSize->setValue(m_Drive->getORGSize());
     ui.sbBackFindPosition->setValue(m_Drive->homePosition());
@@ -72,6 +72,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 	connect(ui.sbVfind,SIGNAL(valueChanged(double)),SLOT(updateLabelSDDist(double)));
 
     ui.sbVfind->setValue(m_Drive->feedVFind());
+
 
 	ui.cbActInALM->addItems(QString("no,SDstop,EMGStop").split(","));
 	ui.cbActInPEL->addItems(QString("no,SDstop,EMGStop").split(","));
@@ -122,6 +123,8 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
      ui.gbDynamic->setToolTip("<img src='/image/scurve.png'/> Book");
 
      setWindowTitle(tr("Edit Drive: ")+m_Drive->getName());
+
+     updateFindLogic(m_Drive->getLogicFindPos());
 }
 
 WLDriveWidget::~WLDriveWidget()
@@ -237,7 +240,7 @@ ui.sbDimB->setValue(m_ddim.B);
 
 void WLDriveWidget::updateCBTypePulse(int index)
 {
-   // ui.cbInvStep->setEnabled(index<4);
+
 }
 
 void WLDriveWidget::updateFindLogic(int index)

@@ -4,7 +4,7 @@
 
 TEMPLATE = app
 TARGET = wlmill
-QT += core widgets serialport gui network script quickwidgets
+QT += core widgets serialport gui network script
 
 QMAKE_LFLAGS = -no-pie
 #DEFINES += QT_NO_DEBUG_OUTPUT\
@@ -99,7 +99,8 @@ SOURCES += \
     wlmilldrivewidget.cpp \
     wlmillmachine.cpp \
     wlpositionwidget.cpp \
-    wlvisualwidget.cpp
+    wlvisualwidget.cpp \
+    wlgaxislabel.cpp
 
 
 HEADERS += \
@@ -169,7 +170,8 @@ HEADERS += \
     wlmillmachine.h \
     wlpositionwidget.h \
     wlvisualwidget.h \
-    ../../wlmotion/wlmotion.h
+    ../../wlmotion/wlmotion.h \
+    wlgaxislabel.h
 
 
 FORMS += \

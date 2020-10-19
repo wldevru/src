@@ -45,7 +45,7 @@ switch(m_Module->type())
 
                    connect(ModuleIOPut,&WLModuleIOPut::changedInput,this,&WLEditIOWidget::setLatchInput);
 
-                   setLabel(m_input ? tr("input"):tr("output"));
+                   setLabel(m_input ? ("input"):("output"));
                   break;;
                    }
 
@@ -55,7 +55,7 @@ case typeMPWM:  {
                   ui->spinBox->setRange(0,(ModulePWM->getSizeOutPWM()-1));
                   ui->spinBox->setEnabled(true);
 
-                  setLabel(m_input ? tr("in PWM"):tr("out PWM"));
+                  setLabel(m_input ? ("in PWM"):("out PWM"));
 
                  break;
                  }
@@ -66,7 +66,7 @@ case typeMEncoder:{
                   ui->spinBox->setRange(0,ModuleEncoder->getSizeEncoder());
                   ui->spinBox->setEnabled(true);
 
-                  setLabel(tr("encoder"));
+                  setLabel(("encoder"));
                   break;
                   }
 default:
@@ -79,7 +79,7 @@ break;
 
 void WLEditIOWidget::setLabel(QString label)
 {
- ui->label->setText(label);
+ui->label->setText(label);
 }
 
 void WLEditIOWidget::setValue(int val)

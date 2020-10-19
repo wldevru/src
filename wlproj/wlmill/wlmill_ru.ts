@@ -2,30 +2,44 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
+    <name>WLAIOPutViewModel</name>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.h" line="78"/>
+        <source>ainput</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.h" line="78"/>
+        <source>aoutput</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.h" line="79"/>
+        <source>inv</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>WLAxisWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="26"/>
         <source>Edit Axis </source>
-        <translation>Правка оси </translation>
+        <translation type="vanished">Правка оси </translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="105"/>
         <source>Input</source>
-        <translation>Вход</translation>
+        <translation type="vanished">Вход</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="329"/>
         <source>Output</source>
-        <translation>Выход</translation>
+        <translation type="vanished">Выход</translation>
     </message>
     <message>
         <source>Action</source>
         <translation type="vanished">Действие</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="379"/>
         <source>Output pulse</source>
-        <translation>Выходные импульсы</translation>
+        <translation type="vanished">Выходные импульсы</translation>
     </message>
     <message>
         <source>invers step</source>
@@ -36,107 +50,84 @@
         <translation type="vanished">инв. напр</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="344"/>
         <source>Dynamic</source>
-        <translation>Динамика</translation>
+        <translation type="vanished">Динамика</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="350"/>
         <source>curve S</source>
-        <translation>задержка (curveS)</translation>
+        <translation type="vanished">задержка (curveS)</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="363"/>
         <source>s</source>
-        <translation>с</translation>
+        <translation type="vanished">с</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="232"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation type="vanished">Тип</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="242"/>
         <source>Linear</source>
-        <translation>Линейный</translation>
+        <translation type="vanished">Линейный</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="247"/>
         <source>Rotary</source>
-        <translation>Поворотный</translation>
+        <translation type="vanished">Поворотный</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="32"/>
         <source>Find position</source>
-        <translation>Поиск положения</translation>
+        <translation type="vanished">Поиск положения</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="63"/>
         <source>back position</source>
-        <translation>поз. возврата</translation>
+        <translation type="vanished">поз. возврата</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="385"/>
         <source>inv.dir</source>
-        <translation>инв.направления</translation>
+        <translation type="vanished">инв.направления</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="395"/>
         <source>inv.pulse</source>
-        <translation>инв.шага</translation>
+        <translation type="vanished">инв.шага</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="405"/>
-        <source>inORG</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="411"/>
         <source>inORG zone size</source>
-        <translation>inORG размер</translation>
+        <translation type="vanished">inORG размер</translation>
     </message>
     <message>
         <source>homePosition</source>
         <translation type="vanished">базовое положение</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="265"/>
         <source>Limits</source>
-        <translation>Пределы</translation>
+        <translation type="vanished">Пределы</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="306"/>
         <source>Minus</source>
-        <translation>Отрицат</translation>
+        <translation type="vanished">Отрицат</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="280"/>
         <source>Plus </source>
-        <translation>Положит</translation>
+        <translation type="vanished">Положит</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="157"/>
         <source>Step size</source>
-        <translation>Размер шага</translation>
+        <translation type="vanished">Размер шага</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="195"/>
         <source>Feed (unit/s)</source>
-        <translation>Подача (ед/с)</translation>
+        <translation type="vanished">Подача (ед/с)</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="208"/>
         <source>Find </source>
-        <translation>Поиск</translation>
+        <translation type="vanished">Поиск</translation>
     </message>
     <message>
         <source>S curve</source>
         <translation type="vanished">S кривая</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.ui" line="258"/>
         <source>verify error</source>
-        <translation>проверка ошибок</translation>
+        <translation type="vanished">проверка ошибок</translation>
     </message>
     <message>
         <source>delay (ms)</source>
@@ -147,96 +138,76 @@
         <translation type="vanished">один шаг, шагов на ед</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="12"/>
         <source>step on size,one step size,ratio A/B</source>
-        <translation>шагов на единицу,один шаг,дробь</translation>
+        <translation type="vanished">шагов на единицу,один шаг,дробь</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="57"/>
         <source>no Find,only ORG,only PEL,only MEL,only ORG back,only PEL back,only MEL back</source>
-        <translation>нет поиска,только ORG,только PEL,только MEL,только ORG с возвратом,только PEL с возвратом,только MEL с возвратом</translation>
+        <translation type="vanished">нет поиска,только ORG,только PEL,только MEL,только ORG с возвратом,только PEL с возвратом,только MEL с возвратом</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="95"/>
         <source>&lt;b&gt;Inputs number&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;inPEL - plus  end limit&lt;/li&gt;&lt;li&gt;inMEL - minus end limit&lt;/li&gt;&lt;li&gt;inALM - alarm input from driver controller&lt;/li&gt;&lt;/ol&gt;&lt;b&gt;Type Action&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;no - no action&lt;/li&gt;&lt;li&gt;EMGStop - emergency stop&lt;/li&gt;&lt;li&gt;SDStop - slow down stop&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished">&lt;b&gt;Номера входов&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;inPEL - положительный предел (plus  end limit)&lt;/li&gt;&lt;li&gt;inMEL - отрицательный предел (minus end limit)&lt;/li&gt;&lt;li&gt;inALM - сигнал тревоги от драйвера двигателя&lt;/li&gt;&lt;/ol&gt;&lt;b&gt;Тип реакции&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;no - нет реакции&lt;/li&gt;&lt;li&gt;EMGStop - незамедлительная остановка (emergency stop)&lt;/li&gt;&lt;li&gt;SDStop - плавная остановка (slow down stop)&lt;/li&gt;&lt;/ol&gt;</translation>
+        <translation type="obsolete">&lt;b&gt;Номера входов&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;inPEL - положительный предел (plus  end limit)&lt;/li&gt;&lt;li&gt;inMEL - отрицательный предел (minus end limit)&lt;/li&gt;&lt;li&gt;inALM - сигнал тревоги от драйвера двигателя&lt;/li&gt;&lt;/ol&gt;&lt;b&gt;Тип реакции&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;no - нет реакции&lt;/li&gt;&lt;li&gt;EMGStop - незамедлительная остановка (emergency stop)&lt;/li&gt;&lt;li&gt;SDStop - плавная остановка (slow down stop)&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="112"/>
         <source>&lt;b&gt;Outputs number&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;outENB -  enable to driver controller&lt;/li&gt;&lt;li&gt;outRALM - reset alarm to driver controller&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished">&lt;b&gt;Номера выходов&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;outENB -  включение драйвера (enable)&lt;/li&gt;&lt;li&gt;outRALM -  сброс сигнала тревоги драйвера двигателя&lt;/li&gt;&lt;/ol&gt;</translation>
+        <translation type="obsolete">&lt;b&gt;Номера выходов&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;outENB -  включение драйвера (enable)&lt;/li&gt;&lt;li&gt;outRALM -  сброс сигнала тревоги драйвера двигателя&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="147"/>
         <source>input numbers are not unique</source>
-        <translation>номера входов совпадают</translation>
+        <translation type="vanished">номера входов совпадают</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="150"/>
         <source>output numbers are not unique</source>
-        <translation>номера выходов совпадают</translation>
+        <translation type="vanished">номера выходов совпадают</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="153"/>
         <source>invalid movement limits</source>
-        <translation>ошибка пределов перемещения</translation>
+        <translation type="vanished">ошибка пределов перемещения</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="158"/>
         <source>invalid base position</source>
-        <translation>ошибка базового положения</translation>
+        <translation type="vanished">ошибка базового положения</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="162"/>
         <source>invalid type pulse</source>
-        <translation>невыбран тип импульсов</translation>
+        <translation type="vanished">невыбран тип импульсов</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="170"/>
         <source>no sensor installed to search</source>
-        <translation>не задан номер датчика для поиска</translation>
+        <translation type="vanished">не задан номер датчика для поиска</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="175"/>
         <source>not specified size ORG</source>
-        <translation>не определен размер inORG</translation>
+        <translation type="vanished">не определен размер inORG</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="183"/>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="190"/>
         <source>no sensor installed to search or action</source>
-        <translation>не задан номер датчика поиска либо дейсвие для датчика </translation>
+        <translation type="vanished">не задан номер датчика поиска либо дейсвие для датчика </translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="195"/>
         <source>search speed not set</source>
-        <translation>не задана скорость поиска</translation>
+        <translation type="vanished">не задана скорость поиска</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="199"/>
         <source>No error!!!</source>
-        <translation>Нет ошибок!!!</translation>
+        <translation type="vanished">Нет ошибок!!!</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="201"/>
         <source>Verify error</source>
-        <translation>Проверка ошибок</translation>
+        <translation type="vanished">Проверка ошибок</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="251"/>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="253"/>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="255"/>
         <source>position</source>
-        <translation>положение</translation>
+        <translation type="vanished">положение</translation>
     </message>
     <message>
         <source>no Find,only ORG,only PEL,only MEL</source>
         <translation type="obsolete">не искать, только по inORG, только по inPEL, только по inMEL</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLAxisWidget.cpp" line="134"/>
         <source>slow down distance: %1 mm</source>
-        <translation>плавная остановка:%1мм</translation>
+        <translation type="vanished">плавная остановка:%1мм</translation>
     </message>
 </context>
 <context>
@@ -305,20 +276,20 @@
 <context>
     <name>WLDeviceWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLDeviceWidget.ui" line="14"/>
+        <location filename="../../wlqt/form/wldevicewidget.ui" line="14"/>
         <source>Select Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбор устройства</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLDeviceWidget.cpp" line="28"/>
+        <location filename="../../wlqt/form/wldevicewidget.cpp" line="28"/>
         <source>no device</source>
-        <translation type="unfinished"></translation>
+        <translation>не найдено</translation>
     </message>
 </context>
 <context>
     <name>WLDialog</name>
     <message>
-        <location filename="WLDialog.cpp" line="57"/>
+        <location filename="wldialogscript.cpp" line="57"/>
         <source>Message: </source>
         <translation>Сообщение:</translation>
     </message>
@@ -354,37 +325,42 @@
 <context>
     <name>WLDrive</name>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="48"/>
+        <location filename="../../wlqt/wldrive.cpp" line="52"/>
         <source>error setting axis position</source>
         <translation>ошибка установки положения оси</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="136"/>
+        <location filename="../../wlqt/wldrive.cpp" line="145"/>
         <source>drive controller has an error.</source>
         <translation>контроллер оси имеет ошибку.</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="142"/>
+        <location filename="../../wlqt/wldrive.cpp" line="151"/>
         <source>error when preparing for movement</source>
         <translation>ошибка при подготовке к движению</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="263"/>
+        <location filename="../../wlqt/wldrive.cpp" line="272"/>
         <source>err vellocity mode axis</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/wldrive.cpp" line="568"/>
+        <source>wrong resolution:</source>
+        <translation>нет разрешения</translation>
     </message>
     <message>
         <source>no permission for movement</source>
         <translation type="vanished">нет разрешения на движение</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="216"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="257"/>
+        <location filename="../../wlqt/wldrive.cpp" line="225"/>
+        <location filename="../../wlqt/wldrive.cpp" line="266"/>
         <source>unfinished previous move</source>
         <translation>незавершено предыдущее движение</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="224"/>
+        <location filename="../../wlqt/wldrive.cpp" line="233"/>
         <source>task out limit axis</source>
         <translation>выход за пределы оси</translation>
     </message>
@@ -393,40 +369,39 @@
         <translation type="obsolete">выход за предел перемещения оси</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="451"/>
+        <location filename="../../wlqt/wldrive.cpp" line="462"/>
         <source>controller error (inALM)</source>
         <translation>ошибка контроллера (inALM)</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="541"/>
         <source>lost permission to move</source>
-        <translation>потерял разрешение на перемещение</translation>
+        <translation type="vanished">потерял разрешение на перемещение</translation>
     </message>
     <message>
         <source>WLMotion axis error</source>
         <translation type="vanished">WLMotion ошибка оси</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="981"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="998"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1012"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1029"/>
         <source>movement setup error</source>
         <translation>ошибка установки движений</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="1040"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1178"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1236"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1071"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1209"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1267"/>
         <source>wrong starting position</source>
         <translation>неправильное начальное положение</translation>
     </message>
     <message>
-        <location filename="../../WLQt/WLDrive.cpp" line="1058"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1077"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1097"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1113"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1149"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1208"/>
-        <location filename="../../WLQt/WLDrive.cpp" line="1271"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1089"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1108"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1128"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1144"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1180"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1239"/>
+        <location filename="../../wlqt/wldrive.cpp" line="1302"/>
         <source>no sensor signal</source>
         <translation>нет сигнала с датчика</translation>
     </message>
@@ -448,68 +423,341 @@
     </message>
 </context>
 <context>
+    <name>WLDriveWidget</name>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="26"/>
+        <source>Edit Axis </source>
+        <translation>Правка оси </translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="49"/>
+        <source>main</source>
+        <translation>главное</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="84"/>
+        <source>inORG</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="90"/>
+        <source>inORG zone size</source>
+        <translation>inORG размер</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="119"/>
+        <source>Output</source>
+        <translation>Выход</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="137"/>
+        <source>Input</source>
+        <translation>Вход</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="189"/>
+        <source>Limits</source>
+        <translation>Пределы</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="204"/>
+        <source>Plus </source>
+        <translation>Положит</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="230"/>
+        <source>Minus</source>
+        <translation>Отрицат</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="253"/>
+        <source>Step size</source>
+        <translation>Размер шага</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="291"/>
+        <source>Find position</source>
+        <translation>Поиск положения</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="322"/>
+        <source>back position</source>
+        <translation>Поз. возврата</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="361"/>
+        <source>Output pulse</source>
+        <translation>Выходные импульсы</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="367"/>
+        <source>inv.dir</source>
+        <translation>инв.напр.</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="374"/>
+        <source>inv.pulse</source>
+        <translation>инв.шага</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="387"/>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="397"/>
+        <source>Linear</source>
+        <translation>Линейный</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="402"/>
+        <source>Rotary</source>
+        <translation>Поворотный</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="413"/>
+        <source>Dynamic</source>
+        <translation>Динамика</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="419"/>
+        <source>curve S</source>
+        <translation>задержка (S)</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="432"/>
+        <source>s</source>
+        <translation>с</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="448"/>
+        <source>Feed (unit/s)</source>
+        <translation>Подача (ед/с)</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="461"/>
+        <source>Find </source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.ui" line="480"/>
+        <source>verify error</source>
+        <translation>проверка ошибок</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="14"/>
+        <source>motion parametrs</source>
+        <translation>параметры движения</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="16"/>
+        <source>step on size,one step size,ratio A/B</source>
+        <translation>шагов на единицу,один шаг,дробь</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="61"/>
+        <source>no Find,only ORG,only PEL,only MEL,only ORG back,only PEL back,only MEL back</source>
+        <translation>нет поиска,только ORG,только PEL,только MEL,только ORG с возвратом,только PEL с возвратом,только MEL с возвратом</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="96"/>
+        <source>&lt;b&gt;Inputs number&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;inPEL - plus  end limit&lt;/li&gt;&lt;li&gt;inMEL - minus end limit&lt;/li&gt;&lt;li&gt;inALM - alarm input from driver controller&lt;/li&gt;&lt;/ol&gt;&lt;b&gt;Type Action&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;no - no action&lt;/li&gt;&lt;li&gt;EMGStop - emergency stop&lt;/li&gt;&lt;li&gt;SDStop - slow down stop&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation>&lt;b&gt;Номера входов&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;inPEL - положительный предел (plus  end limit)&lt;/li&gt;&lt;li&gt;inMEL - отрицательный предел (minus end limit)&lt;/li&gt;&lt;li&gt;inALM - сигнал тревоги от драйвера двигателя&lt;/li&gt;&lt;/ol&gt;&lt;b&gt;Тип реакции&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;no - нет реакции&lt;/li&gt;&lt;li&gt;EMGStop - незамедлительная остановка (emergency stop)&lt;/li&gt;&lt;li&gt;SDStop - плавная остановка (slow down stop)&lt;/li&gt;&lt;/ol&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="113"/>
+        <source>&lt;b&gt;Outputs number&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;outENB -  enable to driver controller&lt;/li&gt;&lt;li&gt;outRALM - reset alarm to driver controller&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation>&lt;b&gt;Номера выходов&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;outENB -  включение драйвера (enable)&lt;/li&gt;&lt;li&gt;outRALM -  сброс сигнала тревоги драйвера двигателя&lt;/li&gt;&lt;/ol&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="124"/>
+        <source>Edit Drive: </source>
+        <translation>Правка привода</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="136"/>
+        <source>slow down distance: %1 mm</source>
+        <translation>плавная остановка:%1мм</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="149"/>
+        <source>input numbers are not unique</source>
+        <translation>номера входов совпадают</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="152"/>
+        <source>output numbers are not unique</source>
+        <translation>номера выходов совпадают</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="156"/>
+        <source>invalid movement limits</source>
+        <translation>ошибка пределов перемещения</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="161"/>
+        <source>invalid base position</source>
+        <translation>ошибка базового положения</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="173"/>
+        <source>no sensor installed to search</source>
+        <translation>не задан номер датчика для поиска</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="178"/>
+        <source>not specified size ORG</source>
+        <translation>не определен размер inORG</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="186"/>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="193"/>
+        <source>no sensor installed to search or action</source>
+        <translation>не задан номер датчика поиска либо дейсвие для датчика </translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="198"/>
+        <source>search speed not set</source>
+        <translation>не задана скорость поиска</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="202"/>
+        <source>No error!!!</source>
+        <translation>Нет ошибок!!!</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="204"/>
+        <source>Verify error</source>
+        <translation>Проверка ошибок</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="265"/>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="267"/>
+        <location filename="../../wlqt/form/wldrivewidget.cpp" line="269"/>
+        <source>position</source>
+        <translation>положение</translation>
+    </message>
+</context>
+<context>
     <name>WLEVScript</name>
     <message>
-        <location filename="WLEvScript.h" line="50"/>
+        <location filename="wlevscript.cpp" line="69"/>
         <source>script</source>
         <translation>скрипт</translation>
     </message>
     <message>
-        <location filename="WLEvScript.h" line="58"/>
+        <location filename="wlevscript.h" line="58"/>
         <source>message</source>
         <translation>сообщение</translation>
     </message>
 </context>
 <context>
-    <name>WLEditIOPutWidget</name>
+    <name>WLEditIOWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLEditIOPutWidget.ui" line="14"/>
+        <location filename="../../wlqt/form/wleditiowidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLEditIOPutWidget.ui" line="20"/>
+        <location filename="../../wlqt/form/wleditiowidget.ui" line="29"/>
+        <source>press to menu</source>
+        <translation>нажмите для появления меню</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wleditiowidget.ui" line="38"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>in PWM</source>
+        <translation type="obsolete">вход </translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wleditiowidget.cpp" line="110"/>
+        <source>Question</source>
+        <translation>Вопрос</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wleditiowidget.cpp" line="111"/>
+        <source>invert input</source>
+        <translation>инвертировать вход</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wleditiowidget.cpp" line="111"/>
+        <source>invert output</source>
+        <translation>инвертировать выход</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wleditiowidget.cpp" line="145"/>
+        <source>invers</source>
+        <translation>инверсия</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wleditiowidget.cpp" line="152"/>
+        <source>latch input</source>
+        <translation>захват входа</translation>
     </message>
 </context>
 <context>
     <name>WLEditMillWidget</name>
     <message>
-        <location filename="WLEditMillWidget.ui" line="14"/>
+        <location filename="wleditmillwidget.ui" line="14"/>
         <source>Edit WLMill</source>
         <oldsource>WLEditMillWidget</oldsource>
         <translation>Правка WLMill</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="303"/>
+        <location filename="wleditmillwidget.ui" line="82"/>
+        <source>height from bottom of sensor</source>
+        <translation>высота от низа датчика</translation>
+    </message>
+    <message>
+        <location filename="wleditmillwidget.ui" line="118"/>
+        <source>height sensor</source>
+        <translation>высота датчика</translation>
+    </message>
+    <message>
+        <location filename="wleditmillwidget.ui" line="150"/>
+        <source>pause height</source>
+        <translation>высота паузы</translation>
+    </message>
+    <message>
+        <location filename="wleditmillwidget.ui" line="309"/>
         <source>PWM OUT controler</source>
-        <translation type="unfinished"></translation>
+        <translation>ШИМ(PWM) выход S</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="306"/>
+        <location filename="wleditmillwidget.ui" line="312"/>
         <source>Index</source>
-        <translation type="unfinished"></translation>
+        <translation>номер выхода PWM</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="326"/>
+        <location filename="wleditmillwidget.ui" line="417"/>
+        <source>Search order</source>
+        <translation type="unfinished">Порядок поиска</translation>
+    </message>
+    <message>
+        <source>String find drive pos</source>
+        <translation type="vanished">Строка поиска приводов.</translation>
+    </message>
+    <message>
+        <location filename="wleditmillwidget.ui" line="429"/>
         <source>Input</source>
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="406"/>
+        <location filename="wleditmillwidget.ui" line="66"/>
         <source>Feed</source>
-        <translation type="unfinished">Подача</translation>
+        <translation>Подача</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="425"/>
+        <location filename="wleditmillwidget.ui" line="44"/>
         <source>mm/min</source>
-        <translation type="unfinished">мм/мин</translation>
+        <translation>мм/мин</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="474"/>
         <source>Encoder</source>
-        <translation>Энкодер</translation>
+        <translation type="vanished">Энкодер</translation>
     </message>
     <message>
         <source>use inputs select</source>
@@ -520,92 +768,92 @@
         <translation type="vanished">принять</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="344"/>
+        <location filename="wleditmillwidget.ui" line="394"/>
         <source>Smooth</source>
         <translation>Сглаживание</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="350"/>
+        <location filename="wleditmillwidget.ui" line="400"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="319"/>
+        <location filename="wleditmillwidget.ui" line="184"/>
         <source>verify error</source>
         <translation>проверка ошибок</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="33"/>
+        <location filename="wleditmillwidget.ui" line="137"/>
         <source>Pause</source>
-        <translation type="unfinished">Пауза</translation>
+        <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="39"/>
+        <location filename="wleditmillwidget.ui" line="143"/>
         <source>G53 Z</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="98"/>
+        <location filename="wleditmillwidget.ui" line="121"/>
         <source>height:</source>
-        <translation type="unfinished"></translation>
+        <translation>Высота датчика</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="123"/>
+        <location filename="wleditmillwidget.ui" line="325"/>
         <source>Touch</source>
-        <translation type="unfinished">Касание</translation>
+        <translation>Касание</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="129"/>
+        <location filename="wleditmillwidget.ui" line="331"/>
         <source>Z,free (mm)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="149"/>
+        <location filename="wleditmillwidget.ui" line="351"/>
         <source>X,Y free (mm)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="169"/>
+        <location filename="wleditmillwidget.ui" line="371"/>
         <source>Diametr (mm)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="192"/>
+        <location filename="wleditmillwidget.ui" line="198"/>
         <source>PWM S output</source>
         <translation>ШИМ выход S</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="201"/>
+        <location filename="wleditmillwidget.ui" line="207"/>
         <source>Calc</source>
         <translation>Расчёт</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="228"/>
+        <location filename="wleditmillwidget.ui" line="234"/>
         <source>PWM min</source>
         <translation>ШИМ мин</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="242"/>
+        <location filename="wleditmillwidget.ui" line="248"/>
         <source>S min</source>
         <translation>S мин</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="256"/>
+        <location filename="wleditmillwidget.ui" line="262"/>
         <source>PWM max</source>
         <translation>ШИМ макс</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="207"/>
+        <location filename="wleditmillwidget.ui" line="213"/>
         <source>S max</source>
         <translation>S макс</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="273"/>
+        <location filename="wleditmillwidget.ui" line="279"/>
         <source>Frequency</source>
         <translation>Частота шима</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="373"/>
+        <location filename="wleditmillwidget.ui" line="26"/>
         <source>Backlash</source>
         <translation>Люфт</translation>
     </message>
@@ -622,17 +870,17 @@
         <translation type="vanished">Ручной</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="59"/>
+        <location filename="wleditmillwidget.ui" line="76"/>
         <source>Probe H</source>
         <translation>Проббинг H</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="266"/>
+        <location filename="wleditmillwidget.ui" line="272"/>
         <source>Invers outPWM</source>
         <translation>инверсия PWM</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="108"/>
+        <location filename="wleditmillwidget.ui" line="169"/>
         <source>Correct S Out</source>
         <translation>Коррекция выхода S</translation>
     </message>
@@ -641,32 +889,35 @@
         <translation type="vanished">высота дат</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="65"/>
+        <location filename="wleditmillwidget.ui" line="85"/>
         <source>back Z:</source>
-        <translation>высота Z</translation>
+        <translation>Высота Z</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="465"/>
         <source>Whell</source>
-        <translation>Штурвал</translation>
+        <translation type="vanished">Штурвал</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.ui" line="501"/>
         <source>Size</source>
-        <translation>имп/обр</translation>
+        <translation type="vanished">имп/обр</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.cpp" line="96"/>
+        <location filename="wleditmillwidget.cpp" line="75"/>
         <source>Back Z is under height probe</source>
         <translation>Высота воврата меньше высоты проббинга</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.cpp" line="99"/>
+        <location filename="wleditmillwidget.cpp" line="82"/>
+        <source>Pause height off-axis position</source>
+        <translation>Высота паузы за пределами перемещения оси</translation>
+    </message>
+    <message>
+        <location filename="wleditmillwidget.cpp" line="85"/>
         <source>No error!!!</source>
         <translation>Нет ошибок!!!</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.cpp" line="101"/>
+        <location filename="wleditmillwidget.cpp" line="87"/>
         <source>Verify error</source>
         <translation>Проверка ошибок</translation>
     </message>
@@ -675,12 +926,12 @@
         <translation type="vanished">Сообщение</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.cpp" line="173"/>
+        <location filename="wleditmillwidget.cpp" line="123"/>
         <source>adjusted</source>
         <translation>Заданно</translation>
     </message>
     <message>
-        <location filename="WLEditMillWidget.cpp" line="173"/>
+        <location filename="wleditmillwidget.cpp" line="123"/>
         <source>percent</source>
         <translation>корректировка  (%)</translation>
     </message>
@@ -699,27 +950,27 @@
 <context>
     <name>WLEditPoint</name>
     <message>
-        <location filename="WLEditPoint.ui" line="23"/>
+        <location filename="wleditpoint.ui" line="23"/>
         <source>WLEditPoint</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLEditPoint.ui" line="29"/>
+        <location filename="wleditpoint.ui" line="29"/>
         <source>Coordinates</source>
         <translation>Координаты</translation>
     </message>
     <message>
-        <location filename="WLEditPoint.ui" line="41"/>
+        <location filename="wleditpoint.ui" line="41"/>
         <source>Accept</source>
         <translation>Принять</translation>
     </message>
     <message>
-        <location filename="WLEditPoint.ui" line="48"/>
+        <location filename="wleditpoint.ui" line="48"/>
         <source>Cancle</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="WLEditPoint.cpp" line="7"/>
+        <location filename="wleditpoint..cpp" line="7"/>
         <source>Enter Point</source>
         <translation>Введите точку</translation>
     </message>
@@ -727,12 +978,12 @@
 <context>
     <name>WLEditText</name>
     <message>
-        <location filename="../../WLQt/form/WLEditText.ui" line="14"/>
+        <location filename="../../wlqt/form/wledittext.ui" line="14"/>
         <source>Edit text</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLEditText.ui" line="23"/>
+        <location filename="../../wlqt/form/wledittext.ui" line="23"/>
         <source>TextLabel</source>
         <translation>имя программы</translation>
     </message>
@@ -752,13 +1003,13 @@
         <translation type="obsolete">Введите значение:</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLEnterNum.ui" line="14"/>
+        <location filename="../../wlqt/form/wlenternum.ui" line="14"/>
         <source>Enter value</source>
         <translation>Введите значение
 </translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLEnterNum.ui" line="49"/>
+        <location filename="../../wlqt/form/wlenternum.ui" line="49"/>
         <source>Value</source>
         <translation></translation>
     </message>
@@ -774,28 +1025,36 @@
         <translation type="vanished">имя программы</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLEnterString.ui" line="14"/>
+        <location filename="../../wlqt/form/wlenterstring.ui" line="14"/>
         <source>Input String</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLEnterString.ui" line="23"/>
+        <location filename="../../wlqt/form/wlenterstring.ui" line="23"/>
         <source>String</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>WLGAxisLabel</name>
+    <message>
+        <location filename="wlgaxislabel.cpp" line="9"/>
+        <source>press for edit</source>
+        <translation>нажмите для правки</translation>
     </message>
 </context>
 <context>
     <name>WLGModelWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLGModelWidget.ui" line="14"/>
+        <location filename="../../wlqt/form/wlgmodelwidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>WLGProgram</name>
     <message>
-        <location filename="../../WLQt/WLGProgram.cpp" line="525"/>
+        <location filename="../../wlqt/wlgprogram.cpp" line="383"/>
         <source>Error in the frame: </source>
         <translation>Ошибка в тексте программы:</translation>
     </message>
@@ -803,126 +1062,152 @@
 <context>
     <name>WLGProgramWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="20"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="20"/>
         <source>WLGProgamWidget</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="41"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="41"/>
         <source>redraw</source>
-        <translation type="unfinished">перерисовать</translation>
+        <translation>перерисовать</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="69"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="69"/>
         <source>reload file</source>
-        <translation type="unfinished">перезагрузить файл</translation>
+        <translation>перезагрузить файл</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="97"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="97"/>
         <source>backup</source>
-        <translation type="unfinished">восстановить</translation>
+        <translation>восстановить</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="125"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="125"/>
         <source>accept</source>
         <translation>принять</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="229"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="235"/>
         <source>enter number position</source>
         <translation>введите номер позиции</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="243"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="249"/>
         <source>text
 </source>
         <translation>имя программы</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.ui" line="267"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.ui" line="273"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.cpp" line="64"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.cpp" line="61"/>
         <source>Confirmation:</source>
-        <translation type="unfinished">Подтверждение:</translation>
+        <translation>Подтверждение:</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.cpp" line="65"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.cpp" line="62"/>
         <source>save program?</source>
-        <translation type="unfinished"></translation>
+        <translation>сохранить изменения?</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLGProgramWidget.cpp" line="133"/>
+        <location filename="../../wlqt/form/wlgprogramwidget.cpp" line="130"/>
         <source>name: </source>
         <translation>имя:</translation>
     </message>
 </context>
 <context>
+    <name>WLIOPutViewModel</name>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.h" line="189"/>
+        <source>input</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.h" line="189"/>
+        <source>output</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.h" line="190"/>
+        <source>inv</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>WLIOPutWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="45"/>
         <source>input,inv</source>
-        <translation>вход,инв</translation>
+        <translation type="vanished">вход,инв</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="60"/>
         <source>output,inv</source>
-        <translation>выход,инв</translation>
+        <translation type="vanished">выход,инв</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="78"/>
-        <source>K,value,inv,F</source>
-        <translation type="unfinished"></translation>
+        <source>Question</source>
+        <translation type="vanished">Вопрос</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="96"/>
-        <source>value,inv,F</source>
-        <translation type="unfinished"></translation>
+        <source>invert input</source>
+        <translation type="vanished">инвертировать вход</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="136"/>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="161"/>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="199"/>
+        <source>invert output</source>
+        <translation type="vanished">инвертировать выход</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.ui" line="14"/>
+        <source>Input/Output</source>
+        <translation>Входы/Выходы</translation>
+    </message>
+</context>
+<context>
+    <name>WLIOWidget</name>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="93"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="110"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="138"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="136"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="93"/>
         <source>invert input</source>
         <translation>инвертировать вход</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="161"/>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="199"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="110"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="138"/>
         <source>invert output</source>
         <translation>инвертировать выход</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="190"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="129"/>
         <source>Eneter value:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите значение</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="191"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="130"/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="206"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="145"/>
         <source>Eneter Frequency:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите частоту:</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.cpp" line="207"/>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="146"/>
         <source>Hz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLIOPutWidget.ui" line="14"/>
-        <source>Input/Output</source>
-        <translation>Входы/Выходы</translation>
+        <location filename="../../wlqt/form/wliowidget.cpp" line="163"/>
+        <source>Value (0-1):</source>
+        <translation>Значение (0-1):</translation>
     </message>
 </context>
 <context>
@@ -1050,12 +1335,12 @@
 <context>
     <name>WLMessManager</name>
     <message>
-        <location filename="../../WLQt/form/WLMessManager.ui" line="26"/>
+        <location filename="../../wlqt/form/wlmessmanager.ui" line="26"/>
         <source>WLMessManager</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLMessManager.ui" line="75"/>
+        <location filename="../../wlqt/form/wlmessmanager.ui" line="75"/>
         <source>clear</source>
         <translation></translation>
     </message>
@@ -1064,12 +1349,12 @@
         <translation type="vanished">имя программы</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLMessManager.cpp" line="121"/>
+        <location filename="../../wlqt/form/wlmessmanager.cpp" line="123"/>
         <source>Message: </source>
         <translation>Сообщение:</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLMessManager.cpp" line="123"/>
+        <location filename="../../wlqt/form/wlmessmanager.cpp" line="125"/>
         <source>Error: </source>
         <translation>Ошибка:</translation>
     </message>
@@ -1077,380 +1362,362 @@
 <context>
     <name>WLMill</name>
     <message>
-        <location filename="WLMill.cpp" line="161"/>
+        <location filename="wlmill.cpp" line="96"/>
         <source>Message</source>
         <translation>Сообщение</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="172"/>
+        <location filename="wlmill.cpp" line="107"/>
         <source>tollbar M</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="175"/>
+        <location filename="wlmill.cpp" line="110"/>
         <source>run spindle cw</source>
         <translation>запуск вращение шпинделя по часовой стрелке</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="176"/>
+        <location filename="wlmill.cpp" line="111"/>
         <source>run spindle ccw</source>
         <translation>запуск вращение шпинделя против часовой стрелке</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="177"/>
+        <location filename="wlmill.cpp" line="112"/>
         <source>stop spindle</source>
         <translation>остановить шпиндель</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="178"/>
+        <location filename="wlmill.cpp" line="113"/>
         <source>run additional cooling</source>
         <translation>включить дополнительное охлаждение</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="179"/>
+        <location filename="wlmill.cpp" line="114"/>
         <source>run cooling</source>
         <translation>включить охлаждение</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="180"/>
+        <location filename="wlmill.cpp" line="115"/>
         <source>stop cooling</source>
         <translation>выключить охлаждение</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="205"/>
-        <location filename="WLMill.cpp" line="222"/>
+        <location filename="wlmill.cpp" line="190"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="213"/>
         <source>Top</source>
-        <translation>Верх</translation>
+        <translation type="vanished">Верх</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="214"/>
         <source>Bottom</source>
-        <translation>Низ</translation>
+        <translation type="vanished">Низ</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="215"/>
         <source>Left</source>
-        <translation>Лево</translation>
+        <translation type="vanished">Лево</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="216"/>
         <source>Right</source>
-        <translation>Право</translation>
+        <translation type="vanished">Право</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="217"/>
         <source>Front</source>
-        <translation>Перед</translation>
+        <translation type="vanished">Перед</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="218"/>
         <source>Rear</source>
-        <translation>Зад</translation>
+        <translation type="vanished">Зад</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="226"/>
         <source>Center</source>
-        <translation>по Центру</translation>
+        <translation type="vanished">по Центру</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="235"/>
-        <location filename="WLMill.cpp" line="405"/>
+        <location filename="wlmill.cpp" line="239"/>
         <source>Program</source>
         <translation>Программа</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="239"/>
         <source>Trajectory</source>
-        <translation>Траектория</translation>
+        <translation type="vanished">Траектория</translation>
     </message>
     <message>
         <source>Backlash</source>
         <translation type="vanished">Люфт</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="243"/>
         <source>Limits</source>
-        <translation>Пределы</translation>
+        <translation type="vanished">Пределы</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="247"/>
         <source>Rot</source>
-        <translation>Поворот СК</translation>
+        <translation type="vanished">Поворот СК</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="252"/>
-        <source>Show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WLMill.cpp" line="261"/>
-        <source>XYZ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WLMill.cpp" line="266"/>
-        <source>GModel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WLMill.cpp" line="273"/>
-        <source>Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WLMill.cpp" line="278"/>
-        <source>Tool</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WLMill.cpp" line="285"/>
         <source>Type</source>
-        <translation type="unfinished">Тип</translation>
+        <translation type="obsolete">Тип</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="291"/>
-        <source>Head/Head,Head/Table</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="WLMill.cpp" line="306"/>
+        <location filename="wlmill.cpp" line="133"/>
         <source>Script</source>
         <translation>Скрипт</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="311"/>
+        <location filename="wlmill.cpp" line="138"/>
         <source>resetScript</source>
         <translation>сброс выполения</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="313"/>
+        <location filename="wlmill.cpp" line="140"/>
         <source>M100</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="314"/>
+        <location filename="wlmill.cpp" line="141"/>
         <source>M101</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="315"/>
+        <location filename="wlmill.cpp" line="142"/>
         <source>M102</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="316"/>
+        <location filename="wlmill.cpp" line="143"/>
         <source>M103</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="317"/>
+        <location filename="wlmill.cpp" line="144"/>
         <source>M104</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="318"/>
+        <location filename="wlmill.cpp" line="145"/>
         <source>M105</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="319"/>
+        <location filename="wlmill.cpp" line="146"/>
         <source>M106</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="320"/>
+        <location filename="wlmill.cpp" line="147"/>
         <source>M107</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="321"/>
+        <location filename="wlmill.cpp" line="148"/>
         <source>M108</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="322"/>
+        <location filename="wlmill.cpp" line="149"/>
         <source>M109</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="323"/>
+        <location filename="wlmill.cpp" line="150"/>
         <source>M110</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="324"/>
+        <location filename="wlmill.cpp" line="151"/>
         <source>M112</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="325"/>
+        <location filename="wlmill.cpp" line="152"/>
         <source>M113</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="326"/>
+        <location filename="wlmill.cpp" line="153"/>
         <source>M114</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="327"/>
+        <location filename="wlmill.cpp" line="154"/>
         <source>M115</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="336"/>
+        <location filename="wlmill.cpp" line="163"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="337"/>
+        <location filename="wlmill.cpp" line="164"/>
         <source>Save program</source>
         <translation>Сохранить программу</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="338"/>
-        <location filename="WLMill.cpp" line="792"/>
+        <location filename="wlmill.cpp" line="165"/>
+        <location filename="wlmill.cpp" line="567"/>
         <source>Save program as</source>
         <translation>Сохранить программу как</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="340"/>
-        <location filename="WLMill.cpp" line="784"/>
+        <location filename="wlmill.cpp" line="167"/>
+        <location filename="wlmill.cpp" line="554"/>
         <source>Load program</source>
         <translation>Загрузить программу</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="343"/>
-        <location filename="WLMill.cpp" line="638"/>
+        <location filename="wlmill.cpp" line="170"/>
+        <location filename="wlmill.cpp" line="408"/>
         <source>Save coordinates</source>
         <translation>Сохранить СК</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="344"/>
+        <location filename="wlmill.cpp" line="171"/>
         <source>Load coordinates</source>
         <translation>Загрузить СК</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="348"/>
+        <location filename="wlmill.cpp" line="172"/>
+        <source>Close</source>
+        <translation>Закрыт</translation>
+    </message>
+    <message>
+        <location filename="wlmill.cpp" line="176"/>
         <source>Edit</source>
         <translation>Правка</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="349"/>
-        <location filename="WLMill.cpp" line="350"/>
-        <location filename="WLMill.cpp" line="351"/>
-        <location filename="WLMill.cpp" line="352"/>
-        <location filename="WLMill.cpp" line="353"/>
+        <location filename="wlmill.cpp" line="177"/>
+        <location filename="wlmill.cpp" line="178"/>
+        <location filename="wlmill.cpp" line="179"/>
+        <location filename="wlmill.cpp" line="180"/>
+        <location filename="wlmill.cpp" line="181"/>
         <source>Drive</source>
         <translation>Ось</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="356"/>
-        <location filename="WLMill.cpp" line="357"/>
-        <location filename="WLMill.cpp" line="358"/>
-        <location filename="WLMill.cpp" line="359"/>
-        <location filename="WLMill.cpp" line="360"/>
         <source>Motion param</source>
         <oldsource>Motion param </oldsource>
-        <translation>Параметры движения</translation>
+        <translation type="vanished">Параметры движения</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="364"/>
+        <location filename="wlmill.cpp" line="191"/>
         <source>Colors</source>
         <translation>Цвета</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="365"/>
+        <location filename="wlmill.cpp" line="185"/>
         <source>Whell</source>
         <translation>Штурвал</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="366"/>
+        <location filename="wlmill.cpp" line="186"/>
         <source>Device</source>
         <translation>Устройство</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="376"/>
+        <location filename="wlmill.cpp" line="193"/>
+        <source>set  State 1</source>
+        <translation>расположение1</translation>
+    </message>
+    <message>
+        <location filename="wlmill.cpp" line="194"/>
+        <source>set  State 2</source>
+        <translation>расположение2</translation>
+    </message>
+    <message>
+        <location filename="wlmill.cpp" line="196"/>
+        <source>save State 1</source>
+        <translation>зап.расположение1</translation>
+    </message>
+    <message>
+        <location filename="wlmill.cpp" line="197"/>
+        <source>save State 2</source>
+        <translation>зап.расположение1</translation>
+    </message>
+    <message>
+        <location filename="wlmill.cpp" line="210"/>
         <source>about</source>
         <translation>о</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="377"/>
+        <location filename="wlmill.cpp" line="211"/>
         <source>program</source>
         <translation>программа</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="378"/>
+        <location filename="wlmill.cpp" line="212"/>
         <source>Qt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="431"/>
+        <location filename="wlmill.cpp" line="257"/>
         <source>Positions</source>
         <translation>Положение</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="470"/>
+        <location filename="wlmill.cpp" line="280"/>
         <source>Mill Control</source>
         <translation>Управление</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="542"/>
+        <location filename="wlmill.cpp" line="343"/>
         <source>Stop error</source>
         <translation>Остановка ошибка</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="686"/>
+        <location filename="wlmill.cpp" line="376"/>
+        <source>other</source>
+        <translation>прочее</translation>
+    </message>
+    <message>
+        <location filename="wlmill.cpp" line="456"/>
         <source>Please modify:</source>
         <translation>Внесите изменения</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="700"/>
+        <location filename="wlmill.cpp" line="470"/>
         <source>Download coordinates</source>
         <translation>Загрузить СК</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="881"/>
+        <location filename="wlmill.cpp" line="656"/>
         <source>Confirmation:</source>
         <translation>Подтверждение:</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="882"/>
+        <location filename="wlmill.cpp" line="657"/>
         <source>Do you really want to exit the program?</source>
         <translation>Вы хотите выйти из программы?</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="979"/>
+        <location filename="wlmill.cpp" line="736"/>
         <source>Attention</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="979"/>
+        <location filename="wlmill.cpp" line="736"/>
         <source>Please restart WLMill</source>
         <translation>Пожалуйста перезапустите WLMill</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="1114"/>
+        <location filename="wlmill.cpp" line="836"/>
         <source>, code=</source>
         <translation>, код=</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="1119"/>
+        <location filename="wlmill.cpp" line="841"/>
         <source>Stop due to an error:</source>
         <translation>Остановка из-за ошибки:</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="1121"/>
+        <location filename="wlmill.cpp" line="843"/>
         <source>Stop: </source>
         <translation>Остановка:</translation>
     </message>
     <message>
-        <location filename="WLMill.cpp" line="1317"/>
+        <location filename="wlmill.cpp" line="984"/>
         <source> WLMill &lt;br&gt; http://wldev.ru &lt;br&gt; wldev@mail.ru &lt;br&gt;&lt;br&gt;WhiteLine&lt;/b&gt; &lt;br&gt; Qt �&lt;b&gt;1549622&lt;/b&gt;&lt;br&gt;buyer:</source>
         <translation></translation>
     </message>
@@ -1458,114 +1725,114 @@
 <context>
     <name>WLMillControl</name>
     <message>
-        <location filename="WLMillControl.ui" line="23"/>
+        <location filename="wlmillcontrol.ui" line="29"/>
         <source>WLMillControl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="787"/>
-        <location filename="WLMillControl.ui" line="1373"/>
+        <location filename="wlmillcontrol.ui" line="471"/>
+        <location filename="wlmillcontrol.ui" line="1099"/>
         <source>Feed</source>
         <translation>Подача</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="451"/>
+        <location filename="wlmillcontrol.ui" line="134"/>
         <source>Auto</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="457"/>
+        <location filename="wlmillcontrol.ui" line="140"/>
         <source>Program</source>
         <translation>Программа</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="463"/>
+        <location filename="wlmillcontrol.ui" line="146"/>
         <source>one tool</source>
         <translation>один инструмент</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="480"/>
+        <location filename="wlmillcontrol.ui" line="163"/>
         <source>Load traj</source>
         <translation>Загрузить траекторию</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="490"/>
+        <location filename="wlmillcontrol.ui" line="173"/>
         <source>Config</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="496"/>
+        <location filename="wlmillcontrol.ui" line="179"/>
         <source>autostart</source>
         <translation>автостарт</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="506"/>
+        <location filename="wlmillcontrol.ui" line="189"/>
         <source>advance backlash</source>
         <translation>упреждение люфта</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="516"/>
+        <location filename="wlmillcontrol.ui" line="212"/>
         <source>trajectory change</source>
         <translation>Изменене траектории</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="541"/>
+        <location filename="wlmillcontrol.ui" line="237"/>
         <source>smooth</source>
         <translation>сглаживание</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="548"/>
+        <location filename="wlmillcontrol.ui" line="244"/>
         <source>simplification</source>
         <translation>упрощение</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="591"/>
+        <location filename="wlmillcontrol.ui" line="274"/>
         <source>Manual</source>
         <translation>Ручной</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="607"/>
+        <location filename="wlmillcontrol.ui" line="296"/>
         <source>Keyboard</source>
         <translation>Клавиатура</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="817"/>
+        <location filename="wlmillcontrol.ui" line="513"/>
         <source>+</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="827"/>
-        <location filename="WLMillControl.ui" line="840"/>
+        <location filename="wlmillcontrol.ui" line="535"/>
+        <location filename="wlmillcontrol.ui" line="548"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="870"/>
+        <location filename="wlmillcontrol.ui" line="578"/>
         <source>F:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="907"/>
+        <location filename="wlmillcontrol.ui" line="618"/>
         <source>Feed = 100% (SHIFT)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="954"/>
+        <location filename="wlmillcontrol.ui" line="317"/>
         <source>Step</source>
         <translation>Шаг</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1830"/>
+        <location filename="wlmillcontrol.ui" line="1628"/>
         <source>Times</source>
         <translation>Времена</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1836"/>
+        <location filename="wlmillcontrol.ui" line="1634"/>
         <source>Left:</source>
         <translation>Осталось:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1843"/>
+        <location filename="wlmillcontrol.ui" line="1641"/>
         <source>End:</source>
         <translation>Конец:</translation>
     </message>
@@ -1574,58 +1841,58 @@
         <translation type="vanished">БЫСТ</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="616"/>
-        <location filename="WLMillControl.ui" line="1428"/>
+        <location filename="wlmillcontrol.ui" line="646"/>
+        <location filename="wlmillcontrol.ui" line="1209"/>
         <source>Direction</source>
         <translation>Направление</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="728"/>
+        <location filename="wlmillcontrol.ui" line="700"/>
         <source>X+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="712"/>
+        <location filename="wlmillcontrol.ui" line="794"/>
         <source>A+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="658"/>
+        <location filename="wlmillcontrol.ui" line="678"/>
         <source>X-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="763"/>
+        <location filename="wlmillcontrol.ui" line="725"/>
         <source>Z+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="747"/>
+        <location filename="wlmillcontrol.ui" line="816"/>
         <source>Y+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="693"/>
+        <location filename="wlmillcontrol.ui" line="841"/>
         <source>A-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="642"/>
+        <location filename="wlmillcontrol.ui" line="769"/>
         <source>Z-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="674"/>
+        <location filename="wlmillcontrol.ui" line="747"/>
         <source>Y-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1079"/>
+        <location filename="wlmillcontrol.ui" line="867"/>
         <source>Whell</source>
         <translation>Штурвал</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1085"/>
+        <location filename="wlmillcontrol.ui" line="964"/>
         <source>Scale</source>
         <translation>Размер</translation>
     </message>
@@ -1634,233 +1901,233 @@
         <translation type="vanished">мм/об</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1173"/>
-        <location filename="WLMillControl.ui" line="1641"/>
+        <location filename="wlmillcontrol.ui" line="908"/>
+        <location filename="wlmillcontrol.ui" line="1518"/>
         <source>Axis</source>
         <translation>Ось</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1193"/>
+        <location filename="wlmillcontrol.ui" line="928"/>
         <source>OFF</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1198"/>
-        <location filename="WLMillControl.ui" line="1662"/>
+        <location filename="wlmillcontrol.ui" line="933"/>
+        <location filename="wlmillcontrol.ui" line="1539"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1203"/>
-        <location filename="WLMillControl.ui" line="1667"/>
+        <location filename="wlmillcontrol.ui" line="938"/>
+        <location filename="wlmillcontrol.ui" line="1544"/>
         <source>Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1208"/>
-        <location filename="WLMillControl.ui" line="1672"/>
+        <location filename="wlmillcontrol.ui" line="943"/>
+        <location filename="wlmillcontrol.ui" line="1549"/>
         <source>Z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1213"/>
-        <location filename="WLMillControl.ui" line="1677"/>
+        <location filename="wlmillcontrol.ui" line="948"/>
+        <location filename="wlmillcontrol.ui" line="1554"/>
         <source>A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1218"/>
-        <location filename="WLMillControl.ui" line="1682"/>
+        <location filename="wlmillcontrol.ui" line="953"/>
+        <location filename="wlmillcontrol.ui" line="1559"/>
         <source>B</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1229"/>
-        <location filename="WLMillControl.ui" line="1311"/>
+        <location filename="wlmillcontrol.ui" line="886"/>
+        <location filename="wlmillcontrol.ui" line="1129"/>
         <source>Mode</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1241"/>
+        <location filename="wlmillcontrol.ui" line="898"/>
         <source>Vellocity</source>
         <translation>Скорость</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1256"/>
-        <location filename="WLMillControl.ui" line="1292"/>
+        <location filename="wlmillcontrol.ui" line="1044"/>
+        <location filename="wlmillcontrol.ui" line="1080"/>
         <source>Script</source>
         <translation>Скрипт</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1262"/>
+        <location filename="wlmillcontrol.ui" line="1050"/>
         <source>Edit Script</source>
         <translation>Правка Скриптов</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1272"/>
+        <location filename="wlmillcontrol.ui" line="1060"/>
         <source>Reser Script</source>
         <translation>Сброс Выполнения</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1305"/>
-        <location filename="WLMillControl.ui" line="1415"/>
+        <location filename="wlmillcontrol.ui" line="1093"/>
+        <location filename="wlmillcontrol.ui" line="1196"/>
         <source>Probe</source>
         <translation>Пробинг</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1319"/>
+        <location filename="wlmillcontrol.ui" line="1150"/>
         <source>2 side</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1345"/>
+        <location filename="wlmillcontrol.ui" line="1140"/>
         <source>Slow down stop</source>
         <translation>Медленная остановка</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1329"/>
+        <location filename="wlmillcontrol.ui" line="1160"/>
         <source>EMG Stop</source>
         <translation>Резкая остановка</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1403"/>
+        <location filename="wlmillcontrol.ui" line="1178"/>
         <source>Input</source>
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1588"/>
+        <location filename="wlmillcontrol.ui" line="1442"/>
         <source>Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1594"/>
+        <location filename="wlmillcontrol.ui" line="1448"/>
         <source>Update</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1604"/>
+        <location filename="wlmillcontrol.ui" line="1458"/>
         <source>config</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1617"/>
+        <location filename="wlmillcontrol.ui" line="1471"/>
         <source>изменить</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1627"/>
+        <location filename="wlmillcontrol.ui" line="1481"/>
         <source>Accept</source>
         <translation>Принять</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1635"/>
+        <location filename="wlmillcontrol.ui" line="1489"/>
         <source>Service</source>
         <translation>Сервис</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1654"/>
+        <location filename="wlmillcontrol.ui" line="1531"/>
         <source>Teach</source>
         <translation>Обучение</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1690"/>
+        <location filename="wlmillcontrol.ui" line="1567"/>
         <source>Find</source>
         <translation>Поиск</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1647"/>
+        <location filename="wlmillcontrol.ui" line="1524"/>
         <source>Reset Find</source>
         <translation>Аннулировать поиск </translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="69"/>
+        <location filename="wlmillcontrol.ui" line="1923"/>
         <source>S:20000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="131"/>
+        <location filename="wlmillcontrol.ui" line="1861"/>
         <source>F:20000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="233"/>
-        <location filename="WLMillControl.ui" line="281"/>
-        <location filename="WLMillControl.ui" line="873"/>
+        <location filename="wlmillcontrol.ui" line="581"/>
+        <location filename="wlmillcontrol.ui" line="1744"/>
+        <location filename="wlmillcontrol.ui" line="1982"/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="309"/>
+        <location filename="wlmillcontrol.ui" line="1818"/>
         <source>100</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1697"/>
+        <location filename="wlmillcontrol.ui" line="1574"/>
         <source>Get Minus Soft Limit</source>
         <translation>Взять отр. предел</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1704"/>
+        <location filename="wlmillcontrol.ui" line="1581"/>
         <source>Get Plus Soft Limit</source>
         <translation>Взять полож. предел</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1727"/>
+        <location filename="wlmillcontrol.ui" line="1495"/>
         <source>out S correct</source>
         <translation>Корректировка S</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1733"/>
+        <location filename="wlmillcontrol.ui" line="1501"/>
         <source>add point</source>
         <translation>взять точку</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1740"/>
+        <location filename="wlmillcontrol.ui" line="1508"/>
         <source>clear</source>
         <translation>очистить</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1761"/>
+        <location filename="wlmillcontrol.ui" line="1684"/>
         <source>Go</source>
         <translation>Пуск</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1801"/>
+        <location filename="wlmillcontrol.ui" line="1612"/>
         <source>(space)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1804"/>
+        <location filename="wlmillcontrol.ui" line="1615"/>
         <source>Pause</source>
-        <translation type="unfinished">Пауза</translation>
+        <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1575"/>
-        <location filename="WLMillControl.ui" line="1807"/>
+        <location filename="wlmillcontrol.ui" line="1416"/>
+        <location filename="wlmillcontrol.ui" line="1618"/>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Reset</source>
         <translation type="vanished">Сброс</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1771"/>
+        <location filename="wlmillcontrol.ui" line="1651"/>
         <source>Buffers</source>
         <translation>Буферы</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1777"/>
+        <location filename="wlmillcontrol.ui" line="1657"/>
         <source>PC:</source>
         <translation>ПК</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1784"/>
+        <location filename="wlmillcontrol.ui" line="1664"/>
         <source>Device:</source>
         <translation>Устройство</translation>
     </message>
     <message>
-        <location filename="WLMillControl.ui" line="1791"/>
+        <location filename="wlmillcontrol.ui" line="1671"/>
         <source>Program:</source>
         <translation>Программа:</translation>
     </message>
@@ -1873,98 +2140,98 @@
         <translation type="vanished">расстояние:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="317"/>
+        <location filename="wlmillcontrol.cpp" line="227"/>
         <source>mm</source>
         <translation>мм</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="269"/>
+        <location filename="wlmillcontrol.cpp" line="179"/>
         <source>Enter base offset tool:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="241"/>
+        <location filename="wlmillcontrol.cpp" line="148"/>
         <source>Left: </source>
-        <translation type="unfinished"></translation>
+        <translation>Осталось:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="242"/>
+        <location filename="wlmillcontrol.cpp" line="149"/>
         <source>End: </source>
-        <translation type="unfinished"></translation>
+        <translation>Завершение:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="317"/>
+        <location filename="wlmillcontrol.cpp" line="227"/>
         <source>Base offset tool:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="327"/>
+        <location filename="wlmillcontrol.cpp" line="237"/>
         <source>Current position Drive </source>
-        <translation type="unfinished">Текущее положение оси:</translation>
+        <translation>Текущее положение оси:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="344"/>
+        <location filename="wlmillcontrol.cpp" line="254"/>
         <source>Program:%1 (%2%)</source>
-        <translation type="unfinished">Программа: %1(%2)</translation>
+        <translation>Программа: %1(%2)</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="347"/>
+        <location filename="wlmillcontrol.cpp" line="257"/>
         <source>PC     :</source>
-        <translation type="unfinished">ПК:</translation>
+        <translation>ПК:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="348"/>
+        <location filename="wlmillcontrol.cpp" line="258"/>
         <source>Device :</source>
-        <translation type="unfinished">Устройство:</translation>
+        <translation>Устройство:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="401"/>
+        <location filename="wlmillcontrol.cpp" line="309"/>
         <source>information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="401"/>
+        <location filename="wlmillcontrol.cpp" line="309"/>
         <source>S correct is off, please on in Edit-&gt;WLMill</source>
-        <translation type="unfinished"></translation>
+        <translation>S корректировка выключена, включите меню Правка-&gt;WLMill</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="407"/>
-        <location filename="WLMillControl.cpp" line="694"/>
+        <location filename="wlmillcontrol.cpp" line="315"/>
+        <location filename="wlmillcontrol.cpp" line="564"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="408"/>
+        <location filename="wlmillcontrol.cpp" line="316"/>
         <source>Delete all data correct S?</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить данные корректировки?</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="469"/>
+        <location filename="wlmillcontrol.cpp" line="351"/>
         <source>Please modify script:</source>
-        <translation type="unfinished">Можно изменить скрипт:</translation>
+        <translation>Можно изменить скрипт:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="532"/>
+        <location filename="wlmillcontrol.cpp" line="408"/>
         <source>Question:</source>
-        <translation type="unfinished">Вопрос:</translation>
+        <translation>Вопрос:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="532"/>
+        <location filename="wlmillcontrol.cpp" line="408"/>
         <source>are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="570"/>
+        <location filename="wlmillcontrol.cpp" line="446"/>
         <source>Please ente S value:</source>
-        <translation type="unfinished">Введите значение S:</translation>
+        <translation>Введите значение S:</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="694"/>
+        <location filename="wlmillcontrol.cpp" line="564"/>
         <source>Continue ?</source>
         <translation>Продолжит ?</translation>
     </message>
     <message>
-        <location filename="WLMillControl.cpp" line="703"/>
+        <location filename="wlmillcontrol.cpp" line="573"/>
         <source>Which element to start processing?:</source>
         <translation>С какого элемента начать обработку?:</translation>
     </message>
@@ -1976,20 +2243,33 @@
         <translation type="obsolete">нет сигнала с датчикаl (inLATCH)</translation>
     </message>
     <message>
-        <location filename="WLMillDrive.cpp" line="210"/>
+        <location filename="wlmilldrive.cpp" line="183"/>
         <source>no sensor signal (inORG)</source>
         <translation>нет сигнала (inORG)</translation>
     </message>
     <message>
-        <location filename="WLMillDrive.cpp" line="238"/>
+        <location filename="wlmilldrive.cpp" line="211"/>
         <source>movement setup error</source>
         <translation>ошибка установки движений</translation>
     </message>
 </context>
 <context>
+    <name>WLMillDriveWidget</name>
+    <message>
+        <location filename="wlmilldrivewidget.ui" line="14"/>
+        <source>mill</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="wlmilldrivewidget.ui" line="43"/>
+        <source>backlash</source>
+        <translation>люфт</translation>
+    </message>
+</context>
+<context>
     <name>WLMillMachine</name>
     <message>
-        <location filename="WLMillMachine.cpp" line="1918"/>
+        <location filename="wlmillmachine.cpp" line="1614"/>
         <source>Machine is not in manual mode</source>
         <oldsource>machine is not in manual mode</oldsource>
         <translation>Станок находится не в ручном режиме</translation>
@@ -2011,50 +2291,50 @@
         <translation type="vanished">Станок находится на ручном управлении.!!!</translation>
     </message>
     <message>
-        <location filename="WLMillMachine.cpp" line="661"/>
-        <location filename="WLMillMachine.cpp" line="1792"/>
-        <location filename="WLMillMachine.cpp" line="1820"/>
-        <location filename="WLMillMachine.cpp" line="1860"/>
-        <location filename="WLMillMachine.cpp" line="1891"/>
-        <location filename="WLMillMachine.cpp" line="1915"/>
-        <location filename="WLMillMachine.cpp" line="1940"/>
-        <location filename="WLMillMachine.cpp" line="3452"/>
+        <location filename="wlmillmachine.cpp" line="428"/>
+        <location filename="wlmillmachine.cpp" line="522"/>
+        <location filename="wlmillmachine.cpp" line="1513"/>
+        <location filename="wlmillmachine.cpp" line="1541"/>
+        <location filename="wlmillmachine.cpp" line="1572"/>
+        <location filename="wlmillmachine.cpp" line="1595"/>
+        <location filename="wlmillmachine.cpp" line="1611"/>
+        <location filename="wlmillmachine.cpp" line="1632"/>
         <source>is off!</source>
         <translation>Станок выключен!</translation>
     </message>
     <message>
-        <location filename="WLMillMachine.cpp" line="297"/>
+        <location filename="wlmillmachine.cpp" line="246"/>
         <source>error name drive</source>
         <translation>неверное имя двиателя</translation>
     </message>
     <message>
-        <location filename="WLMillMachine.cpp" line="1104"/>
+        <location filename="wlmillmachine.cpp" line="862"/>
         <source>device %1 not found.</source>
         <translation>устройство  %1 не найдено</translation>
     </message>
     <message>
-        <location filename="WLMillMachine.cpp" line="1488"/>
-        <location filename="WLMillMachine.cpp" line="1504"/>
-        <location filename="WLMillMachine.cpp" line="1617"/>
-        <location filename="WLMillMachine.cpp" line="1635"/>
+        <location filename="wlmillmachine.cpp" line="1212"/>
+        <location filename="wlmillmachine.cpp" line="1228"/>
+        <location filename="wlmillmachine.cpp" line="1363"/>
+        <location filename="wlmillmachine.cpp" line="1381"/>
         <source>no sensor signal</source>
         <oldsource>no signal</oldsource>
         <translation>нет сигнала с датчика</translation>
     </message>
     <message>
-        <location filename="WLMillMachine.cpp" line="2896"/>
+        <location filename="wlmillmachine.cpp" line="2379"/>
         <source>error set circle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLMillMachine.cpp" line="3245"/>
-        <location filename="WLMillMachine.cpp" line="3251"/>
+        <location filename="wlmillmachine.cpp" line="2671"/>
+        <location filename="wlmillmachine.cpp" line="2677"/>
         <source>the stop button</source>
         <translation>Кнопка остановки</translation>
     </message>
     <message>
-        <location filename="WLMillMachine.cpp" line="3245"/>
-        <location filename="WLMillMachine.cpp" line="3251"/>
+        <location filename="wlmillmachine.cpp" line="2671"/>
+        <location filename="wlmillmachine.cpp" line="2677"/>
         <source>is pressed</source>
         <translation>нажата</translation>
     </message>
@@ -2319,24 +2599,46 @@
     </message>
 </context>
 <context>
-    <name>WLPamListWidget</name>
+    <name>WLOutPWMViewModel</name>
     <message>
-        <location filename="../../WLQt/form/WLPamListWidget.ui" line="17"/>
-        <source>Edit parametr motion</source>
-        <translation>Правка режимов движения</translation>
+        <location filename="../../wlqt/form/wliowidget.h" line="287"/>
+        <source>value</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLPamListWidget.ui" line="23"/>
+        <location filename="../../wlqt/form/wliowidget.h" line="288"/>
+        <source>inv</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wliowidget.h" line="289"/>
+        <source>Freq</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>WLPamListWidget</name>
+    <message>
+        <source>Edit parametr motion</source>
+        <translation type="vanished">Правка режимов движения</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wlpamlistwidget.ui" line="17"/>
+        <source>motion parameters</source>
+        <translation>параметры движения</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wlpamlistwidget.ui" line="40"/>
         <source>add</source>
         <translation>добавить</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLPamListWidget.ui" line="30"/>
+        <location filename="../../wlqt/form/wlpamlistwidget.ui" line="47"/>
         <source>remove</source>
         <translation>стереть</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLPamListWidget.cpp" line="31"/>
+        <location filename="../../wlqt/form/wlpamlistwidget.cpp" line="34"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
@@ -2344,29 +2646,29 @@
 <context>
     <name>WLPamWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLPamWidget.ui" line="20"/>
+        <location filename="../../wlqt/form/wlpamwidget.ui" line="20"/>
         <source>Motion parameters</source>
         <translation>Параметры движения</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLPamWidget.ui" line="137"/>
+        <location filename="../../wlqt/form/wlpamwidget.ui" line="137"/>
         <source>Vst (1/s)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLPamWidget.ui" line="147"/>
+        <location filename="../../wlqt/form/wlpamwidget.ui" line="147"/>
         <source>Acc (1/s^2)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLPamWidget.ui" line="157"/>
+        <location filename="../../wlqt/form/wlpamwidget.ui" line="157"/>
         <source>Vma(1/s)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLPamWidget.ui" line="167"/>
+        <location filename="../../wlqt/form/wlpamwidget.ui" line="167"/>
         <source>Ade (1/s^2)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Dynamics</source>
@@ -2409,88 +2711,83 @@
         <translation type="obsolete">взять Home</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="26"/>
+        <location filename="wlpositionwidget.ui" line="26"/>
         <source>WLPositionWidget</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="84"/>
+        <location filename="wlpositionwidget.ui" line="243"/>
         <source>(esc)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="99"/>
+        <location filename="wlpositionwidget.ui" line="258"/>
         <source>Esc</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="187"/>
+        <location filename="wlpositionwidget.ui" line="41"/>
         <source>Position</source>
         <translation>Положения</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="243"/>
         <source>FindX</source>
-        <translation>ПоискX</translation>
+        <translation type="vanished">ПоискX</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="204"/>
-        <source>X,Y=0</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="WLPositionWidget.ui" line="256"/>
         <source>FindB</source>
-        <translation>ПоискB</translation>
+        <translation type="vanished">ПоискB</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="145"/>
+        <location filename="wlpositionwidget.ui" line="146"/>
         <source>G Code</source>
         <translation>G код</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="292"/>
-        <location filename="WLPositionWidget.ui" line="316"/>
-        <location filename="WLPositionWidget.ui" line="340"/>
-        <location filename="WLPositionWidget.ui" line="364"/>
-        <location filename="WLPositionWidget.ui" line="388"/>
-        <source>qrc:/AxisPosLabel.qml</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WLPositionWidget.ui" line="423"/>
+        <location filename="wlpositionwidget.ui" line="283"/>
         <source>On/Off Machine</source>
         <translation>Включение/выключение станка</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="47"/>
+        <location filename="wlpositionwidget.ui" line="321"/>
+        <source>go G28 position (Z,XY)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="wlpositionwidget.ui" line="324"/>
+        <source>G28</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="wlpositionwidget.ui" line="355"/>
+        <source>go find drive position</source>
+        <translation>найти положения всех осей</translation>
+    </message>
+    <message>
+        <location filename="wlpositionwidget.ui" line="393"/>
         <source>coordinate rotation</source>
         <translation>поворот координат</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="457"/>
         <source>go home position</source>
-        <translation>идти в позицию home</translation>
+        <translation type="vanished">идти в позицию home</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="123"/>
+        <location filename="wlpositionwidget.ui" line="196"/>
         <source>current rot</source>
         <translation>текущий поворот СК</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="217"/>
         <source>FindY</source>
-        <translation>ПоискY</translation>
+        <translation type="vanished">ПоискY</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="230"/>
         <source>FindZ</source>
-        <translation>ПоискZ</translation>
+        <translation type="vanished">ПоискZ</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="269"/>
         <source>FindA</source>
-        <translation>ПоискA</translation>
+        <translation type="vanished">ПоискA</translation>
     </message>
     <message>
         <source>set Home</source>
@@ -2502,8 +2799,7 @@
         <translation type="obsolete">Поворот СК</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.ui" line="156"/>
-        <location filename="WLPositionWidget.ui" line="401"/>
+        <location filename="wlpositionwidget.ui" line="157"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
@@ -2536,51 +2832,63 @@
         <translation type="obsolete">СК выбранная</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="13"/>
         <source>Axis,Base</source>
-        <translation>Двигатели,Система координат</translation>
+        <translation type="vanished">Двигатели,Система координат</translation>
     </message>
     <message>
         <source>setHome</source>
         <translation type="vanished">установить позицию  home</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="49"/>
         <source>set home</source>
-        <translation>задать положение</translation>
+        <translation type="vanished">задать положение</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="50"/>
         <source>get home</source>
-        <translation>взять положение</translation>
+        <translation type="vanished">взять положение</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="58"/>
+        <location filename="wlpositionwidget.cpp" line="48"/>
+        <source>set G28 position</source>
+        <translation>задать позицию G28</translation>
+    </message>
+    <message>
+        <location filename="wlpositionwidget.cpp" line="49"/>
+        <source>get G28 position</source>
+        <translation>взять позицию G28</translation>
+    </message>
+    <message>
+        <location filename="wlpositionwidget.cpp" line="56"/>
         <source>set base postion</source>
         <translation>установить базовую позицию</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="59"/>
+        <location filename="wlpositionwidget.cpp" line="57"/>
         <source>set verify postion</source>
         <translation>установить проверочную позицию</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="60"/>
+        <location filename="wlpositionwidget.cpp" line="58"/>
         <source>rotation correction</source>
         <translation>коррекция поворота</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="133"/>
-        <source>&lt;b&gt;GCode:&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;G0,G1&lt;/li&gt;&lt;li&gt;G2,G3 (I,J,K,R) &lt;/li&gt;&lt;li&gt;G17,G18,G19&lt;/li&gt;&lt;li&gt;G28(home)&lt;/li&gt;&lt;li&gt;G51(XYZ)&lt;/li&gt;&lt;li&gt;G53(no modal)&lt;/li&gt;&lt;li&gt;G54-G59&lt;/li&gt;&lt;li&gt;G80,G81,G83(Z,R,Q)&lt;/li&gt;&lt;li&gt;G90,G91&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="wlpositionwidget.cpp" line="98"/>
+        <source>&lt;b&gt;GCode:&lt;/font&gt;&lt;/b&gt;&lt;ol&gt;&lt;li&gt;G0,G1&lt;/li&gt;&lt;li&gt;G2,G3 (I,J,K,R) &lt;/li&gt;&lt;li&gt;G17,G18,G19&lt;/li&gt;&lt;li&gt;G28(home)&lt;/li&gt;&lt;li&gt;G51(XYZ scale)&lt;/li&gt;&lt;li&gt;G53(no modal)&lt;/li&gt;&lt;li&gt;G54-G59&lt;/li&gt;&lt;li&gt;G80,G81,G83(Z,R,Q)&lt;/li&gt;&lt;li&gt;G90,G91&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="650"/>
+        <location filename="wlpositionwidget.cpp" line="362"/>
+        <source>enter G28 position</source>
+        <translation>Ввод положения G28</translation>
+    </message>
+    <message>
+        <location filename="wlpositionwidget.cpp" line="379"/>
         <source>Question:</source>
-        <translation type="unfinished">Вопрос:</translation>
+        <translation>Вопрос:</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="650"/>
+        <location filename="wlpositionwidget.cpp" line="379"/>
         <source>are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
@@ -2589,7 +2897,7 @@
         <translation type="vanished">мм</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="528"/>
+        <location filename="wlpositionwidget.cpp" line="296"/>
         <source>gr</source>
         <translation>гр</translation>
     </message>
@@ -2599,9 +2907,8 @@
         <translation type="vanished">Введите значение поворота вокруг точки P0:</translation>
     </message>
     <message>
-        <location filename="WLPositionWidget.cpp" line="630"/>
         <source>enter Home position</source>
-        <translation>введите положение точки HOME (G28)</translation>
+        <translation type="vanished">введите положение точки HOME (G28)</translation>
     </message>
 </context>
 <context>
@@ -2620,39 +2927,157 @@
     </message>
 </context>
 <context>
-    <name>WLWhellWidget</name>
+    <name>WLVisualWidget</name>
     <message>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="26"/>
-        <source>Edit Whell</source>
-        <translation type="unfinished">Правка Штурвала</translation>
+        <location filename="wlvisualwidget.cpp" line="77"/>
+        <source>Rot or move view</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="32"/>
+        <location filename="wlvisualwidget.cpp" line="83"/>
+        <source>view to window</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="90"/>
+        <source>view orientation</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="95"/>
+        <source>Top</source>
+        <translation>Верх</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="96"/>
+        <source>Bottom</source>
+        <translation>Низ</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="97"/>
+        <source>Left</source>
+        <translation>Лево</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="98"/>
+        <source>Right</source>
+        <translation>Право</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="99"/>
+        <source>Front</source>
+        <translation>Перед</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="100"/>
+        <source>Rear</source>
+        <translation>Зад</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="109"/>
+        <source>list show</source>
+        <translation>список отображения</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="114"/>
+        <source>Program</source>
+        <translation>Программа</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="118"/>
+        <source>Trajectory</source>
+        <translation>Траектория</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="122"/>
+        <source>Limits</source>
+        <translation>Пределы</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="126"/>
+        <source>Rot</source>
+        <translation>Поворот СК</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="137"/>
+        <source>type show</source>
+        <translation>Тип отображения</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="141"/>
+        <source>XYZ</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="146"/>
+        <source>GModel</source>
+        <translation>G Модель</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="155"/>
+        <source>Model</source>
+        <translation>Модель</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="160"/>
+        <source>Tool</source>
+        <translation>Инструмент</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="171"/>
+        <source>zoom in</source>
+        <translation>увеличить</translation>
+    </message>
+    <message>
+        <location filename="wlvisualwidget.cpp" line="178"/>
+        <source>zoom out</source>
+        <translation>уменьшить</translation>
+    </message>
+</context>
+<context>
+    <name>WLWhellWidget</name>
+    <message>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="26"/>
+        <source>Edit Whell</source>
+        <translation>Правка Штурвала</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="32"/>
         <source>Other</source>
         <translation>Прочее</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="38"/>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="54"/>
+        <source>Pulses</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="77"/>
         <source>inverse</source>
         <translation>инверсия</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="48"/>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="63"/>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="85"/>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="87"/>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="102"/>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="124"/>
         <source>Input</source>
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="75"/>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="97"/>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="114"/>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="136"/>
         <source>binary</source>
         <translation>двоичный</translation>
     </message>
     <message>
-        <location filename="../../WLQt/form/WLWhellWidget.ui" line="107"/>
+        <location filename="../../wlqt/form/wlwhellwidget.ui" line="146"/>
         <source>Output</source>
         <translation>Выход</translation>
+    </message>
+    <message>
+        <location filename="../../wlqt/form/wlwhellwidget.cpp" line="40"/>
+        <source>Edit Whell: </source>
+        <translation>Правка колеса(MPG)</translation>
     </message>
 </context>
 <context>

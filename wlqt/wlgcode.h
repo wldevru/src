@@ -21,10 +21,10 @@
 
 struct WLGTool
 {
-double d;
-double l;
+float d;
+float l;
 
-WLGTool() {d=l=0.0;}
+WLGTool() {d=l=0.0f;}
 
 QString toString()
 {
@@ -36,8 +36,8 @@ bool fromString(QString str)
 QStringList List=str.split(",");
 if(List.size()==2)
  {
- d=List[0].toDouble();
- l=List[1].toDouble();
+ d=List[0].toFloat();
+ l=List[1].toFloat();
  return true;
  }
 return false;
@@ -293,7 +293,7 @@ struct WLGCodeData
  WLGPoint refPoint0SC[sizeSC]; //Вращение
  WLGPoint refPoint1SC[sizeSC]; //Вращение
 
- WLGPoint homePosition;
+ WLGPoint G28Position;
 
  WLGTool Tools[sizeTools];
 
@@ -444,8 +444,8 @@ public:
 	     
 	void reset(void) {resetGValue();resetGCode();resetMCode();}
 
-    WLGPoint getHomePosition()        {return m_data.homePosition;}
-    void setHomePosition(WLGPoint hp) {m_data.homePosition=hp;}
+    WLGPoint getG28Position()        {return m_data.G28Position;}
+    void setG28Position(WLGPoint hp) {m_data.G28Position=hp;}
 
 	int getPlaneCirc();
 
@@ -466,7 +466,7 @@ private:
     WLGCodeData m_data;
 
 
-signals :
+signals:
 
 void changedSK(int);
 void changedF();

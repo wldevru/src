@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QMenu>
-#include <QtQuick>
 
 #include "ui_wlpositionwidget.h"
 
@@ -38,14 +37,15 @@ signals:
 
 private slots:
 
+     void oPBFindDrivePos();
 	 void onExGCode();
 
      void updateEnableMoved(bool);
 	 void onPBSetXY0();
 	 
      void onPBRotSK();
-	 void onPBsetHome();
-     void onPBgetHome();
+     void onPBsetG28();
+     void onPBgetG28();
 	 void onPBsetP0();
 	 void onPBsetP1();
 

@@ -14,150 +14,7 @@
    <string>Edit WLMill</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_8">
-   <item row="1" column="1" rowspan="2">
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="title">
-      <string>Input</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <widget class="WLEditIOWidget" name="editInEMG" native="true"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="WLEditIOWidget" name="editInProbe" native="true"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="WLEditIOWidget" name="editInSD" native="true"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="9" rowspan="2">
-    <widget class="QGroupBox" name="groupBox_8">
-     <property name="title">
-      <string>Touch</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_13">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_21">
-        <property name="text">
-         <string>Z,free (mm)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="sbXYFreeTouch">
-        <property name="decimals">
-         <number>2</number>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>15.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_20">
-        <property name="text">
-         <string>X,Y free (mm)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="sbZFreeTouch">
-        <property name="decimals">
-         <number>2</number>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>15.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_22">
-        <property name="text">
-         <string>Diametr (mm)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="sbDiametrTouch">
-        <property name="decimals">
-         <number>2</number>
-        </property>
-        <property name="minimum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>50.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="8" rowspan="2">
-    <widget class="QGroupBox" name="groupBox_7">
-     <property name="title">
-      <string>Probe H</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_9">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_18">
-        <property name="text">
-         <string>back Z:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="sbTabletHProbe">
-        <property name="decimals">
-         <number>2</number>
-        </property>
-        <property name="minimum">
-         <double>-9999999.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>9999999.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="sbBackZHProbe">
-        <property name="decimals">
-         <number>2</number>
-        </property>
-        <property name="minimum">
-         <double>-9999999.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>9999999.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_17">
-        <property name="text">
-         <string>height:</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="pbVerError">
-     <property name="text">
-      <string>verify error</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="7" rowspan="2">
+   <item row="2" column="6">
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -213,14 +70,100 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="9">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   <item row="1" column="7" rowspan="2">
+    <widget class="QGroupBox" name="groupBox_7">
+     <property name="title">
+      <string>Probe H</string>
      </property>
+     <layout class="QGridLayout" name="gridLayout_9">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="toolTip">
+         <string>height from bottom of sensor</string>
+        </property>
+        <property name="text">
+         <string>back Z:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="sbTabletHProbe">
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <double>-9999999.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>9999999.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="sbBackZHProbe">
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <double>-9999999.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>9999999.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_17">
+        <property name="toolTip">
+         <string>height sensor</string>
+        </property>
+        <property name="text">
+         <string>height:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="0" column="5" colspan="5">
+   <item row="1" column="2" colspan="3">
+    <widget class="QGroupBox" name="groupBox_6">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Pause</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_12">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="cbHPause">
+        <property name="text">
+         <string>G53 Z</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="sbHPause">
+        <property name="toolTip">
+         <string>pause height</string>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <double>-10000.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="5" colspan="4">
     <widget class="QGroupBox" name="gbCorrectSOut">
      <property name="title">
       <string>Correct S Out</string>
@@ -233,6 +176,20 @@
        <widget class="QTableWidget" name="twCorrectS"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="pbVerError">
+     <property name="text">
+      <string>verify error</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="8">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
     </widget>
    </item>
    <item row="0" column="1" colspan="4">
@@ -362,32 +319,69 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="2" colspan="3">
-    <widget class="QGroupBox" name="groupBox_6">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+   <item row="1" column="8" rowspan="2">
+    <widget class="QGroupBox" name="groupBox_8">
      <property name="title">
-      <string>Pause</string>
+      <string>Touch</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_12">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="cbHPause">
+     <layout class="QGridLayout" name="gridLayout_13">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_21">
         <property name="text">
-         <string>G53 Z</string>
+         <string>Z,free (mm)</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="sbHPause">
+       <widget class="QDoubleSpinBox" name="sbXYFreeTouch">
         <property name="decimals">
          <number>2</number>
         </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
         <property name="maximum">
-         <double>300.000000000000000</double>
+         <double>15.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string>X,Y free (mm)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="sbZFreeTouch">
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>15.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_22">
+        <property name="text">
+         <string>Diametr (mm)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="sbDiametrTouch">
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>50.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -413,6 +407,36 @@
          <double>30.000000000000000</double>
         </property>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="6">
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
+      <string>Search order</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QLineEdit" name="leStrFindDrivePos"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1" rowspan="2">
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Input</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="WLEditIOWidget" name="editInEMG" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="WLEditIOWidget" name="editInProbe" native="true"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="WLEditIOWidget" name="editInSD" native="true"/>
       </item>
      </layout>
     </widget>

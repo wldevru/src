@@ -53,21 +53,18 @@ WLGProgramWidget::~WLGProgramWidget()
 
 void WLGProgramWidget::onUpdate()
 {
-//Program->stopUpdateShowTraj();
-//QTimer::singleShot(50,Program,SLOT(updateShowTraj()));
 m_GProgram->updateShowTraj();
 }
 
 void WLGProgramWidget::onAccept()
 {
-qDebug()<<"onAccept()";
 if((QMessageBox::question(this, tr("Confirmation:"),
        tr("save program?"),
-       QMessageBox::Yes|QMessageBox::No))== QMessageBox::Yes) {
-m_GProgram->setTextProgram(ui.textProgram->toPlainText());
-emit changed(m_changedProgram=false);
-}
-
+       QMessageBox::Yes|QMessageBox::No))== QMessageBox::Yes)
+   {
+   saveTextProgram();
+   emit changed(m_changedProgram=false);
+   }
 }
 
 void  WLGProgramWidget::showListProgram(int iCenter)
@@ -143,7 +140,8 @@ if(m_GProgram->getElementCount()<20000)
  ui.textProgram->blockSignals(true);
  ui.textProgram->setPlainText(m_GProgram->getTextProgram());
  ui.textProgram->blockSignals(false);
- QTimer::singleShot(500,ui.pbAccept,SLOT(click()));
+
+ //QTimer::singleShot(100,this,SLOT(saveTextProgram()));
  }
 else
  {
@@ -156,6 +154,11 @@ else
 
 emit changed(m_changedProgram=false);
 qDebug()<<"endloadTextProgram";
+}
+
+void WLGProgramWidget::saveTextProgram()
+{
+m_GProgram->setTextProgram(ui.textProgram->toPlainText());
 }
 
 void WLGProgramWidget::onBackup()
