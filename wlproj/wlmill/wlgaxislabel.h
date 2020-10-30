@@ -24,6 +24,8 @@ private:
    WLMillDrive *m_drive=nullptr;
    WLGCode     *m_gcode=nullptr;
 
+   double m_GPos=0;
+
    QRect rName;
    QRect rPos;
    QRect rF;
@@ -33,7 +35,8 @@ signals:
    void changedPress(QString name,int type);
 
 public slots:
-    // QWidget interface
+
+   void setGPos(double gpos) {m_GPos=gpos;}
 
 protected:
     void paintEvent(QPaintEvent *event);

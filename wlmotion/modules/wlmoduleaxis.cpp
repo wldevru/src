@@ -226,27 +226,27 @@ return true;
 
 void  WLModuleAxis::setInEMGStop(int index)
 {
-disconnect(inEMGStop,SIGNAL(changed(bool)),this,SIGNAL(changedInEMGStop(bool)));
+disconnect(inEMGStop,SIGNAL(changed()),this,SIGNAL(changedInEMGStop()));
 
 inEMGStop->removeComment("inEMGStop");
 inEMGStop=ModuleIOPut->getInput(index);;
 inEMGStop->addComment("inEMGStop");
 
-connect(inEMGStop,SIGNAL(changed(bool)),this,SIGNAL(changedInEMGStop(bool)));
+connect(inEMGStop,SIGNAL(changed()),this,SIGNAL(changedInEMGStop()));
 
 setInputMAxis(IO_inEMGStop,index);
 }
 
 void  WLModuleAxis::setInSDStop(int index)
 {
-disconnect(inSDStop,SIGNAL(changed(bool)),this,SIGNAL(changedInSDStop(bool)));
+disconnect(inSDStop,SIGNAL(changed()),this,SIGNAL(changedInSDStop()));
 
 inSDStop->removeComment("inSDStop");
 inSDStop=ModuleIOPut->getInput(index);;
 inSDStop->addComment("inSDStop");
 
 
-connect(inSDStop,SIGNAL(changed(bool)),this,SIGNAL(changedInSDStop(bool)));
+connect(inSDStop,SIGNAL(changed()),this,SIGNAL(changedInSDStop()));
 
 setInputMAxis(IO_inSDStop,index);
 }

@@ -1,6 +1,7 @@
 #ifndef WLGCODE_H
 #define WLGCODE_H
 
+#include <QDebug>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -22,13 +23,13 @@
 struct WLGTool
 {
 float d;
-float l;
+float h;
 
-WLGTool() {d=l=0.0f;}
+WLGTool() {d=h=0.0f;}
 
 QString toString()
 {
-return QString::number(d)+","+QString::number(l);
+return QString::number(d)+","+QString::number(h);
 }
 
 bool fromString(QString str)
@@ -37,7 +38,7 @@ QStringList List=str.split(",");
 if(List.size()==2)
  {
  d=List[0].toFloat();
- l=List[1].toFloat();
+ h=List[1].toFloat();
  return true;
  }
 return false;
@@ -69,7 +70,6 @@ double w;
 
 WLGPoint() {x=y=z=a=b=c=u=v=w=0;}
 
-
 double get(QString name,bool *ok=nullptr)
 {
 name=name.toUpper();
@@ -90,10 +90,20 @@ if(ok!=nullptr) *ok=false;
 return 0;
 }
 
+bool isValid()
+{
+return   !isnan(x)&&!isinf(x)
+       &&!isnan(y)&&!isinf(y)
+       &&!isnan(z)&&!isinf(z)
+       &&!isnan(a)&&!isinf(a)
+       &&!isnan(b)&&!isinf(b)
+       &&!isnan(c)&&!isinf(c);
+}
+
 QString toString()
 {
 return
-     "X "+QString::number(x)
+   +"X "+QString::number(x)
    +",Y "+QString::number(y)
    +",Z "+QString::number(z)
    +",A "+QString::number(a)
@@ -293,6 +303,7 @@ struct WLGCodeData
  WLGPoint refPoint0SC[sizeSC]; //Вращение
  WLGPoint refPoint1SC[sizeSC]; //Вращение
 
+ WLGPoint G43Position;
  WLGPoint G28Position;
 
  WLGTool Tools[sizeTools];
@@ -380,13 +391,14 @@ public:
     bool isGCode(int i) {return m_data.GCode[i];}
     bool isMCode(int i) {return m_data.MCode[i];}
 
-  double getValue(char);
-    bool isValid(char);
-	bool setValue(char name,double data);
+   double getValue(char);
+   bool isValid(char);
+   bool setValue(char name,double data);
+
 	void resetGValue();
 
    WLGPoint getPointGCode(WLGPoint lastGPoint,bool scale=true);
-   //WLGPoint getPointG(WLGPoint lastGPoint) {return getPointActivSC(getPointGCode(lastGPoint));}
+
    WLGPoint getPointG28(WLGPoint lastGPoint);
    WLGPoint getPointG53(WLGPoint lastGPoint);
    WLGPoint getPointIJK(WLGPoint lastGPoint);
@@ -408,7 +420,7 @@ public:
    WLGPoint getRefPoint1SC(int i,bool *ok=nullptr);
 
    bool setOffsetActivSC(WLGPoint P)    {return setOffsetSC(m_data.iSC,P);}
-   bool setOffsetSC(int i,WLGPoint P);
+   bool setOffsetSC(int i,WLGPoint P,bool send=true);
    
    bool setRefPoint0SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint0SC[i]=P; return 1;} else return 0;}
    bool setRefPoint1SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint1SC[i]=P; return 1;} else return 0;}
@@ -447,29 +459,37 @@ public:
     WLGPoint getG28Position()        {return m_data.G28Position;}
     void setG28Position(WLGPoint hp) {m_data.G28Position=hp;}
 
+    WLGPoint getG43Position()        {return m_data.G43Position;}
+    void setG43Position(WLGPoint hp) {m_data.G43Position=hp;}
+
 	int getPlaneCirc();
 
 	QString getActivGCodeString();
 
-    void setDataTool(int number,double _diam,double _length);
+       void setDataTool(int index,WLGTool tool,bool send=true);
+    WLGTool getDataTool(int index) {return index<sizeTools ? m_data.Tools[index] : WLGTool();}
 
-    WLGTool getCurTool()   {return m_data.Tools[m_data.iCurTool];}
-    WLGTool getTool(int i) {return m_data.Tools[i];}
+    float getHvalue(int index=0);
+    float getHcorr();
 
     void verifyG51();
 
     void setData(const WLGCodeData &data);
 
     WLGCodeData getData() const;
+public:
+
+    Q_INVOKABLE void setHTool(int i,float h);
+    Q_INVOKABLE int getT(){return getValue('T');}
 
 private:
     WLGCodeData m_data;
-
 
 signals:
 
 void changedSK(int);
 void changedF();
+void changedTool();
 
 };
 

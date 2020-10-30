@@ -59,7 +59,6 @@ return ret;
 
 void WLEVScript::reset()
 {qDebug()<<"resetScript";
-
  if(isBusy())
     {
      QScriptValue sv;

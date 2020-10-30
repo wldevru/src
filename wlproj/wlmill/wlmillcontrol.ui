@@ -106,7 +106,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="styleSheet">
-          <string notr="true">QTabWidget:pane {background-repeat:no repeat;}</string>
+          <string notr="true">#QTabWidget:pane {background-repeat:no repeat;}</string>
          </property>
          <property name="inputMethodHints">
           <set>Qt::ImhNone</set>
@@ -118,7 +118,7 @@
           <enum>QTabWidget::Rounded</enum>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>0</number>
          </property>
          <property name="elideMode">
           <enum>Qt::ElideNone</enum>
@@ -286,7 +286,7 @@
               <enum>QTabWidget::Rounded</enum>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="elideMode">
               <enum>Qt::ElideLeft</enum>
@@ -1442,45 +1442,22 @@
            <string>Tools</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_33">
-           <item row="2" column="0">
+           <item row="1" column="1">
+            <widget class="QPushButton" name="pbAcceptTool">
+             <property name="text">
+              <string>Accept</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
             <widget class="QPushButton" name="pbUpdateTool">
              <property name="text">
               <string>Update</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0" colspan="3">
+           <item row="0" column="0" colspan="2">
             <widget class="QTableWidget" name="tableTools"/>
-           </item>
-           <item row="0" column="0" colspan="3">
-            <widget class="QGroupBox" name="groupBox_14">
-             <property name="title">
-              <string>config</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_32">
-              <item row="0" column="0">
-               <widget class="QLabel" name="labelBaseOffsetTool">
-                <property name="text">
-                 <string notr="true">Base offset</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="pbEditOffsetTool">
-                <property name="text">
-                 <string>изменить</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QPushButton" name="pbAcceptTool">
-             <property name="text">
-              <string>Accept</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
@@ -2113,7 +2090,7 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroupWhellX"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroupWhellX"/>
  </buttongroups>
 </ui>

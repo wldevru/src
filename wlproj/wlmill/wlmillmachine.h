@@ -158,7 +158,13 @@ class WLMillMachine : public QThread
 	
 private:
     enum StateMMachine{noInit,Init,Ready};
-    enum TypeAutoMMachine{AUTO_ProbeEMG,AUTO_ProbeSD,AUTO_HProbeEMG,AUTO_HProbeSD,AUTO_FindDrivePos};
+    enum TypeAutoMMachine{AUTO_ProbeEMG
+                         ,AUTO_ProbeSD
+                         ,AUTO_HProbeEMG
+                         ,AUTO_HProbeSD
+                         ,AUTO_FindDrivePos
+                         ,AUTO_HToolEMG
+                         ,AUTO_HToolSD};
 	enum FlagMMachine 
 	          {
                ma_busy=      1<<0,     //занят
@@ -304,7 +310,7 @@ public:
     QString correctSOut();
 	void setStringCorrectSOut(QString str);
 
-    WLGCode   *GCode() {return &m_GCode;}
+    WLGCode   *getGCode() {return &m_GCode;}
  public:
     WLEVScript *m_EVMScript;
     WLEVScript *m_EVLScript;
@@ -398,6 +404,7 @@ bool updateProbe();
 bool updateHProbe();
 bool updateProgram();
 bool updateFindDrivePos();
+bool updateHTool();
 
 void updateMainDimXYZ();
 
@@ -429,7 +436,7 @@ public:
 
   void setActiv(bool en=true) {
 	                           bool last=Flag.get(ma_activ); 
-                                    Flag.set(ma_activ,en);  
+                                         Flag.set(ma_activ,en);
                                     if(last!=en)
                                          emit changedActiv(en);
                               }
@@ -524,6 +531,7 @@ public:
     void goFindDrivePos();
 
 
+
 	void saveConfig();
 	void setMessage(QString name,QString data,int code) {qDebug()<<"setMessageMM"<<code;
 	                                                     if(code<0)
@@ -532,8 +540,9 @@ public:
                                                           reset();
 														  } 
 														  else
-                                                          if(code==0) Pause(1);
-														 emit sendMessage(name,data,code);}
+                                                            if(code==0) Pause(1);
+                                                          emit sendMessage(name,data,code);
+                                                          }
 
 
     void Pause() {Pause(true);emit changedPause(true);}//плавная остановка
@@ -580,6 +589,7 @@ Q_INVOKABLE void goDriveTeach(QString nameDrive);
 Q_INVOKABLE void goDriveTouch(QString nameDrive,int dir,float F);
 Q_INVOKABLE	void goDriveProbe(QString nameDrive,int dir,float F,int type);
 Q_INVOKABLE	void goHProbe(float F,bool sd);
+Q_INVOKABLE	void goHTool(float F,bool sd);
 	
 
     void setPercentManual(float per);
@@ -593,7 +603,7 @@ Q_INVOKABLE	void goHProbe(float F,bool sd);
 
 
     void setSimpli(bool enable) {Flag.set(ma_simpli,enable);}
-    void setSimpliDist(float val)  {m_simpliDist=qBound(0.0f,val,5.0f);}
+    void setSimpliDist(double val)  {m_simpliDist=qBound(0.0f,(float)val,5.0f);}
 
     void setSmooth(bool enable)     {Flag.set(ma_smooth,enable);}
     void setSmoothDist(double val)  {m_smoothDist=val;}
@@ -620,8 +630,6 @@ signals:
     void changedRDY(bool);
 
     void changedSValue(int);
-
-    void changedSK();
 
     void changedOn(bool);
     void changedActiv(bool);

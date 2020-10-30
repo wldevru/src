@@ -181,11 +181,11 @@ for(int i=0;i<size;i++)
 Stream<<S
 	  <<Fmov
 	  <<_id;
-
+/*
 qDebug()<<"index"<<m_lastIndexElementBuf<<m_free;
 qDebug()<<"addBufULine en:"<<midPos[0]<<midPos[1]<<midPos[2]<<_id;
 qDebug()<<"addBufULine en:"<<endPos[0]<<endPos[1]<<endPos[2]<<"S:"<<S<<"F:"<<Fmov;
-
+*/
 m_free--;
 //emit ChangedFreeBuf(getFreeBuf());
 
@@ -220,10 +220,10 @@ for(int i=0;i<size;i++)
 Stream<<S
 	  <<Fmov
 	  <<_id;
-
+/*
 qDebug()<<"index"<<m_lastIndexElementBuf<<m_free;
 qDebug()<<"addBufLine3D en:"<<endPos[0]<<endPos[1]<<endPos[2]<<"i:"<<_id<<"S:"<<S<<"F:"<<Fmov;
-
+*/
 m_free--;
 //emit ChangedFreeBuf(getFreeBuf());
 
@@ -263,11 +263,11 @@ Stream<<S
 	  <<Fmov
 	  <<_id;
 
-
+/*
 qDebug()<<"addBufCirc3D"<<mask<<"S:"<<S<<"F:"<<Fmov<<indexs[0]<<indexs[1]<<indexs[2];
 qDebug()<<"ePos"<<endPos[0]<<endPos[1]<<endPos[2];
 qDebug()<<"cPos"<<cenPosIJ[0]<<cenPosIJ[1];
-
+*/
 m_free--;
 //emit ChangedFreeBuf(getFreeBuf());
 

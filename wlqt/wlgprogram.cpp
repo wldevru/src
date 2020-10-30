@@ -20,8 +20,6 @@ m_build=0;
 
 m_maxShowPoints=DEF_maxShowPoints;
 
-m_GModel=nullptr;
-
 iActivElement=0;
 iLastMovElement=0;
 
@@ -33,8 +31,6 @@ m_buildElement=0;
 
 time=0;
 activ=0;
-
-m_GModel=&defGModel;
 
 m_showGCode=nullptr;
 
@@ -176,11 +172,8 @@ bool ok=true;
 bool ch_delta=true;
 int iLast=0;
 
-
-
 QString txt;
-GCode.reset();
-
+//GCode.reset();
 
 MutexShowPoint.lock();
 showPoints.clear();
@@ -219,14 +212,16 @@ for(qint32 index=0;(index<indexData.size())
 
   for(int i=0,j=0;i<curListTraj.size();i++)
     {
-    m_GModel->offsetFrame=GCode.getSC(GCode.getActivSC()).to3D();
+    m_GModel.setOffsetFrame(GCode.getSC(GCode.getActivSC()).to3D());
 
-    Points=curListTraj[i].calcPoints(&ok,m_GModel);
+    if(istart!=-1)
+      Points=curListTraj[i].calcPoints(&ok,&m_GModel,1);
+    else
+      Points.clear();
 
     Point.color= curListTraj[i].isFast()? m_colorF : m_colorG;
 
     ch_delta=!ch_delta;
-
 
      if((fast!=curListTraj[i].isFast())
       ||Points.isEmpty())
@@ -249,11 +244,9 @@ for(qint32 index=0;(index<indexData.size())
 
     if(istart==-1)
 	   {
-       if((!qIsInf(lastGPoint.x))&&(!qIsNaN(lastGPoint.x))
-        &&(!qIsInf(lastGPoint.y))&&(!qIsNaN(lastGPoint.y))
-        &&(!qIsInf(lastGPoint.z))&&(!qIsNaN(lastGPoint.z)))
+       if(lastGPoint.isValid())
                   {
-                  istart=showPoints.size()-1;
+                  istart=0;//showPoints.size()-1;
                   for(int j=0;j<istart;j++)
                           showPoints[j].pos=showPoints[istart].pos;
                   }
@@ -523,7 +516,6 @@ GCode->verifyG51();
 if(GCode->isGCode(53))
 {
 GCode->resetGCode(53);
-
 curGPoint=GCode->getPointG53(lastGPoint);
 }
 else

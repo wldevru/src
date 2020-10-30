@@ -42,7 +42,7 @@ m_MillMachine=_MillMachine;
 
 
 connect(m_Program,SIGNAL(ChangedShowTraj()),this,SLOT(updateTrajProgram()),Qt::QueuedConnection);
-connect(m_Program,SIGNAL(changedActivElement(int)),this,SLOT(setEditElement(int)),Qt::QueuedConnection);
+//connect(m_Program,SIGNAL(changedActivElement(int)),this,SLOT(setEditElement(int)),Qt::QueuedConnection);
 
 connect(m_Program,SIGNAL(startedBuildShow()),this,SLOT(resetProgramBuffer()),Qt::DirectConnection);
 
@@ -179,7 +179,11 @@ m_tbZoomOut -> setToolTip(tr("zoom out"));
 m_tbZoomOut -> setAutoRepeat(true);
 connect(m_tbZoomOut,&QToolButton::clicked,this,&WLVisualWidget::on_tbZoomOut);
 
-
+m_tbUpdate = new QToolButton(this);
+m_tbUpdate -> setIcon(QPixmap(":/data/icons/update.png"));
+m_tbUpdate -> setIconSize(QSize(32,32));
+m_tbUpdate -> setToolTip(tr("zoom out"));
+connect(m_tbUpdate,&QToolButton::clicked,m_Program,&WLGProgram::updateShowTraj,Qt::DirectConnection);
 
 m_timerView=new QTimer;
 m_timerView->setSingleShot(true);
@@ -359,15 +363,16 @@ if(m_enRotToolF)
 void WLVisualWidget::paintGL()
 {
     // Clear color and depth buffer
+
     setGLClearColor();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    int activSC=m_MillMachine->GCode()->getActivSC();
+    int activSC=m_MillMachine->getGCode()->getActivSC();
 
-    WL6DPoint  SC=m_MillMachine->GCode()->getOffsetSC(activSC).to6D();
+    WL6DPoint  SC=m_MillMachine->getGCode()->getOffsetSC(activSC).to6D();
 
-    SC.a=m_MillMachine->GCode()->getRefPoint0SC(activSC).a;
+    SC.a=m_MillMachine->getGCode()->getRefPoint0SC(activSC).a;
 
     showSC("G"+QString::number(activSC+53),SC.toM());
     showSC("G53",WL6DPoint().toM(),1.5);
@@ -379,8 +384,8 @@ void WLVisualWidget::paintGL()
 
     if(m_typeView==XYZ)
      {
-     showHome(m_MillMachine->GCode()->getG28Position().to3D());
-     showTool(m_MillMachine->getCurrentPosition().to3D(),true,10,QVector3D(0,1,0));
+     showHome(m_MillMachine->getGCode()->getG28Position().to3D());
+     showTool(m_MillMachine->getCurrentPosition(true).to3D(),true,10,QVector3D(0,1,0));
 
      if(m_viewRotPointF) showRotPoint();
 
@@ -402,10 +407,9 @@ void WLVisualWidget::paintGL()
                       ,QVector3D(.75,0,0));
      }
     else {
-         showHome(m_MillMachine->getGModel()->getFrame(m_MillMachine->GCode()->getG28Position()));
-         showTool(m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D(),true,10,QVector3D(0,1,0));
+         showHome(m_MillMachine->getGModel()->getFrame(m_MillMachine->getGCode()->getG28Position()));
+         showTool(m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition(true)).to6D(),true,10,QVector3D(0,1,0));
     }
-
 
     m_timerView->start(25);
 
@@ -811,9 +815,9 @@ void WLVisualWidget::showTrackTraj()
 if(trackTraj.size()==defTrackSize) trackTraj.removeFirst();
 
 if(m_typeView==XYZ)
-  trackTraj+=m_MillMachine->getCurrentPosition().to6D().to3Df();
+  trackTraj+=m_MillMachine->getCurrentPosition(true).to6D().to3Df();
 else
-  trackTraj+=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D().to3Df();
+  trackTraj+=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition(true)).to6D().to3Df();
 
 int vertexLocation;
 QMatrix4x4 matrix;
@@ -846,17 +850,17 @@ void WLVisualWidget::showRotPoint()
 {
 WLFrame frRefP0,frRefP1;
 WL6DPoint SCPoint;
-int activSC=m_MillMachine->GCode()->getActivSC();
+int activSC=m_MillMachine->getGCode()->getActivSC();
 
-SCPoint=m_MillMachine->GCode()->getOffsetSC(activSC).to3D();
-frRefP0.fromM(SCPoint.toM()*m_MillMachine->GCode()->getRefPoint0SC(activSC).to3D().toM());
+SCPoint=m_MillMachine->getGCode()->getOffsetSC(activSC).to3D();
+frRefP0.fromM(SCPoint.toM()*m_MillMachine->getGCode()->getRefPoint0SC(activSC).to3D().toM());
 showTool(frRefP0.to6D(),false,5,QVector3D(0.8f,0.8f,0.0f));
 
-SCPoint.a=m_MillMachine->GCode()->getRefPoint0SC(activSC).a;
+SCPoint.a=m_MillMachine->getGCode()->getRefPoint0SC(activSC).a;
 
-frRefP0=m_MillMachine->GCode()->getRefPoint0SC(activSC).to3D();
+frRefP0=m_MillMachine->getGCode()->getRefPoint0SC(activSC).to3D();
 
-frRefP1.fromM(frRefP0.toM()*SCPoint.toM()*frRefP0.toM().inverted()*m_MillMachine->GCode()->getRefPoint1SC(activSC).to3D().toM());
+frRefP1.fromM(frRefP0.toM()*SCPoint.toM()*frRefP0.toM().inverted()*m_MillMachine->getGCode()->getRefPoint1SC(activSC).to3D().toM());
 showTool(frRefP1.to6D(),false,2,QVector3D(0.8f,0.8f,0.0f));
 }
 
@@ -1003,11 +1007,16 @@ if (event->buttons() & Qt::LeftButton)
  long n;
 
  n=selectElement(x,y);
- setEditElement(n);  
 
- m_timePress.start();
+ setEditElement(n);
+
+ if(n>0)
+   {
+   emit changedEditElement(EditElement);
+   }
 
  updatePointRot();
+
  } 
  else
  if (event->buttons() & Qt::MidButton )  updatePointRot();
@@ -1101,7 +1110,7 @@ int WLVisualWidget::selectElement(int x,int y)
 void WLVisualWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
 Q_UNUSED(event);
-setViewCenter();
+//setViewCenter();
 }
 
 void WLVisualWidget::keyPressEvent ( QKeyEvent * event )
@@ -1132,7 +1141,7 @@ if (!progTraj.link()
 
 if(!progSelect.addShaderFromSourceFile(QOpenGLShader::Vertex,  ":/select.vsh")
  ||!progSelect.addShaderFromSourceFile(QOpenGLShader::Fragment,":/select.fsh"))
-    close();
+   close();
 
 if (!progSelect.link()
   ||!progSelect.bind())
@@ -1236,7 +1245,7 @@ void WLVisualWidget::createGLListTraj()
 
 void WLVisualWidget::updatePointRot()
 {
-qDebug()<<"updateRotPoint";
+qDebug()<<"updateRotPoint"<<EditElement;
 //return;
 QMutexLocker locker(&m_Program->Mutex);
 //if(Program->ListTraj.size()==0) return; //если пуст
@@ -1245,11 +1254,11 @@ WL3DPointf Psum;
 if(m_typeOffset==Tool)
 {}
 else {
- if(m_Program->MutexShowPoint.tryLock())
+ if(m_Program->MutexShowPoint.tryLock(100))
  {
  if(EditElement>0
  &&(EditElement<m_Program->indexData.size())
- &&((m_Program->indexData[EditElement].offsetPoint)<m_Program->showPoints.size()))
+ &&((m_Program->indexData[EditElement].offsetPoint+1)<m_Program->showPoints.size()))
   {
   Psum=m_Program->showPoints[m_Program->indexData[EditElement].offsetPoint+1].pos;
   }
@@ -1301,6 +1310,7 @@ m_tbView  -> move(5,m_tbZoomOut->geometry().bottom()+3);
 m_tbViewShow -> move(5,m_tbView->geometry().bottom()+3);
 m_tbViewType -> move(5,m_tbViewShow->geometry().bottom()+3);
 m_tbViewCenter->move(5,m_tbViewType->geometry().bottom()+10);
+m_tbUpdate->move(5,m_tbViewCenter->geometry().bottom()+10);
 }
 
 void WLVisualWidget::on_TButtonRot()
@@ -1509,17 +1519,38 @@ m_toolHeight=h;
 calcPointsTool();
 }
 
+void WLVisualWidget::setViewXYZ()
+{
+m_typeView=XYZ;
+trackTraj.clear();
+
+m_Program->setGModelData(WLGModelData());
+
+QTimer::singleShot(200,this,SLOT(shotsetViewCenter()));
+
+}
+
+void WLVisualWidget::setViewGModel()
+{
+m_typeView=GModel;
+trackTraj.clear();
+
+m_Program->setGModelData(m_MillMachine->getGModel()->getData());
+
+QTimer::singleShot(200,this,SLOT(shotsetViewCenter()));
+}
+
 void WLVisualWidget::showEvent(QShowEvent *event)
 {
-Q_UNUSED(event)
+    Q_UNUSED(event)
     placeVisualElements();
 
-QOpenGLWidget::showEvent(event);
+    QOpenGLWidget::showEvent(event);
 }
 
 void WLVisualWidget::resizeEvent(QResizeEvent *event)
 {
-Q_UNUSED(event)
+    Q_UNUSED(event)
     placeVisualElements();
 
 QOpenGLWidget::resizeEvent(event);
@@ -1550,7 +1581,6 @@ for(int i=0;i<Program->ListTraj.size();i++)
 
 void WLVisualWidget::setEditElement(int id)
 {
-//QList<WLElementTraj>  ListTraj=Program->getListTraj();
 qDebug()<<"setEditElement"<<id;
 
 if(EditElement==id) return;
@@ -1562,14 +1592,9 @@ if(0<id&&id<m_Program->getElementCount())
   EditElement=id;
   m_Program->setActivElement(EditElement);
   m_Program->Mutex.unlock();
-
-  emit changedEditElement(EditElement);
   }
 else
   m_Program->Mutex.unlock();
-//for(int i=0;i<EditElements.size();i++)
- // qDebug()<<"EditElement+ "<<EditElements[i];
-//QTimer::singleShot(0,this,SLOT(updateGL()));
 }
 
 

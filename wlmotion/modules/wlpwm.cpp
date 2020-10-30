@@ -11,7 +11,7 @@ error=0;
 connect(this,SIGNAL(changedPower(float)),SIGNAL(changed()));
 connect(this,SIGNAL(changedK(float)),SIGNAL(changed()));
 connect(this,SIGNAL(changedFreq(float)),SIGNAL(changed()));
-connect(this,SIGNAL(changedEnable(bool)),SIGNAL(changed()));
+//connect(this,SIGNAL(changedEnable(bool)),SIGNAL(changed()));
 }
 
 WLPWM::~WLPWM()

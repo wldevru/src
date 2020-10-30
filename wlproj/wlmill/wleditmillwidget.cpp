@@ -53,11 +53,8 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
     connect(ui.buttonBox,SIGNAL(accepted()),SLOT(onAccept()));
 	connect(ui.buttonBox,SIGNAL(rejected()),SLOT(onReject()));
 
-    //connect(ui.pbVCPAccept,SIGNAL(clicked()),SLOT(onSetPort()));
-
 	connect(ui.pbVerError,SIGNAL(clicked()),SLOT(onVerifyError()));
 
-    //updatePort();
 	setModal(true);
 
 }
@@ -67,7 +64,7 @@ WLEditMillWidget::~WLEditMillWidget()
 
 }
 
-void WLEditMillWidget::onVerifyError()
+QString WLEditMillWidget::verifyError()
 {
 QString str;
 
@@ -78,13 +75,31 @@ WLMillDrive *ZD=MillMachine->getDrive("Z");
 
  if(ui.cbHPause->isChecked()
  &&!ZD->isInfinity()
-&&((ZD->maxPosition()>ui.sbHPause->value())||(ZD->minPosition()>ui.sbHPause->value())))
+&&((ZD->maxPosition()<ui.sbHPause->value())||(ZD->minPosition()>ui.sbHPause->value())))
     str+=tr("Pause height off-axis position")+"\n";
 
-if(str.isEmpty())
-	str=tr("No error!!!");
+
+return str;
+}
+
+void WLEditMillWidget::onVerifyError()
+{
+QString str=verifyError();
+
+if(str.isEmpty()) str=tr("No error!!!");
 
 QMessageBox::information(this, tr("Verify error"),str,QMessageBox::Ok);
+}
+
+void WLEditMillWidget::onAccept()
+{
+QString str;
+
+if(!verifyError().isEmpty())
+    onVerifyError();
+  else
+    done(1);
+
 }
 
 

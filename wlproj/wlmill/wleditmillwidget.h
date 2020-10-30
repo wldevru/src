@@ -18,6 +18,8 @@ public:
 
 void saveData();
 
+QString verifyError();
+
 private:
 	WLMillMachine *MillMachine;
 
@@ -29,7 +31,7 @@ private:
 
 private slots:
 	void onVerifyError();
-    void onAccept() {done(1);}
+    void onAccept();
     void onReject() {done(0);}
     //void updatePort();
     //void onSetPort();

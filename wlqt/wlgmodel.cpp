@@ -2,19 +2,6 @@
 
 WLGModel::WLGModel(QObject *parent) : QObject(parent)
 {
-axisX.name='X';
-axisY.name='Y';
-axisZ.name='Z';
-axisA.name='A';
-axisB.name='B';
-axisC.name='C';
-
-axisX.valueFrame.x=1;
-axisY.valueFrame.y=1;
-axisZ.valueFrame.z=1;
-
-
-listAxis<<&axisX<<&axisY<<&axisZ;
 }
 
 WLFrame WLGModel::getFrame(WLGPoint GPoint)
@@ -24,82 +11,87 @@ QMutexLocker locker(&Mutex);
 WLFrame ret;
 
 QMatrix4x4 posM;
+
 posM.setToIdentity();
 
-axisX.value=GPoint.x;
-axisY.value=GPoint.y;
-axisZ.value=GPoint.z;
-axisA.value=GPoint.a;
-axisB.value=GPoint.b;
-axisC.value=GPoint.c;
+m_data.axisX.value=GPoint.x;
+m_data.axisY.value=GPoint.y;
+m_data.axisZ.value=GPoint.z;
+m_data.axisA.value=GPoint.a;
+m_data.axisB.value=GPoint.b;
+m_data.axisC.value=GPoint.c;
 
-posM=offsetFrame.toM().inverted()*posM;
+posM=m_data.offsetFrame.toM().inverted()*posM;
 
-foreach(SAxisGModel *Axis,listAxis)
+QStringList List=m_data.strAxis.split(",");
+
+foreach(QString name,List)
  {
- posM=Axis->getPosM(posM);
+      if(name=="X") posM=m_data.axisX.getPosM(posM);
+ else if(name=="Y") posM=m_data.axisY.getPosM(posM);
+ else if(name=="Z") posM=m_data.axisZ.getPosM(posM);
+ else if(name=="A") posM=m_data.axisA.getPosM(posM);
+ else if(name=="B") posM=m_data.axisB.getPosM(posM);
+ else if(name=="C") posM=m_data.axisC.getPosM(posM);
  }
 
-ret.fromM(offsetFrame.toM()*posM);
+ret.fromM(m_data.offsetFrame.toM()*posM);
+
+return ret;
+}
+
+WLGPoint WLGModel::getGPoint(WLFrame Frame)
+{
+QMutexLocker locker(&Mutex);
+
+WLGPoint ret;
 
 return ret;
 }
 
 void WLGModel::writeXMLData(QXmlStreamWriter &stream)
 {
-QString str;
+stream.writeAttribute("list",getStrAxis());
 
-foreach(SAxisGModel *Axis,listAxis)
- {
- if(!str.isEmpty()) str+=",";
- str+=Axis->name;
- }
-
-stream.writeAttribute("list",str);
-
-stream.writeAttribute("axisX",axisX.toString());
-stream.writeAttribute("axisY",axisY.toString());
-stream.writeAttribute("axisZ",axisZ.toString());
-stream.writeAttribute("axisA",axisA.toString());
-stream.writeAttribute("axisB",axisB.toString());
-stream.writeAttribute("axisC",axisC.toString());
+stream.writeAttribute("axisX",m_data.axisX.toString());
+stream.writeAttribute("axisY",m_data.axisY.toString());
+stream.writeAttribute("axisZ",m_data.axisZ.toString());
+stream.writeAttribute("axisA",m_data.axisA.toString());
+stream.writeAttribute("axisB",m_data.axisB.toString());
+stream.writeAttribute("axisC",m_data.axisC.toString());
 }
 
 void WLGModel::readXMLData(QXmlStreamReader &stream)
 {
-if(!stream.attributes().value("axisX").isEmpty()) axisX.fromString(stream.attributes().value("axisX").toString());
-if(!stream.attributes().value("axisY").isEmpty()) axisY.fromString(stream.attributes().value("axisY").toString());
-if(!stream.attributes().value("axisZ").isEmpty()) axisZ.fromString(stream.attributes().value("axisZ").toString());
-if(!stream.attributes().value("axisA").isEmpty()) axisA.fromString(stream.attributes().value("axisA").toString());
-if(!stream.attributes().value("axisB").isEmpty()) axisB.fromString(stream.attributes().value("axisB").toString());
-if(!stream.attributes().value("axisC").isEmpty()) axisC.fromString(stream.attributes().value("axisC").toString());
+if(!stream.attributes().value("axisX").isEmpty()) m_data.axisX.fromString(stream.attributes().value("axisX").toString());
+if(!stream.attributes().value("axisY").isEmpty()) m_data.axisY.fromString(stream.attributes().value("axisY").toString());
+if(!stream.attributes().value("axisZ").isEmpty()) m_data.axisZ.fromString(stream.attributes().value("axisZ").toString());
+if(!stream.attributes().value("axisA").isEmpty()) m_data.axisA.fromString(stream.attributes().value("axisA").toString());
+if(!stream.attributes().value("axisB").isEmpty()) m_data.axisB.fromString(stream.attributes().value("axisB").toString());
+if(!stream.attributes().value("axisC").isEmpty()) m_data.axisC.fromString(stream.attributes().value("axisC").toString());
 
-if(!stream.attributes().value("list").isEmpty())
- {
- QStringList List=stream.attributes().value("list").toString().split(",");
+if(!stream.attributes().value("list").isEmpty())  setStrAxis(stream.attributes().value("list").toString());
+}
 
- listAxis.clear();
+WLGModelData WLGModel::getData()
+{
+return m_data;
+}
 
- foreach(QString str,List)
-  {
-  str=str.toUpper();
+void WLGModel::setData(WLGModelData data)
+{
+Mutex.lock();
+m_data=data;
+Mutex.unlock();
+}
 
-  if(str[0]=='X') listAxis<<&axisX;
-  else
-      if(str[0]=='Y') listAxis<<&axisY;
-      else
-          if(str[0]=='Z') listAxis<<&axisZ;
-          else
-              if(str[0]=='A') listAxis<<&axisA;
-              else
-                  if(str[0]=='B') listAxis<<&axisB;
-                  else
-                      if(str[0]=='C') listAxis<<&axisC;
+void WLGModel::setStrAxis(QString str)
+{
+m_data.strAxis=str;
+}
 
-   }
-
-  }
-
-
+QString WLGModel::getStrAxis()
+{
+return m_data.strAxis;
 }
 

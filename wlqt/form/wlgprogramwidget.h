@@ -33,6 +33,11 @@ private:
     int   m_startIProgram;
     int     m_endIProgram;
     int m_sizeListProgram;
+
+    QString m_lastNameProgram;
+
+    int iEditElement=0;
+
 signals:
 
 	void changed(bool);

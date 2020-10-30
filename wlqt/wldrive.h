@@ -193,8 +193,8 @@ public:
    void setFeedVFind(double Vfind) {if(Vfind>0) m_feedVFind=Vfind;}
  double feedVFind() {return m_feedVFind;}
 
-void setTypeDrive(enum typeDrive _type=Linear) {m_type=_type; setTruPosition(false);}
-enum typeDrive type() {return m_type;}
+void setType(enum typeDrive _type=Linear) {m_type=_type; setTruPosition(false);}
+enum typeDrive getType() {return m_type;}
 
  static double calcRotaryInfEndPosition(double startPos,double endPos);
 
@@ -490,7 +490,7 @@ virtual void startTask()  {if(!isWait()&&!isMotion())
                              }
                           }
 public:
-   void startMovPos(double pos,float V) {setMot(pos); startMotion(V);}
+   void startMovPos(double pos,float V) {if(setMot(pos)==1) startMotion(V);}
    void startMovVel(float V)            {startMotion(V);}
 
 protected:

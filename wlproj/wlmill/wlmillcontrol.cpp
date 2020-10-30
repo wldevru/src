@@ -114,6 +114,8 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 	connect(ui.pbPlusProbeZ,SIGNAL(clicked()),SLOT(updateProbeButtons()));
 	connect(ui.pbMinusProbeZ,SIGNAL(clicked()),SLOT(updateProbeButtons()));
 	connect(ui.pbMinusProbeH,SIGNAL(clicked()),SLOT(updateProbeButtons()));
+    //connect(ui.pbMinusProbeHTool,SIGNAL(clicked()),SLOT(updateProbeButtons()));
+
 	
     ui.sbFtouch->setValue(MillMachine->VProbe());
 
@@ -137,9 +139,10 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 	connect(ui.pbStartFindAxis,SIGNAL(clicked()),SLOT(onFindAxis()));
 	connect(ui.pbRFindAxis,SIGNAL(clicked()),SLOT(onRFindAxis()));
 
-	connect(ui.pbEditOffsetTool,SIGNAL(clicked()),SLOT(onEditOffsetTool()));
+//	connect(ui.pbEditOffsetTool,SIGNAL(clicked()),SLOT(onEditOffsetTool()));
 
-	updateLabelBaseOffsetTool();
+//	updateLabelBaseOffsetTool();
+    connect(MillMachine->getGCode(),&WLGCode::changedTool,this,&WLMillControl::updateTableTools);
 	updateTableTools();
 		
     updateTab();
@@ -164,13 +167,22 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
     ui.stackedWidget->setCurrentIndex(0);
     ui.tabWidget->setCurrentIndex(0);
 
+
+    if(!MillMachine->getDrive("A"))
+       {
+       ui.pbMinusA->setVisible(false);
+       ui.pbPlusA->setVisible(false);
+       ui.pbPlusProbeA->setVisible(false);
+       ui.pbMinusProbeA->setVisible(false);
+       }
+
 }
 
 WLMillControl::~WLMillControl()
 {
 
 }
-
+/*
 void WLMillControl::onEditOffsetTool()
 {
 WLEnterNum EnterNum(this);
@@ -185,17 +197,19 @@ if(EnterNum.exec())
 
 updateLabelBaseOffsetTool();
 }
+*/
 
 void WLMillControl::onAcceptTableTools()
 {
-double D,L;
+double D,H;
+WLGTool tool;
 
 for(int i=0;i<ui.tableTools->rowCount();i++)
   {
-  D=ui.tableTools->item(i,0)->data(0).toString().toDouble();
-  L=ui.tableTools->item(i,1)->data(0).toString().toDouble();
+  tool.d=ui.tableTools->item(i,0)->data(0).toString().toDouble();
+  tool.h=ui.tableTools->item(i,1)->data(0).toString().toDouble();
 
-  MillMachine->GCode()->setDataTool(i+1,D,L);
+  MillMachine->getGCode()->setDataTool(i+1,tool,false);
   }
 
 ui.pbAcceptTool->setEnabled(false);
@@ -206,12 +220,12 @@ void WLMillControl::updateTableTools()
 ui.tableTools->setColumnCount(2);
 ui.tableTools->setRowCount(sizeTools-1);
 
-ui.tableTools->setHorizontalHeaderLabels(QString("D,L").split(","));
+ui.tableTools->setHorizontalHeaderLabels(QString("D,H").split(","));
 
 for(int i=0;i<ui.tableTools->rowCount();i++)
   {
-  ui.tableTools->setItem(i,0,new QTableWidgetItem(QString::number(MillMachine->GCode()->getTool(i+1).d)));
-  ui.tableTools->setItem(i,1,new QTableWidgetItem(QString::number(MillMachine->GCode()->getTool(i+1).l)));
+  ui.tableTools->setItem(i,0,new QTableWidgetItem(QString::number(MillMachine->getGCode()->getDataTool(i+1).d)));
+  ui.tableTools->setItem(i,1,new QTableWidgetItem(QString::number(MillMachine->getGCode()->getDataTool(i+1).h)));
   }
 
 ui.pbAcceptTool->setEnabled(false);
@@ -221,11 +235,12 @@ void WLMillControl::updateWhellXButton(quint8 id)
 {
 ui.buttonGroupWhellX->button(id)->click();
 }
-
+/*
 void WLMillControl::updateLabelBaseOffsetTool()
 {
     ui.labelBaseOffsetTool->setText(tr("Base offset tool:")+QString::number(MillMachine->getBaseOffsetTool())+tr("mm"));
 }
+*/
 
 void WLMillControl::onTeachAxis()
 {
@@ -405,6 +420,8 @@ void WLMillControl::updateProbeButtons()
 {
 QString name=this->sender()->objectName();
 
+MillMachine->stop();
+
 if(QMessageBox::question(this, tr("Question:"),tr("are you sure?"),QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
 {
 if(name=="pbPlusProbeX") MillMachine->goDriveProbe("X",1,calcFtouch(),ui.rbProbeSD->isChecked());
@@ -424,7 +441,8 @@ else
 if(name=="pbMinusProbeA") MillMachine->goDriveProbe("A",0,calcFtouch(),ui.rbProbeSD->isChecked());
 else	
 if(name=="pbMinusProbeH") MillMachine->goHProbe(calcFtouch(),ui.rbProbeSD->isChecked());
-
+else
+if(name=="pbMinusProbeHTool") MillMachine->goHTool(calcFtouch(),ui.rbProbeSD->isChecked());
 }
 
 }
@@ -489,7 +507,7 @@ MillMachine->setEnableManualWhell(false);
 
 void WLMillControl::updateTab()
 {
-MillMachine->stop();
+//MillMachine->stop();
 
 updateWhellAxis();
 
@@ -755,7 +773,7 @@ else {
 
 void WLMillControl::on_pbStopTouch_pressed()
 {
-    MillMachine->stop();
+MillMachine->stop();
 }
 
 

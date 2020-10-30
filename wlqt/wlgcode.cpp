@@ -15,6 +15,7 @@ setGCode(17);
 setGCode(02);
 setGCode(01);
 setGCode(54);
+
 }
 
 WLGCode::WLGCode(WLGCodeData _data):WLGCode()
@@ -56,21 +57,47 @@ if(m_data.G51Scale.x!=1.0
 ret+="\nF"+QString::number(m_data.gF.value);
 ret+=" S" +QString::number(m_data.gS.value);
 ret+=" T" +QString::number(m_data.gT.value);
+ret+=" H" +QString::number(m_data.gH.value);
 
 
 
 return ret;
 }
 
-void WLGCode::setDataTool(int number, double _diam, double _length)
+
+void WLGCode::setDataTool(int number,WLGTool tool,bool send)
 {
 if(number<sizeTools
- &&number>=0
- &&_diam>0)
+ &&number>=0)
     {
-    m_data.Tools[number].d=_diam;
-    m_data.Tools[number].l=_length;
+    m_data.Tools[number]=tool;
+    if(send)
+      {
+      emit changedTool();
+      }
     }
+}
+
+float WLGCode::getHvalue(int index)
+{
+float ret=0;
+
+if(index<sizeTools)
+ {
+ ret=getDataTool(index==0 ? getValue('H') : index).h;
+ }
+
+return ret;
+}
+
+float WLGCode::getHcorr()
+{
+float ret=0;
+
+if(isGCode(43)) ret=getHvalue();
+  else if(isGCode(44)) ret=-getHvalue();
+
+return ret;
 }
 
 void WLGCode::verifyG51()
@@ -95,6 +122,17 @@ WLGCodeData WLGCode::getData() const
 {
     return m_data;
 }
+
+void WLGCode::setHTool(int i, float h)
+{
+WLGTool Tool=getDataTool(i);
+
+Tool.h=h;
+
+setDataTool(i,Tool);
+}
+
+
 
 
 
@@ -235,10 +273,10 @@ switch(code)
            m_data.GCode[21]=0;
            break;
    //**07
-   case 43:m_data.GCode[43]=1;//"Corect Tool +";
+   case 43:m_data.GCode[43]=1;//"Corect Tool H +";
            m_data.GCode[44]=0;
            break;
-   case 44:m_data.GCode[44]=1;//"Corect Tool -";
+   case 44:m_data.GCode[44]=1;//"Corect Tool H-";
            m_data.GCode[43]=0;
            break;
    case 49:m_data.GCode[44]=0;//"Corect Tool Off";
@@ -270,7 +308,6 @@ switch(code)
            if(m_data.iSC!=code-53)
             {
             m_data.iSC=code-53;//"Check SK";
-            emit changedSK(m_data.iSC);
             }
            break;
    //**13
@@ -383,7 +420,15 @@ switch(name)
   case 'S': m_data.gS.set(data); break;
   case 'T': m_data.gT.set(data); break;
 
-  case 'H': m_data.gH.set(data); break;
+  case 'H': if(data>=0
+               &&data<sizeTools)   {
+                m_data.gH.set(data);
+                }
+           else {
+                return false;
+                }
+
+            break;
 
   default : return false;
 }
@@ -537,18 +582,11 @@ else
     if(isValid('X')) newPoint.x=getValue('X')*(scale ? m_data.G51Scale.x:1.0);
     if(isValid('Y')) newPoint.y=getValue('Y')*(scale ? m_data.G51Scale.y:1.0);
 
-    if(isValid('Z'))
-    {
-    newPoint.z=getValue('Z')*(scale ? m_data.G51Scale.z:1.0);
-
-    if(getValue('H')<sizeTools)
+     if(isValid('Z'))
      {
-     if(isGCode(43))
-        newPoint.z+=m_data.Tools[static_cast<int>(m_data.gH.value)].l;
-     if(isGCode(44))
-        newPoint.z-=m_data.Tools[static_cast<int>(m_data.gH.value)].l;
+     newPoint.z=getValue('Z')*(scale ? m_data.G51Scale.z:1.0);
+     newPoint.z+=getHcorr();
      }
-    }
 	if(isValid('A')) newPoint.a=getValue('A'); 
 	if(isValid('B')) newPoint.b=getValue('B'); 
 	if(isValid('C')) newPoint.c=getValue('C'); 
@@ -659,6 +697,9 @@ WLGPoint newPoint=getPointActivSC(lastGPoint);
 
 newPoint=getPointGCode(newPoint,false);
 
+if(isGCode(90))
+    newPoint.z-=getHcorr();
+
 return getPointActivSC(newPoint,true);
 }
 
@@ -715,13 +756,13 @@ else
   }
 }
 
-bool WLGCode::setOffsetSC(int i, WLGPoint P)
+bool WLGCode::setOffsetSC(int i, WLGPoint P,bool send)
 {
 if(0<i&&i<sizeSC)
    {
    m_data.offsetSC[i]=P;
 
-   emit changedSK(m_data.iSC);
+   if(send) emit changedSK(m_data.iSC);
    return 1;
    }
 

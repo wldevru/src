@@ -31,13 +31,40 @@ painter.setPen(QColor(Qt::black));
 
 QString name=m_drive ? m_drive->getName() : "?";
 QString  pos=m_drive ? QString("%1").arg(m_drive->getAxisPosition(),0,'f',2) : "0000.00";
-QString    f=m_drive ? QString("%1").arg(m_drive->Vnow(),0,'f',2) : "0000.00";
+QString    f=m_drive ? QString("%1").arg(m_drive->Vnow()*60,0,'f',2) : "0000.00";
 
-
-QString   ofst;
+QString ofst;
+  float Hofst=0;
 
 if(m_gcode)
-   ofst=m_drive ? QString("%1").arg((m_drive->getRealPosition()-m_gcode->getOffsetActivSC().get(m_drive->getName())),0,'f',2) : "0000.00";
+   {
+  if(name=="Z")
+     {
+     if(m_gcode->isGCode(43))
+       {
+       Hofst=- m_gcode->getHvalue();
+       }
+       else if(m_gcode->isGCode(44))
+         {
+         Hofst=m_gcode->getHvalue();
+         }
+     }
+
+   ofst=QString("%1").arg(m_GPos,0,'f',2);
+
+   if(name=="Z")
+      {
+      if(m_gcode->isGCode(43))
+        {
+        ofst+=" (G43H"+QString::number(m_gcode->getValue('H'))+")";
+        }
+        else if(m_gcode->isGCode(44))
+          {
+          ofst+=" (G44H"+QString::number(m_gcode->getValue('H'))+")";
+          }
+      }
+
+   }
 else
    ofst=pos;
 
@@ -86,7 +113,7 @@ font.setPixelSize(rName.height()-2);
 painter.setFont(font);
 if(m_drive)
   {
-  painter.setPen(m_drive->isTruPosition() ? QColor(Qt::black) : QColor(Qt::red));
+  painter.setPen(m_drive->isTruPosition() ?  QColor(Qt::black) : QColor(Qt::red));
   }
 else
    painter.setPen(QColor(Qt::darkRed));

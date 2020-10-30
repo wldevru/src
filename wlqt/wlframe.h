@@ -65,15 +65,15 @@ reset();
 }
 
 
-QString toString() 
-{
-return  
-	 "X "+QString::number(x)
-   +",Y "+QString::number(y)
-   +",Z "+QString::number(z)
-   +",A "+QString::number(a)
-   +",B "+QString::number(b)
-   +",C "+QString::number(c);
+QString toString() {
+
+return
+        "X "+QString::number(x)
+      +",Y "+QString::number(y)
+      +",Z "+QString::number(z)
+      +",A "+QString::number(a)
+      +",B "+QString::number(b)
+      +",C "+QString::number(c);
 }
 
 bool fromString(QString str) 

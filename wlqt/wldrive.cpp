@@ -37,10 +37,6 @@ WLDrive::~WLDrive()
 {
 qDebug()<<"~WLDrive()";
 driveList.removeOne(this);
-/*
-quit();
-wait();
-*/
 }
 
 
@@ -93,9 +89,9 @@ return false;
 bool WLDrive::setPad(dataPad pad,typeMParAxis type)
 {
 return getAxis()->setParMov(pad.Aac/dim.value
-                        ,pad.Ade/dim.value
-                        ,pad.Vst/dim.value
-                        ,pad.Vma/dim.value,type);
+                           ,pad.Ade/dim.value
+                           ,pad.Vst/dim.value
+                           ,pad.Vma/dim.value,type);
 }
 
 bool WLDrive::setMainPad()
@@ -183,7 +179,6 @@ return -1;
 
 void WLDrive::reset()
 {
-qDebug()<<"reset Drive";
 QMutexLocker locker(&MutexDrive);
 
 if(Flag.get(fl_auto)) emit autoFinished();
@@ -196,8 +191,7 @@ Flag.set(fl_activ
         |fl_auto
 	    |fl_wait
 	    |fl_interp
-	    |fl_manual,0);
-	//  |fl_setpos,0);
+        |fl_manual,0);
 
 setVerifyPosition();
 
@@ -210,6 +204,8 @@ if(getAxis())
   getAxis()->reset();
   getAxis()->setKF(1.0);
   }
+
+emit finished();
 }
 
 
@@ -234,7 +230,6 @@ if(isTruPosition()
  return -1;
  }
 
-
 m_nextPosition.set(pos,dim);
 
 if(isDone())
@@ -245,14 +240,8 @@ if(isDone())
  }
 else
  {
-// curPad=Pad.getData();
  if(calcForStartMotion()<0)  return -1;
-/*
- getAxis()->setParMov(curPad.Aac/dim.value
-                     ,curPad.Ade/dim.value
-                     ,curPad.Vst/dim.value
-                     ,curPad.Vma/dim.value);
-*/
+
  Flag.set(fl_rot,m_nextPosition.step>m_nowPosition.step);
  Flag.set(fl_activ,true);
  return 1;
@@ -273,7 +262,6 @@ if(!isInfinity())
  return -1;
  }
 
-// curPad=Pad.getData();
 if(calcForStartMotion()<0)  return -1;
 
 Flag.set(fl_rot,dir);
@@ -554,6 +542,8 @@ if(qAbs(eP-sP)>0.5)
      eP+=1.0;
  }
 
+qDebug()<<"calcRotaryInfEndPosition"<<startPos<<endPos<<"calc="<<(sPC+eP)*360.0;
+
 return (sPC+eP)*360.0;
 }
 
@@ -579,7 +569,7 @@ void WLDrive::writeXMLData(QXmlStreamWriter &stream)
 stream.writeAttribute("name",         getName());
 stream.writeAttribute("indexMAxis",   QString::number(indexMAxis()));
 
-stream.writeAttribute("type", QString::number(typeDrive()));
+stream.writeAttribute("type", QString::number(getType()));
 
 stream.writeAttribute("Dim",getDriveDim().toString());
 
@@ -631,9 +621,9 @@ if(!stream.attributes().value("Dim").isEmpty())
    }
 
 if(!stream.attributes().value("type").isEmpty())
-   setTypeDrive(static_cast<typeDrive>(stream.attributes().value("type").toInt()));
+   setType(static_cast<typeDrive>(stream.attributes().value("type").toInt()));
 else
-   setTypeDrive();
+   setType();
 
 if(!stream.attributes().value("MinPosition").isEmpty()
  &&!stream.attributes().value("MaxPosition").isEmpty())
@@ -943,8 +933,10 @@ if(error!=0)
 
 void WLDrive::updatePos(qint32 Pos)
 {
-//QMutexLocker locker(&MutexCallData);
 QMutexLocker locker1(&MutexDrivePosition);                      
+
+
+
 /*
 oldPos=nowPosition.step;
 qint64 newPos=nowPosition.step;
@@ -968,11 +960,31 @@ qint64 newPos=Pos;
 
 if(Flag.get(fl_setpos))
   {
-  if(m_nowPosition.step==newPos) 	Flag.set(fl_setpos,0); //позиция установлена
+  if((qint32)m_nowPosition.step==(qint32)newPos) 	Flag.set(fl_setpos,0); //позиция установлена
   return;
   }
   else
-  {
+  {/*
+  qint64  nowPosF0;
+
+  qint64   newPosPlus;
+  qint64  newPosMinus;
+
+  nowPosF0=m_nowPosition.step&(0xFFFFFFFF00000000);
+
+  newPosPlus=nowPosF0+Pos;
+  newPosMinus=nowPosF0-Pos;
+
+  if(qAbs(newPosPlus-m_nowPosition.step)
+   <qAbs(newPosMinus-m_nowPosition.step))
+    {
+    newPos=newPosPlus;
+    }
+  else
+    {
+    newPos=newPosMinus;
+    }
+*/
   if(m_nowPosition.step!=newPos)
 	   {
        Flag.set(fl_rot,newPos>m_nowPosition.step);
@@ -1082,8 +1094,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
     						}
     					   else
     					    {
-							qDebug()<<"wrong starting position";
-    						reset();							
+                            reset();
                             emit sendMessage(getFullName(),tr("wrong starting position")+"(inORG=1)",-8);
     					    }
     						break;
@@ -1243,6 +1254,7 @@ if(isAuto()&&autoTypeDrive!=autoNo)
 								 setTruPosition(true);    
 
                                  reset();
+
               				     if(logicFindPos==onlyPELHome)
 							      {
                                   if(setMovHome())  startMotion(0);

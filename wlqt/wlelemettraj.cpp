@@ -96,11 +96,11 @@ bool WLElementTraj::setLineXYZ(WLGPoint _startPoint,WLGPoint _endPoint)
 {
  startPoint=_startPoint;
    endPoint=_endPoint;
-
+/*
 qDebug()<<"line";
 qDebug()<<startPoint.toString();
 qDebug()<<endPoint.toString();
-
+*/
 if(startPoint==endPoint) Type=nomov;   else	 Type=line;
 
 return true;
@@ -110,45 +110,126 @@ QList <WL6DPoint> WLElementTraj::calcLinePoints(bool *ok,WLGModel *GModel,double
 {
 QList <WL6DPoint> Points;
 
-if(!isLine()||startPoint==endPoint) 	
-	{
-	if(ok!=NULL) *ok=false;
+if(!isLine())
+    {
+    if(ok) *ok=false;
     }
 
 movDistance=(GModel->getFrame(endPoint).to3D()
             -GModel->getFrame(startPoint).to3D()).r();
 
-Points.clear();
 
-if(delta==0.0f)
+
+if(delta==0.0f||movDistance==0.0f)
  {
  Points+=GModel->getFrame(startPoint).to6D();
  Points+=GModel->getFrame(endPoint).to6D();
  }
 else {
- int n=movDistance/delta+1;
+ int n=5;
+ float k;
+ float dist;
 
  WLGPoint deltaG=(endPoint-startPoint)/(double)n;
- //WLGPoint cur;
+
+ dist=(GModel->getFrame(endPoint).to3D()-GModel->getFrame(startPoint).to3D()).r();
+
+ k=(float)n*dist/delta;
+
+ n=k+1;
+
+ deltaG=(endPoint-startPoint)/(double)n;
 
  for(int i=0;i<=n;i++)
-    {
-    //cur=startPoint+deltaG*(double)i;
+    {        
     Points+=GModel->getFrame(startPoint+deltaG*(double)i).to6D();
     }
-
 }
-//Points+=startPoint.to3D();
-//Points+=endPoint.to3D();
 
-//midPoint=(endPoint.to3D()+startPoint.to3D())/2;
-//movDistance=(endPoint-startPoint).to3D().r();
+startV=endV=(endPoint-startPoint).normalize();//bug
 
-startV=endV=(endPoint-startPoint).normalize();
-
-if(ok!=NULL) *ok=true;
+if(ok) *ok=true;
 
 return Points;
+}
+
+QList <WLElementTraj> WLElementTraj::calcModelPoints(bool *ok, WLGModel *GModel, double delta)
+{
+QList <WLElementTraj> retList;
+WL6DPoint lastP,curP;
+WLGPoint lastGP,curGP;
+
+double dist;
+double dF;
+double dFxyz;
+double kF;
+
+if(!isLine())
+    {
+    retList+=*this;
+    return retList;
+    }
+
+if(delta<=0.0f) delta=0.5;
+
+int n=5;
+
+WLGPoint deltaG=(endPoint-startPoint)/(double)n;
+
+lastGP=startPoint;
+curGP=startPoint+deltaG;
+dist=(GModel->getFrame(curGP).to3D()-GModel->getFrame(lastGP).to3D()).r();
+
+kF=(float)n*dist/delta;
+
+n=kF+1;
+
+deltaG=(endPoint-startPoint)/(double)n;
+
+dFxyz=deltaG.x*deltaG.x
+     +deltaG.y*deltaG.y
+     +deltaG.z*deltaG.z;
+
+dF=dFxyz
+  +deltaG.a*deltaG.a
+  +deltaG.b*deltaG.b
+  +deltaG.c*deltaG.c;
+
+kF= dFxyz!=0.0 ? sqrt(dF/dFxyz) : 1;
+
+dF=sqrt(dF);
+dFxyz=sqrt(dFxyz);
+
+curGP=startPoint;
+curP=GModel->getFrame(curGP).to6D();
+
+WLElementTraj ET=*this;
+
+for(int i=1;i<=n;i++)
+    {
+    lastP=curP;
+    lastGP=curGP;
+
+    curGP=startPoint+deltaG*(double)i;
+    curP=GModel->getFrame(curGP).to6D();
+
+    dist=(curP.to3D()-lastP.to3D()).r();
+    //qDebug()<<"curP"<<curP.toString();
+    //qDebug()<<"lastP"<<lastP.toString();
+    ET.setLineXYZ(lastGP,curGP);
+
+    if(this->getF()>0)
+         ET.setF(dF/(dist/this->getF()));
+
+    qDebug()<<"kF"<<kF<<"dF"<<dF<<"dFxyz"<<dFxyz<<"dist"<<dist<<"n"<<n<<"F="<<ET.getF()<<this->getF();
+    retList+=ET;
+
+    ET.clearM();
+    }
+
+if(ok) *ok=true;
+
+return retList;
 }
 
 QList <WL6DPoint> WLElementTraj::calcULinePoints(bool *ok,WLGModel *GModel,double delta)
@@ -157,7 +238,7 @@ Q_UNUSED(GModel)
 Q_UNUSED(delta)
 QList <WL6DPoint> Points;
 
-if(!isULine()||startPoint==endPoint) 	
+if(!isULine())
 	{
     if(ok!=nullptr) *ok=false;
     }
@@ -265,6 +346,8 @@ return true;
 
 QList <WL6DPoint> WLElementTraj::calcCirclePoints(bool *ok,WLGModel *GModel,double delta)
 {
+Q_UNUSED(GModel);
+
 QList <WL6DPoint> Points;
 
 if(!isCirc()) 

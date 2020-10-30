@@ -19,6 +19,8 @@ WLGProgramWidget::WLGProgramWidget(WLGProgram *_Program,QWidget *parent)
 
     //connect(ui.listProgram,SIGNAL(//
 	
+    ui.pbUpdate->setVisible(false);
+
     ui.pbUpdate->setIcon(QIcon(":/data/icons/update.png"));
     ui.pbAccept->setIcon(QIcon(":/data/icons/accept.png"));
     ui.pbBackup->setIcon(QIcon(":/data/icons/backup.png"));
@@ -127,33 +129,54 @@ void  WLGProgramWidget::loadTextProgram()
 qDebug()<<"loadTextProgram"<<m_GProgram->getElementCount();
 
 QString buf;
+bool backupPos=false;
+
 ui.labelName->setText(tr("name: ")+m_GProgram->getName());
 ui.labelName->setToolTip(m_GProgram->getNameFile());
-//qDebug()<<"loadTextProgram1";
-//qDebug()<<"loadTextProgram2";
+
+if(m_lastNameProgram==m_GProgram->getNameFile())
+ {
+ backupPos=true;
+ }
+
+m_lastNameProgram=m_GProgram->getNameFile();
 
 if(m_GProgram->getElementCount()<20000)
- { 
- qDebug()<<"istProgram<20000"<<m_GProgram->getElementCount();
+ {
+ int pos=ui.textProgram->textCursor().position();
+
  ui.stackedWidget->setCurrentIndex(1);
  ui.textProgram->setEnabled(true);
  ui.textProgram->blockSignals(true);
  ui.textProgram->setPlainText(m_GProgram->getTextProgram());
- ui.textProgram->blockSignals(false);
-
+ ui.textProgram->blockSignals(false); 
  //QTimer::singleShot(100,this,SLOT(saveTextProgram()));
+
+ if(backupPos)
+     {
+     QTextCursor cursor = ui.textProgram->textCursor();
+     cursor.setPosition(pos);
+
+     ui.textProgram->setTextCursor(cursor);
+     }
  }
 else
  {
+ int iShow=m_startIProgram+ui.listProgram->currentRow();
  ui.stackedWidget->setCurrentIndex(0);
  ui.sbPosition->setRange(0,m_GProgram->getElementCount());
  ui.vsbProgram->setRange(0,m_GProgram->getElementCount());
  ui.vsbProgram->setPageStep(m_sizeListProgram);
- showListProgram(0);
+
+ if(backupPos)
+     showListProgram(iShow);
+   else
+     showListProgram(0);
  }
 
-emit changed(m_changedProgram=false);
-qDebug()<<"endloadTextProgram";
+
+m_changedProgram=false;
+emit changed(m_changedProgram);
 }
 
 void WLGProgramWidget::saveTextProgram()
@@ -197,7 +220,7 @@ void WLGProgramWidget::setEditElement(int iElement)
 {
 qDebug()<<"set iElement"<<iElement<<ui.stackedWidget->currentIndex()<<m_changedProgram;
 
-if(0<=iElement)
+if(iElement>=0)
 {
  if(ui.stackedWidget->currentIndex()==1)
  {
@@ -208,11 +231,14 @@ if(0<=iElement)
 
   ui.textProgram->setFocus();
 
-  //for(int i=0;i<iElement;i++)
-  pos= m_GProgram->indexData[iElement-1].offsetInFile;
+  if(iElement==0)
+     pos=0;
+  else
+     pos= m_GProgram->indexData[iElement-1].offsetInFile;
+
 
   cursor.setPosition(pos);
-  qDebug()<<"setPosET"<<pos;
+
   cursor.select(QTextCursor::LineUnderCursor);
 
   blockSignals(true);
@@ -238,7 +264,8 @@ for(int i=0;i<m_GProgram->getElementCount();i++)
 	 if(posF<=(m_GProgram->indexData[i].offsetInFile-1)) 
 	    {
 	    qDebug()<<"onChangedPositionTextProgram()"<<posF<<(m_GProgram->indexData[i].offsetInFile-1);
-        emit changedEditElement(i);
+        iEditElement=i;
+        emit changedEditElement(iEditElement);
 		break;
 	    }
      }
@@ -284,5 +311,7 @@ else
 
 ui.listProgram->blockSignals(false);
 
-emit changedEditElement(m_startIProgram+ui.listProgram->row(ui.listProgram->currentItem()));
+iEditElement=m_startIProgram+ui.listProgram->row(ui.listProgram->currentItem());
+
+emit changedEditElement(iEditElement);
 }

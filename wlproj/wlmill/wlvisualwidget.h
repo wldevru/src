@@ -42,6 +42,7 @@ private:
     QToolButton *m_tbViewType;
     QToolButton *m_tbViewShow;
     QToolButton *m_tbView;
+    QToolButton *m_tbUpdate;
 
     QToolButton *m_tbZoomIn;
     QToolButton *m_tbZoomOut;
@@ -58,8 +59,6 @@ private:
     bool m_zoomDir;
 
     QTimer *m_timerView;
-
-    QTime m_timePress;
 
     int lastSizeSPsize=0;
 
@@ -210,8 +209,8 @@ public slots:
     void setViewRotPoint(){m_viewRotPointF=!m_viewRotPointF;update();}
     void setViewLimits()  {m_viewLimits=!m_viewLimits;      update();}
 
-    void setViewXYZ()     {m_typeView=XYZ;   trackTraj.clear(); m_Program->setGModel(nullptr);                 setViewCenter();}
-    void setViewGModel()  {m_typeView=GModel;trackTraj.clear(); m_Program->setGModel(m_MillMachine->getGModel());setViewCenter();}
+    void setViewXYZ();
+    void setViewGModel();
 
     void setViewOffsetModel()     {m_typeOffset=Model;setViewCenter();}
     void setViewOffsetTool()      {m_typeOffset=Tool; setViewCenter();}

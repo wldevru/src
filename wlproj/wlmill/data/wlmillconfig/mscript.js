@@ -59,50 +59,6 @@ function M101()
 }
 
 
-function M102()
-{
-var i
-var im
-var pos={X:100,Y:200,Z:300};
-
-DIALOG.message("Hello!",0);
-
-if(DIALOG.enterNum("Enter number"))
- { 
- im=DIALOG.num()
-  DIALOG.message(im.toString(),0);
-
-  for(i=0;i<im;i++)
-  {
-  iM++;
-  DOUT.tog(5);
-  DELAY(250);
-  } 
- }
-
-
-return pos;
-}
-
-
-function M103()
-{
-}
-
-
-function M104()
-{
-}
-
-function M105()
-{
-}
-
-
-function M106()
-{
-}
-
 function M3()
 {
 //DIALOG.message("M3 шпиндель включен!",0);
@@ -251,13 +207,40 @@ DIALOG.message("Сканирование успешно завершено!");
 return 1;
 }
 
+function userFunc2()
+{
+var front=!MACHINE.getInProbe()
+var Fprobe=50
+var T= GCODE.getT()
+var Zback=MACHINE.getCurPositionSC("Z")
+
+DIALOG.enterNum("Номер инструмента=")
+while(WAIT(DIALOG.isShow()));
+
+if(DIALOG.isOk()) 
+  T=DIALOG.getNum();
+else
+  return
+
+MACHINE.runGCode("G0 G53 Z0")
+MACHINE.runGCode("G0 G53 X73 Y421")
+MACHINE.runGCode("G0 G53 Z-10")
+while(WAIT(MACHINE.isActiv()));
+
+MACHINE.goDriveProbe("Z",0,400,0)
+while(WAIT(MACHINE.isActiv()));
+
+MACHINE.runGCode("G0 G53 Z0")
+while(WAIT(MACHINE.isActiv()));
+
+GCODE.setHTool(T,MACHINE.getProbePosition("Z",front))
+return 1;
+}
+
 function ON()
 {
-//DIALOG.message("Станок включён!");
 }
 
 function OFF()
 {
-M5()
-M9()
 }

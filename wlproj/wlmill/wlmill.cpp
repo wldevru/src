@@ -23,7 +23,7 @@
 #include "wlmilldrivewidget.h"
 #include "wldevicewidget.h"
 #include "wldelayscript.h"
-
+#include "wlgmodelwidget.h"
 
 WLMill::WLMill(QWidget *parent)
 : QMainWindow(parent)
@@ -51,10 +51,10 @@ WLMill::WLMill(QWidget *parent)
 
     MillMachine = new WLMillMachine(Program,EVMScript);
 
-    Program->setShowGCode(MillMachine->GCode());
+    Program->setShowGCode(MillMachine->getGCode());
 
     connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
-    connect(MillMachine,SIGNAL(changedSK()),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
+    connect(MillMachine->getGCode(),SIGNAL(changedSK(int)),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
 
     connect(MillMachine,SIGNAL(ready()),SLOT(readyMachine()));
     MillMachine->start();
@@ -184,6 +184,7 @@ MEdit->addSeparator();
 MEdit->addAction(("WLMill"),this,SLOT(onEditWLMill()));
 MEdit->addAction(tr("Whell"),this,SLOT(onEditWhell()));
 MEdit->addAction(tr("Device"),this,SLOT(onEditDevice()));
+MEdit->addAction(("GModel"),this,SLOT(onEditGModel()));
 
 
 
@@ -258,8 +259,6 @@ dockPosition->setWindowTitle(tr("Positions"));
 dockPosition->setObjectName("DPosition");
 
 PositionWidget=new WLPositionWidget(MillMachine,Program,this);
-
-connect(PositionWidget,SIGNAL(changedViewSC(int)),VisualWidget,SLOT(setViewSC(int)));
 
 PositionWidget->show();
 
@@ -364,8 +363,6 @@ delete EVMScript;
 qDebug("DELETE WHITE END");
 }
 
-
-
 void WLMill::onEditDrive(QString nameDrive)
 {
 if(MillMachine->getDrive(nameDrive))
@@ -385,9 +382,7 @@ if(MillMachine->getDrive(nameDrive))
 
   MillMachine->saveConfig();
   }
-
 }
-
 
 void WLMill::onEditWLMill()
 {
@@ -426,9 +421,9 @@ stream.writeStartElement("WhiteLineSC");
  stream.writeStartElement("SC");
  stream.writeAttribute("i",QString::number(i));
 
- stream.writeAttribute("Frame",MillMachine->GCode()->getOffsetSC(i).toString());
- stream.writeAttribute("refPoint0",MillMachine->GCode()->getRefPoint0SC(i).toString());
- stream.writeAttribute("refPoint1",MillMachine->GCode()->getRefPoint1SC(i).toString());
+ stream.writeAttribute("Frame",MillMachine->getGCode()->getOffsetSC(i).toString());
+ stream.writeAttribute("refPoint0",MillMachine->getGCode()->getRefPoint0SC(i).toString());
+ stream.writeAttribute("refPoint1",MillMachine->getGCode()->getRefPoint1SC(i).toString());
  stream.writeEndElement();
  }
 
@@ -738,6 +733,18 @@ if(DW.exec())
   }
  }
 
+}
+
+void WLMill::onEditGModel()
+{
+WLGModelWidget GMW(MillMachine->getGModel(),this);
+
+GMW.show();
+
+if(GMW.exec())
+ {
+ qDebug()<<"updateGModel";
+ }
 }
 
 void WLMill::onEditWhell()

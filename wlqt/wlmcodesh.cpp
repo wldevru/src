@@ -11,7 +11,7 @@ WLMCodeSH::WLMCodeSH(QTextDocument *parent)
      QStringList keywordPatterns;
      keywordPatterns << "\\bDIALOG\\b" << "\\bAXIS\\b" << "\\bTIMER\\b"
                      << "\\bDIN\\b" << "\\bDOUT\\b" << "\\bK\\b"
-                     << "\\bFILE\\b" << "\\bMACHINE\\b" ;
+                     << "\\bFILE\\b" << "\\bMACHINE\\b"<< "\\bGCODE\\b" ;
                      /*<< "\\blong\\b" << "\\bnamespace\\b" << "\\boperator\\b"
                      << "\\bprivate\\b" << "\\bprotected\\b" << "\\bpublic\\b"
                      << "\\bshort\\b" << "\\bsignals\\b" << "\\bsigned\\b"

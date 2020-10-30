@@ -62,7 +62,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 
     connect(ui.comboBoxLogicFind,SIGNAL(currentIndexChanged(int)),SLOT(updateFindLogic(int)));
 
-    updateFindLogic(m_Drive->getLogicFindPos());
+    ui.comboBoxLogicFind->setCurrentIndex(m_Drive->getLogicFindPos());
 
     ui.sbOrgSize->setValue(m_Drive->getORGSize());
     ui.sbBackFindPosition->setValue(m_Drive->homePosition());
@@ -84,7 +84,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 
 	ui.sbDelaySCurve->setValue(Axis->getDelaySCurve());
 
-    ui.cbTypeDrive->setCurrentIndex(m_Drive->type());
+    ui.cbTypeDrive->setCurrentIndex(m_Drive->getType());
     ui.gbLimit->setChecked(!m_Drive->isInfinity());
 
 	connect(ui.pbVerError,SIGNAL(clicked()),SLOT(onVerifyError()));
@@ -139,16 +139,16 @@ dataPad Pad=m_Drive->pad()->getData("main");
 ui.labelSDDist->setText(QString(tr("slow down distance: %1 mm")).arg((Pad.Vst-V)/Pad.Ade*(V+Pad.Vst)/2,0,'g',2));
 }
 
-void WLDriveWidget::onVerifyError()
+QString WLDriveWidget::verifyError()
 {
 QString str;
 
-if((ui.editInALM->value()==ui.editInORG->value()&&ui.editInALM->value()>1&&ui.editInORG->value()>1)
+if(/*(ui.editInÇÓÄALM->value()==ui.editInORG->value()&&ui.editInALM->value()>1&&ui.editInORG->value()>1&&ui.groupBoxORG->isEnabled())
  ||(ui.editInALM->value()==ui.editInPEL->value()&&ui.editInALM->value()>1&&ui.editInPEL->value()>1)
  ||(ui.editInALM->value()==ui.editInMEL->value()&&ui.editInALM->value()>1&&ui.editInMEL->value()>1)
- ||(ui.editInORG->value()==ui.editInPEL->value()&&ui.editInORG->value()>1&&ui.editInPEL->value()>1)
- ||(ui.editInORG->value()==ui.editInMEL->value()&&ui.editInORG->value()>1&&ui.editInMEL->value()>1)
- ||(ui.editInPEL->value()==ui.editInMEL->value()&&ui.editInPEL->value()>1&&ui.editInMEL->value()>1))
+ ||(ui.editInORG->value()==ui.editInPEL->value()&&ui.editInORG->value()>1&&ui.groupBoxORG->isEnabled()&&ui.editInPEL->value()>1)
+ ||(ui.editInORG->value()==ui.editInMEL->value()&&ui.editInORG->value()>1&&ui.groupBoxORG->isEnabled()&&ui.editInMEL->value()>1)
+ ||*/(ui.editInPEL->value()==ui.editInMEL->value()&&ui.editInPEL->value()>1&&ui.editInMEL->value()>1))
 str+=tr("input numbers are not unique")+"\n";
 
 if((ui.editOutRALM->value()==ui.editOutENB->value()&&ui.editOutRALM->value()>0&&ui.editOutENB->value()>0))
@@ -171,51 +171,59 @@ switch(ui.comboBoxLogicFind->currentIndex())
 {
 case 4:
 case 1: if(ui.editInORG->value()>1)
-		{}
-		else
-		str+=tr("no sensor installed to search")+" (inORG)"+"\n";
+        {}
+        else
+        str+=tr("no sensor installed to search")+" (inORG)"+"\n";
 
-	    if(ui.sbOrgSize->value()>0)
-		{}
-		else
-		str+=tr("not specified size ORG")+"\n";
-	    break;
-	    break;
-
-case 2: 
+        if(ui.sbOrgSize->value()>0)
+        {}
+        else
+        str+=tr("not specified size ORG")+"\n";
+        break;
+case 2:
 case 5: if(ui.editInPEL->value()>1&&ui.cbActInPEL->currentIndex()>0)
-		{}
-		else
-		str+=tr("no sensor installed to search or action")+" (inPEL)"+"\n";
-	    break;
+        {}
+        else
+        str+=tr("no sensor installed to search or action")+" (inPEL)"+"\n";
+        break;
 
-case 3: 
+case 3:
 case 6: if(ui.editInMEL->value()>1&&ui.cbActInMEL->currentIndex()>0)
-		{}
-		else
-		str+=tr("no sensor installed to search or action")+" (inMEL)""\n";
-	    break;
+        {}
+        else
+        str+=tr("no sensor installed to search or action")+" (inMEL)""\n";
+        break;
 }
 
 if(ui.comboBoxLogicFind->currentIndex()>0&&ui.sbVfind->value()<=0)
 str+=tr("search speed not set")+"\n";
 
+return str;
+}
 
-if(str.isEmpty())
-	str=tr("No error!!!");
+void WLDriveWidget::onVerifyError()
+{
+QString str=verifyError();
+
+if(str.isEmpty()) str=tr("No error!!!");
 
 QMessageBox::information(this, tr("Verify error"),str,QMessageBox::Ok);
 }
 
 void WLDriveWidget::accept()
 {
-saveDataDrive();
+if(!verifyError().isEmpty())
+    onVerifyError();
+ else
+  {
+  saveDataDrive();
 
-for(int i=1;i<ui.tabWidget->count();i++)    {
-  static_cast<QDialog*>(ui.tabWidget->widget(i))->accept();
+  for(int i=1;i<ui.tabWidget->count();i++)    {
+    static_cast<QDialog*>(ui.tabWidget->widget(i))->accept();
+    }
+
+  QDialog::accept();
   }
-
-QDialog::accept();
 }
 
 void WLDriveWidget::updateCBDimm(int index)
@@ -310,7 +318,7 @@ Axis->setTypePulse((typePulseAxis)ui.cbTypePulse->currentIndex()
                   |(ui.cbInvDir->isChecked() ?MAF_invDir:0));
 
 m_Drive->setFeedVFind(ui.sbVfind->value());
-m_Drive->setTypeDrive(static_cast<WLDrive::typeDrive>(ui.cbTypeDrive->currentIndex()));
+m_Drive->setType(static_cast<WLDrive::typeDrive>(ui.cbTypeDrive->currentIndex()));
 m_Drive->setInfinity(!ui.gbLimit->isChecked());
 m_Drive->setMinMaxPosition(ui.sbMLIM->value(),ui.sbPLIM->value());
 

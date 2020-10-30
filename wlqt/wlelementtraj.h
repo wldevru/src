@@ -79,6 +79,8 @@ inline QList<WL6DPoint> calcPoints(bool *ok,WLGModel *GModel,double delta=0)
 					return List; 
                     }
 
+QList <WLElementTraj> calcModelPoints(bool *ok,WLGModel *GModel,double delta);
+
 TypeElement getType() {return Type;}
 
 inline void setFast(bool _fast=true)     {speedF= _fast ? -1: 0;}
@@ -152,11 +154,13 @@ static void updateFS(QList<WLElementTraj> &Traj);
 
 bool calcVector(WL3DPoint &startV,WL3DPoint &endV);
 
+
 private:
 
 QList <WL6DPoint> calcCirclePoints(bool *ok,WLGModel *GModel,double delta);
 QList <WL6DPoint> calcLinePoints(bool *ok,WLGModel *GModel,double delta);
 QList <WL6DPoint> calcULinePoints(bool *ok,WLGModel *GModel,double delta);
+
 void update();
 
 

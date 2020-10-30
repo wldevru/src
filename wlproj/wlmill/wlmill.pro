@@ -64,7 +64,6 @@ SOURCES += \
     ../../wlqt/form/wledittext.cpp \
     ../../wlqt/form/wlenternum.cpp \
     ../../wlqt/form/wlenterstring.cpp \
-    ../../wlqt/form/wlgmodelwidget.cpp \
     ../../wlqt/form/wlgprogramwidget.cpp \
     ../../wlqt/form/wliowidget.cpp \
     ../../wlqt/form/wlmessmanager.cpp \
@@ -100,7 +99,8 @@ SOURCES += \
     wlmillmachine.cpp \
     wlpositionwidget.cpp \
     wlvisualwidget.cpp \
-    wlgaxislabel.cpp
+    wlgaxislabel.cpp \
+    ../../wlqt/form/wlgmodelwidget.cpp
 
 
 HEADERS += \
@@ -133,7 +133,6 @@ HEADERS += \
     ../../wlqt/form/wledittext.h \
     ../../wlqt/form/wlenternum.h \
     ../../wlqt/form/wlenterstring.h \
-    ../../wlqt/form/wlgmodelwidget.h \
     ../../wlqt/form/wlgprogramwidget.h \
     ../../wlqt/form/wliowidget.h \
     ../../wlqt/form/wlmessmanager.h \
@@ -171,7 +170,8 @@ HEADERS += \
     wlpositionwidget.h \
     wlvisualwidget.h \
     ../../wlmotion/wlmotion.h \
-    wlgaxislabel.h
+    wlgaxislabel.h \
+    ../../wlqt/form/wlgmodelwidget.h
 
 
 FORMS += \
@@ -181,7 +181,6 @@ FORMS += \
     ../../wlqt/form/wledittext.ui \
     ../../wlqt/form/wlenternum.ui \
     ../../wlqt/form/wlenterstring.ui \
-    ../../wlqt/form/wlgmodelwidget.ui \
     ../../wlqt/form/wlgprogramwidget.ui \
     ../../wlqt/form/wliowidget.ui \
     ../../wlqt/form/wlmessmanager.ui \
@@ -192,7 +191,9 @@ FORMS += \
     wleditpoint.ui \
     wlmillcontrol.ui \
     wlmilldrivewidget.ui \
-    wlpositionwidget.ui
+    wlpositionwidget.ui \
+    ../../wlqt/form/wlframewidget.ui \
+    ../../wlqt/form/wlgmodelwidget.ui
 
 
 RESOURCES += \

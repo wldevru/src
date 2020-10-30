@@ -22,6 +22,8 @@ public:
 
 
     void addTabWidget(QDialog *dialog,QString name) {ui.tabWidget->addTab(dialog,name);}
+
+    QString verifyError();
 private:
     Ui::WLDriveWidget ui;
 

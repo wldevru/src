@@ -83,8 +83,8 @@ public:
     bool setActInProbe(typeActIOPutAxis typeAct);
 
 signals:
-	void changedInEMGStop(bool);
-    void changedInSDStop(bool);
+    void changedInEMGStop();
+    void changedInSDStop();
 	
 
 public:

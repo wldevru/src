@@ -56,12 +56,12 @@ private slots:
     void onSetSCor();
     void onClearSCorList();
 
-	void onEditOffsetTool();
+    //void onEditOffsetTool();
 
 	void updateTableTools();
     void updateWhellXButton(quint8);
 
-	void updateLabelBaseOffsetTool();
+    //void updateLabelBaseOffsetTool();
 	// void updateLabelS(double data);
     void onTeachAxis();
     void onFindAxis()  {MillMachine->goDriveFind(ui.cbServiceAxis->currentText());}

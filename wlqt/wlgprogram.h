@@ -64,8 +64,7 @@ private:
     WL3DPointf m_colorG;
     WL3DPointf m_colorBl;
 
-    WLGModel    *m_GModel;
-    WLGModel  defGModel;
+    WLGModel    m_GModel;
 public:
     QList <WLElementGProgram> indexData;
     QList <WLShowPointProgram>  showPoints;
@@ -89,7 +88,7 @@ public:
     WLGProgram(QObject *parent);
     ~WLGProgram();
 
-void setGModel(WLGModel *_GModel) {m_GModel= _GModel!=nullptr? _GModel: &defGModel; updateShowTraj();}
+void setGModelData(WLGModelData _GModelData) {m_GModel.setData(_GModelData); updateShowTraj();}
 
 long getActivElement()   {return iActivElement;}
 long getLastMovElement() {return iLastMovElement;}
@@ -131,7 +130,9 @@ public slots:
 
 	void saveFile() {saveFile(FileName);}
 
+
     void updateShowTraj() {
+                          qDebug()<<"updateShowTraj()";
                           m_buildShow=false;
                           QTimer::singleShot(200,this,SLOT(updateShowTraj_p()));
                           }
@@ -140,8 +141,7 @@ private slots:
    void calcTime();
    void buildShowTraj(WLGCodeData GCodeData);
 
-   void updateShowTraj_p() {qDebug()<<"updateShowTraj()";
-                            if(m_showGCode)
+   void updateShowTraj_p() {if(m_showGCode)
                                  {
                                  m_buildShow=true;
 

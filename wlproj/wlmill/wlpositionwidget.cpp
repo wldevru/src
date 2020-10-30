@@ -21,11 +21,11 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
     ui.gALabelA->setDrive(MillMachine->getDrive("A"));
     ui.gALabelB->setDrive(MillMachine->getDrive("B"));
 
-    ui.gALabelX->setGCode(MillMachine->GCode());
-    ui.gALabelY->setGCode(MillMachine->GCode());
-    ui.gALabelZ->setGCode(MillMachine->GCode());
-    ui.gALabelA->setGCode(MillMachine->GCode());
-    ui.gALabelB->setGCode(MillMachine->GCode());
+    ui.gALabelX->setGCode(MillMachine->getGCode());
+    ui.gALabelY->setGCode(MillMachine->getGCode());
+    ui.gALabelZ->setGCode(MillMachine->getGCode());
+    ui.gALabelA->setGCode(MillMachine->getGCode());
+    ui.gALabelB->setGCode(MillMachine->getGCode());
 
     connect(ui.gALabelX,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
     connect(ui.gALabelY,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
@@ -188,6 +188,13 @@ QPalette blckPalette,redPalette;
 
 blckPalette.setColor(QPalette::WindowText, Qt::black);
  redPalette.setColor(QPalette::WindowText, Qt::red);
+
+ui.gALabelX->setGPos(GP.x);
+ui.gALabelY->setGPos(GP.y);
+ui.gALabelZ->setGPos(GP.z);
+ui.gALabelA->setGPos(GP.a);
+ui.gALabelB->setGPos(GP.b);
+
 /*
 ui.qwAxisLabelPosX->rootObject()->setProperty("p_data53",QString("%1").arg((GP53.x),0,'f',2));
 ui.qwAxisLabelPosY->rootObject()->setProperty("p_data53",QString("%1").arg((GP53.y),0,'f',2));
@@ -263,6 +270,22 @@ if(disButton) return;
 
 if(type==WLGAxisLabel::typeName)
  {
+ QMenu menu(this);
+ QAction *act;
+
+ act=menu.addAction(tr("Find"));
+ connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->goDriveFind(nameDrive);});
+
+ act=menu.addAction(tr("Reset Find"));
+ connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->getDrive(nameDrive)->setTruPosition(false);});
+
+
+      if(nameDrive=="X") menu.exec(ui.gALabelX->mapToGlobal(pos()));
+ else if(nameDrive=="Y") menu.exec(ui.gALabelY->mapToGlobal(pos()));
+ else if(nameDrive=="Z") menu.exec(ui.gALabelZ->mapToGlobal(pos()));
+ else if(nameDrive=="A") menu.exec(ui.gALabelA->mapToGlobal(pos()));
+ else if(nameDrive=="B") menu.exec(ui.gALabelB->mapToGlobal(pos()));
+
  return;
  }
 
@@ -281,6 +304,7 @@ switch(type)
 {
 case WLGAxisLabel::typeOfst:  MillMachine->setCurPositionSC(nameDrive,pos);
                               break;
+
 case WLGAxisLabel::typePos:   MillMachine->getDrive(nameDrive)->setPosition(pos);
                               break;
 }

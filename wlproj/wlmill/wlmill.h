@@ -285,6 +285,7 @@ private slots:
     void saveState2();
 
     void onEditDevice();
+    void onEditGModel();
     void onEditWhell();
     void onSetColors();
 
