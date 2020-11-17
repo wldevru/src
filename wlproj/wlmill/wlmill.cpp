@@ -743,6 +743,7 @@ GMW.show();
 
 if(GMW.exec())
  {
+ Program->setGModelData(MillMachine->getGModel()->getData());
  qDebug()<<"updateGModel";
  }
 }

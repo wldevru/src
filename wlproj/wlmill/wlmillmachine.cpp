@@ -13,7 +13,6 @@ m_Program=_Program;
 
 m_EVMScript=_EVMScript;
 m_EVLScript=nullptr;
-
 m_motDevice=nullptr;
 
 m_hPause=0;
@@ -310,6 +309,8 @@ emit ready();
 qDebug("runned machine");
 }
 
+
+
 bool WLMillMachine::isEmptyMotion()
 {
 WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
@@ -317,8 +318,8 @@ WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
 if(ModulePlanner)
      return    MillTraj.isEmpty()
             && ModulePlanner->isEmpty()
-            &&!ModulePlanner->isMoving()
-            &&(!m_EVMScript->isBusy()||Flag.get(ma_runscript));
+            &&!ModulePlanner->isMoving();
+            //&&(!m_EVMScript->isBusy()||Flag.get(ma_runscript));
 else
      return true;
 }
@@ -546,7 +547,7 @@ if(Flag.get(ma_pause))
  Flag.set(ma_continue,runScript("CONTINUE()"));
  }
 
- if(!isEmptyMotion())
+ if(!isEmptyMotion()&&(!isActivScript()||isRunScript()))
   {
    Flag.set(ma_runlist,1);
    setActiv();
@@ -1140,14 +1141,18 @@ if(!isReady()) return;
 QMutexLocker locker(&Mutex);
 
 setActiv(isActivDrive());
-
+qDebug()<<"setFinished"<<isActivDrive()<<!isEmptyMotion()
+                                       <<Flag.get(ma_runprogram)
+                                       <<isAuto();
 if(isAuto())
 updateAuto();
 else
 {
 updateMovBuf();
 
-if(isEmptyMotion()&&Flag.get(ma_readyRunList))//if no mov data and last mov
+if(isEmptyMotion()
+ &&Flag.get(ma_readyRunList)
+ &&(!isActivScript()||isRunScript()))//if no mov data and last mov
    {
    if(Flag.get(ma_runprogram))
        {
@@ -1511,7 +1516,7 @@ if(nameCoord=="X") newPos.x=pos;
 else
 if(nameCoord=="Y") newPos.y=pos;
 else
-if(nameCoord=="Z") newPos.z=pos;
+if(nameCoord=="Z") newPos.z=pos+getGCode()->getHcorr();
 else
 if(nameCoord=="A") newPos.a=pos;
 else
@@ -1877,7 +1882,7 @@ else
  {
  if(getDrive("X")) GP.x=getDrive("X")->getViewPosition();
  if(getDrive("Y")) GP.y=getDrive("Y")->getViewPosition();
- if(getDrive("Z")) GP.z=getDrive("Z")->getViewPosition()+getGCode()->getHcorr();
+ if(getDrive("Z")) GP.z=getDrive("Z")->getViewPosition();
  if(getDrive("A")) GP.a=getDrive("A")->getViewPosition();
  if(getDrive("B")) GP.b=getDrive("B")->getViewPosition();
  if(getDrive("C")) GP.c=getDrive("C")->getViewPosition();
@@ -1922,8 +1927,8 @@ MutexShowTraj.unlock();
 baseTraj.clear();
 
 if(MillTraj.isEmpty())
-   {
-   lastGPoint=m_GCode.getPointActivSC(getCurrentPosition(),true);
+   {//getCurrentPositionActivSC()
+   lastGPoint=getCurrentPositionActivSC();
    lastMillGPoint=getAxisPosition();
    }
 
@@ -2024,7 +2029,7 @@ updateMovProgram();
 emit changedTrajSize(MillTraj.size());
 emit changedReadyRunList(Flag.set(ma_readyRunList,!MillTraj.isEmpty()));
 
-if(Flag.get(ma_autostart)) startMovList();
+//if(Flag.get(ma_autostart)) startMovList();
 
 return true;
 }
@@ -2056,7 +2061,6 @@ if(MillTraj.isEmpty()
     lastGPoint=m_GCode.getPointActivSC(getCurrentPosition(),true);
     lastMillGPoint=getAxisPosition();
     }
-//if(isEmptyMotion()) lastGPoint=getCurrentPositionActivSC(); 	
 
 if(WLGProgram::translate(gtxt,curListTraj,lastGPoint,&m_GCode,0))
     {		
@@ -2369,7 +2373,7 @@ int WLMillMachine::updateMovBuf()
 {
 QMutexLocker locker(&MutexMillTraj);
 
-qDebug()<<"update MovBuf";
+///qDebug()<<"update MovBuf";
 
 WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
 
@@ -2387,10 +2391,9 @@ if(!Flag.get(ma_runlist)) return 0;
 
 if(isEmptyMotion())  return 1;
 
-
 while((ModulePlanner->getFree()>0)
     &&(!MillTraj.isEmpty())
-    &&(!m_EVMScript->isBusy()||Flag.get(ma_runscript))) //если можно отправлять
+    &&(!isActivScript()||isRunScript())) //если можно отправлять
 {
 if(!MillTraj.first().isEmptyM())
 {
@@ -2420,6 +2423,7 @@ double dF;
 double dFscale;
 double dL;
 double kF;
+qint64 pos;
 quint8 i=0;
 
 if(lastEndPos.isEmpty())
@@ -2430,14 +2434,19 @@ foreach(WLMillDrive *mD,millDrives)
 
 foreach(WLMillDrive *mD,millDrives)
 {
-sPos+=ME.startPoint.get(mD->getName())/mD->dimension();
-mPos+=ME.midPoint.get(mD->getName())/mD->dimension();
+pos=ME.startPoint.get(mD->getName())/mD->dimension();
+sPos+=pos;
 
-ePos+=ME.endPoint.get(mD->getName())/mD->dimension();
+pos=ME.midPoint.get(mD->getName())/mD->dimension();
+mPos+=pos;
+
+pos=ME.endPoint.get(mD->getName())/mD->dimension();
+ePos+=pos;
 
 distPos+=ePos.last()-sPos.last();
 
-cPos+=ME.centerPoint.get(mD->getName())/mD->dimension();
+pos=ME.centerPoint.get(mD->getName())/mD->dimension();
+cPos+=pos;
 
 indexs+=i;
 
@@ -2467,6 +2476,7 @@ case WLElementTraj::line:
 
                            kF= dFxyz!=0.0 ? sqrt(dF/dFxyz) : 1;
                            */
+                          
 
                            foreach(WLMillDrive *mD,millDrives)
                             {

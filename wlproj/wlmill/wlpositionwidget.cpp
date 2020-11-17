@@ -101,7 +101,8 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
                   "<li>G0,G1</li>"
                   "<li>G2,G3 (I,J,K,R) </li>"
                   "<li>G17,G18,G19</li>"
-                  "<li>G28(home)</li>"
+                  "<li>G28 </li>"
+                  "<li>G43 G44 G49</li>"
                   "<li>G51(XYZ scale)</li>"
                   "<li>G53(no modal)</li>"
                   "<li>G54-G59</li>"
@@ -191,7 +192,7 @@ blckPalette.setColor(QPalette::WindowText, Qt::black);
 
 ui.gALabelX->setGPos(GP.x);
 ui.gALabelY->setGPos(GP.y);
-ui.gALabelZ->setGPos(GP.z);
+ui.gALabelZ->setGPos(GP.z-MillMachine->getGCode()->getHcorr());
 ui.gALabelA->setGPos(GP.a);
 ui.gALabelB->setGPos(GP.b);
 

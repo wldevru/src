@@ -37,9 +37,11 @@
 #define sendDev_status   103 //send status
 #define sendDev_version  104 //send version
 
-
 #define errorDevice_nomodule 20
 
+#ifndef UDPPORT
+ #define UDPPORT 2020
+#endif
 
 const QString errorDevice("0,no error\
 ,20,no module");

@@ -536,11 +536,12 @@ ElementTraj.setSpindleCW(GCode->isMCode(3));
 ElementTraj.setCoolM(GCode->isMCode(8));
 ElementTraj.setCoolS(GCode->isMCode(7));
 
+ElementTraj.hcorr=GCode->getHcorr();
+
 if(GCode->isValid('R') //Если R для круга то перещитываем в I и J
  &&GCode->isGCode(80)){                      
                       ok=GCode->calcCenterPointR(lastGPoint,GCode->getPointActivSC(curGPoint));
                       }
-
 if(!ok) return ok;
 
 if(GCode->isGCode(28))

@@ -89,6 +89,7 @@ bool isInvalid(void)  {return Flags.get(IOPF_invalid);}
 bool isInput(void)    {return Flags.get(IOPF_input);}
 bool isOutput(void)   {return !isInput();}
 
+void setBasicOutputInv() {if(isOutput()) setInv(Flags.get(IOPF_old));}
 void setData(quint8 _flags);
 
 QString toString() {

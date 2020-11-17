@@ -66,6 +66,8 @@ public slots:
     void outputReset(int index) {outputSetTo(index,0);}
     void outputTog(int index)   {getOutput(index)->setTog();}
 
+    void setBasicOutputsInv();
+
 public:
     void callInputData(quint8 m_index);
     void callOutputData(quint8 m_index);

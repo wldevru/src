@@ -59,7 +59,11 @@ setTruPosition(false);
 
 if((long) m_nowPosition.step!=lastPosStep)
 {
-if(getAxis()->setPos(m_nowPosition.step))   Flag.set(fl_setpos,true);
+if(getAxis()->setPos(m_nowPosition.step))
+    {
+    m_posLast=m_nowPosition.step;
+    Flag.set(fl_setpos,true);
+    }
 
 return 1;
 }
@@ -915,6 +919,8 @@ connect(getAxis(),&WLAxis::changedFreq,this,&WLDrive::updateFreq);
 
 setEnable(true);
 setTruPosition(false);
+
+m_posLast=getAxis()->getNowPos();
 return true;
 }
 
@@ -935,28 +941,30 @@ void WLDrive::updatePos(qint32 Pos)
 {
 QMutexLocker locker1(&MutexDrivePosition);                      
 
+bool dir;
 
+qint64 newPos=m_nowPosition.step;
 
-/*
-oldPos=nowPosition.step;
-qint64 newPos=nowPosition.step;
+newPos&=0xFFFFFFFF00000000;
 
-newPos/=4294967296;
+newPos|=(quint32)Pos;
 
-if(qAbs(qint64(Pos)-(qint64)oldPos)>0xFFFFF)
+dir=isInfinity()? (Pos-m_posLast)>0: Pos>m_posLast;
+
+if(dir)
  {
- if(Pos>0)
-     newPos--;
- else
-     newPos++;
-
+ if(m_posLast<0&&Pos>=0)
+   {
+   newPos+=(qint64)1<<32;
+   }
  }
-newPos*=4294967296;
-
-newPos+=Pos;
-oldPos=Pos;
-*/
-qint64 newPos=Pos;
+ else
+ {
+ if(m_posLast>=0&&Pos<0)
+   {
+   newPos-=(qint64)1<<32;
+   }
+ }
 
 if(Flag.get(fl_setpos))
   {
@@ -964,30 +972,12 @@ if(Flag.get(fl_setpos))
   return;
   }
   else
-  {/*
-  qint64  nowPosF0;
-
-  qint64   newPosPlus;
-  qint64  newPosMinus;
-
-  nowPosF0=m_nowPosition.step&(0xFFFFFFFF00000000);
-
-  newPosPlus=nowPosF0+Pos;
-  newPosMinus=nowPosF0-Pos;
-
-  if(qAbs(newPosPlus-m_nowPosition.step)
-   <qAbs(newPosMinus-m_nowPosition.step))
-    {
-    newPos=newPosPlus;
-    }
-  else
-    {
-    newPos=newPosMinus;
-    }
-*/
+  {
   if(m_nowPosition.step!=newPos)
 	   {
        Flag.set(fl_rot,newPos>m_nowPosition.step);
+       m_posLast=Pos;
+       //Flag.set(fl_rot,dir);
        m_nowPosition.step=newPos;
        waitAfterUpdatePosition();
 	   }  

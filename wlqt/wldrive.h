@@ -173,6 +173,8 @@ private:
 
   QTimer *updateTimer;
 
+  qint32 m_posLast;
+
   enum typeDrive m_type;
 
 protected:

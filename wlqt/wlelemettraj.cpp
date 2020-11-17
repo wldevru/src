@@ -22,7 +22,7 @@ if(MList.indexOf(iM)==-1) MList+=iM;
 void WLElementTraj::reset(bool all)
 { 
 blsh=false;
-//ipos=0;
+hcorr=0.0;
 plane=0;
 index=0;
 speedF=0;
@@ -30,7 +30,9 @@ speedS=0;
 movDistanceIJ=movDistanceK=movDistance=0;
 str.clear();
 setChild(false);
+
 Type=nomov;
+
 if(all)
 	{	
 	flags.reset();

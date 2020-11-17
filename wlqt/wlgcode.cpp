@@ -562,11 +562,7 @@ switch(name)
 WLGPoint WLGCode::getPointGCode(WLGPoint lastPoint,bool scale)
 { 
 WLGPoint newPoint=lastPoint;
-/*
-if(isGCode(28))
-	newPoint=getPointG28(lastPoint);
-else
-    */
+
 if(isGCode(91))
 	{
     if(isValid('X')) newPoint.x+=getValue('X')*(scale ? m_data.G51Scale.x:1.0);
@@ -582,11 +578,12 @@ else
     if(isValid('X')) newPoint.x=getValue('X')*(scale ? m_data.G51Scale.x:1.0);
     if(isValid('Y')) newPoint.y=getValue('Y')*(scale ? m_data.G51Scale.y:1.0);
 
-     if(isValid('Z'))
+    if(isValid('Z'))
      {
      newPoint.z=getValue('Z')*(scale ? m_data.G51Scale.z:1.0);
      newPoint.z+=getHcorr();
      }
+
 	if(isValid('A')) newPoint.a=getValue('A'); 
 	if(isValid('B')) newPoint.b=getValue('B'); 
 	if(isValid('C')) newPoint.c=getValue('C'); 
@@ -612,14 +609,11 @@ Fr.x=GPoint.x;
 Fr.y=GPoint.y;
 Fr.z=GPoint.z;
 
-//Fr.fromM(frSC.toM()*Fr.toM()*getRotMatrix(0,0,a)*Fr.toM().inverted());
 if(back)
  {
- //Fr.fromM(getRotMatrix(0,0,-getRefPoint0SC(iSC).a)*Fr.toM());
  Fr.fromM(frP0.toM()*getRotMatrix(0,0,-getRefPoint0SC(iSC).a)*frP0.toM().inverted()*Fr.toM()); }
 else
  {
- //Fr.fromM(getRotMatrix(0,0,getRefPoint0SC(iSC).a)*Fr.toM());
  Fr.fromM(frP0.toM()*getRotMatrix(0,0,getRefPoint0SC(iSC).a)*frP0.toM().inverted()*Fr.toM());
  }
 
@@ -696,10 +690,10 @@ WLGPoint WLGCode::getPointG53(WLGPoint lastGPoint)
 WLGPoint newPoint=getPointActivSC(lastGPoint);
 
 newPoint=getPointGCode(newPoint,false);
-
+/*
 if(isGCode(90))
     newPoint.z-=getHcorr();
-
+*/
 return getPointActivSC(newPoint,true);
 }
 

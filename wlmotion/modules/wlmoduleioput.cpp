@@ -178,8 +178,8 @@ void WLModuleIOPut::setInputInvStr(QString data)
 {
 QStringList List=data.split(",");
 
-for(int i=0;i<List.size();i++)
-  if((List[i].toInt()<Inputs.size())&&(List[i].toInt()>1)) getInput(List[i].toInt())->setInv(true);
+for(int i=2;i<getSizeInputs();i++)
+    getInput(i)->setInv(List.indexOf(QString::number(i))!=-1);
 }
 
 QString WLModuleIOPut::getInputInvStr()
@@ -202,8 +202,8 @@ void WLModuleIOPut::setOutputInvStr(QString data)
 {
 QStringList List=data.split(",");
 
-for(int i=0;i<List.size();i++)
-  if(List[i].toInt()<Outputs.size()&&List[i].toInt()>0) getOutput(List[i].toInt())->setInv();
+for(int i=1;i<getSizeOutputs();i++)
+    getOutput(i)->setInv(List.indexOf(QString::number(i))!=-1);
 }
 
 QString WLModuleIOPut::getOutputInvStr()
@@ -222,6 +222,11 @@ for(int i=1;i<Outputs.size();i++)
 return  ret;
 }
 
+void WLModuleIOPut::setBasicOutputsInv()
+{
+for(int i=1;i<getSizeOutputs();i++)
+    getInput(i)->setBasicOutputInv();
+}
 
 void WLModuleIOPut::updateAllInputData()
 {
@@ -231,7 +236,6 @@ for(int i=2;i<getSizeInputs();i++)
      Inputs[i]->setInv(Inputs[i]->isInv());
  callInputData(i);
  }
-
 }
 
 void WLModuleIOPut::updateAllOutputData()

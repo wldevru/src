@@ -21,12 +21,14 @@ void WLIOPut::setData(quint8 _flags)
 {
  const auto last=Flags.m_Data;
 
- Flags.m_Data&= //IOPF_inv
-               // IOPF_enable
+ Flags.m_Data&=//IOPF_inv
+               //IOPF_enable
                  IOPF_input
                 |IOPF_asend
                 |IOPF_pulse;
 
+ if(isOutput())
+   Flags.m_Data&=IOPF_old;
 
  Flags.m_Data|=_flags;
 
@@ -129,7 +131,7 @@ void WLIOPut::setInv(bool _inv)
  
  Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
  Stream.setByteOrder(QDataStream::LittleEndian);
- 
+
  if(Flags.get(IOPF_input))
   Stream<<(quint8)comIOPut_setInputInv<<getIndex()<<(quint8)_inv;
  else

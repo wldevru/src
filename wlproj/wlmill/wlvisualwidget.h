@@ -154,8 +154,8 @@ private:
 
     int selectElement(int x,int y);
 
-     void WLDrawArrow(WL3DPoint Vec,WL3DPoint O,float s=1); 
-	 void WLDrawArrow1(WL3DPoint Vec,WL3DPoint O,float s=1);
+    void drawArrow(WL3DPoint Vec,WL3DPoint O,float s=1);
+    void drawArrow1(WL3DPoint Vec,WL3DPoint O,float s=1);
 
    void updatePointRot();
    void updatePointRotAll(float *X,float *Y,float *Z);

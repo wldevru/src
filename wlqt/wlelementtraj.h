@@ -138,9 +138,10 @@ bool blsh;
 
 float speedF;
 float speedS;
-
+float hcorr;
 
 quint32  index;
+
 int   iTool;
 
 QList <int> MList;

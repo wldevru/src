@@ -205,7 +205,7 @@ WLVisualWidget::~WLVisualWidget()
 
 }
 
-void WLVisualWidget::WLDrawArrow1(WL3DPoint Ar,WL3DPoint O,float s)
+void WLVisualWidget::drawArrow1(WL3DPoint Ar,WL3DPoint O,float s)
 {
  /*
 makeCurrent();
@@ -301,7 +301,7 @@ glPopMatrix();
 */
 }
 
-void WLVisualWidget::WLDrawArrow(WL3DPoint Ar,WL3DPoint O,float s)
+void WLVisualWidget::drawArrow(WL3DPoint Ar,WL3DPoint O,float s)
 {
 /*
 makeCurrent();
@@ -385,7 +385,7 @@ void WLVisualWidget::paintGL()
     if(m_typeView==XYZ)
      {
      showHome(m_MillMachine->getGCode()->getG28Position().to3D());
-     showTool(m_MillMachine->getCurrentPosition(true).to3D(),true,10,QVector3D(0,1,0));
+     showTool(m_MillMachine->getCurrentPosition().to3D(),true,10,QVector3D(0,1,0));
 
      if(m_viewRotPointF) showRotPoint();
 
@@ -408,7 +408,7 @@ void WLVisualWidget::paintGL()
      }
     else {
          showHome(m_MillMachine->getGModel()->getFrame(m_MillMachine->getGCode()->getG28Position()));
-         showTool(m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition(true)).to6D(),true,10,QVector3D(0,1,0));
+         showTool(m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D(),true,10,QVector3D(0,1,0));
     }
 
     m_timerView->start(25);
@@ -815,9 +815,9 @@ void WLVisualWidget::showTrackTraj()
 if(trackTraj.size()==defTrackSize) trackTraj.removeFirst();
 
 if(m_typeView==XYZ)
-  trackTraj+=m_MillMachine->getCurrentPosition(true).to6D().to3Df();
+  trackTraj+=m_MillMachine->getCurrentPosition().to6D().to3Df();
 else
-  trackTraj+=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition(true)).to6D().to3Df();
+  trackTraj+=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D().to3Df();
 
 int vertexLocation;
 QMatrix4x4 matrix;
@@ -1526,8 +1526,7 @@ trackTraj.clear();
 
 m_Program->setGModelData(WLGModelData());
 
-QTimer::singleShot(200,this,SLOT(shotsetViewCenter()));
-
+QTimer::singleShot(200,this,SLOT(setViewCenter()));
 }
 
 void WLVisualWidget::setViewGModel()
@@ -1537,7 +1536,7 @@ trackTraj.clear();
 
 m_Program->setGModelData(m_MillMachine->getGModel()->getData());
 
-QTimer::singleShot(200,this,SLOT(shotsetViewCenter()));
+QTimer::singleShot(200,this,SLOT(setViewCenter()));
 }
 
 void WLVisualWidget::showEvent(QShowEvent *event)

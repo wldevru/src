@@ -352,8 +352,6 @@ public:
     bool isUseCorrectSOut()                     {return Flag.get(ma_useCorrectSOut);}
     void setEnableUseCorrectSOut(bool enable)   {Flag.set(ma_useCorrectSOut,enable);/*setSOut(getCurSOut());*/}
 
-Q_INVOKABLE void rotAboutRotPointSC(int i,float a);
-Q_INVOKABLE void setCurPositionSC(QString nameCoord,double pos);
 
 SHProbeData getHProbeData(){return hProbeData;}
 void setHProbeData(SHProbeData hPData) {hProbeData=hPData;}
@@ -444,6 +442,8 @@ public:
   bool isEmptyMotion();
 
   bool isActivDrive()  {return   WLDrive::isActivs();}
+  bool isActivScript() {return   m_EVMScript->isBusy();}
+  bool isRunScript()   {return   Flag.get(ma_runscript);}
 
   float getCurSpeed() {return sqrt(pow(getDrive("X")->Vnow(),2)
                                   +pow(getDrive("Y")->Vnow(),2)
@@ -479,12 +479,14 @@ Q_INVOKABLE  void enableSOut(bool enable) {
 Q_INVOKABLE bool isTryProbe(bool dir);
 Q_INVOKABLE double getProbePosition(QString nameDrive,bool dir);
 
+Q_INVOKABLE void rotAboutRotPointSC(int i,float a);
+Q_INVOKABLE void setCurPositionSC(QString nameCoord,double pos);
 
 Q_INVOKABLE bool isActiv() {
-                           qDebug()<<!isEmptyMotion()<<Flag.get(ma_runprogram)<<isAuto();
+                           //qDebug()<<!isEmptyMotion()<<Flag.get(ma_runprogram)<<isAuto();
                            return !isEmptyMotion()
-							      |Flag.get(ma_runprogram)
-							      |isAuto();
+                                  |Flag.get(ma_runprogram)
+                                  |isAuto();
                            }
 
 Q_INVOKABLE double getCurPositionSC(QString name);

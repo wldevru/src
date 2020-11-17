@@ -89,12 +89,8 @@ setCommand(data);
 
 void WLDevice::sendEthData()
 {
-m_udpSocket.writeDatagram(m_bufEth,m_HA,2020);
-/*
-for(int i=0;i<m_bufEth.size();i++)
-    qDebug()<<(quint8)m_bufEth[i];
-*/
- //qDebug()<<"sendEth"<<m_bufEth.size();
+m_udpSocket.writeDatagram(m_bufEth,m_HA,UDPPORT);
+
 if(status==DEVICE_connect)
   {
   Flags.set(fl_waitack);
@@ -185,8 +181,8 @@ char dataBuf[512];
 QList <QHostAddress> HADList;
 QByteArray BA(buf,4);
 
-udpSocket.bind(2021);
-udpSocket.writeDatagram(BA,QHostAddress::Broadcast,2020);
+udpSocket.bind(UDPPORT);
+udpSocket.writeDatagram(BA,QHostAddress::Broadcast,UDPPORT);
 
 QThread::msleep (250);
 udpSocket.waitForReadyRead(350);
@@ -195,11 +191,13 @@ n=udpSocket.readDatagram(dataBuf,512,&HA,&port);
 
 while(n>0)
 {
-if(port==2020)
+if(port==UDPPORT)
    {
-   if(HADList.indexOf(HA)==-1)    HADList+=HA;
-    }
-n=udpSocket.readDatagram(buf,4,&HA,&port);
+   if(HADList.indexOf(HA)==-1&&
+     n!=BA.size()) HADList+=HA;
+   }
+
+n=udpSocket.readDatagram(dataBuf,4,&HA,&port);
 }
 
 udpSocket.close();
@@ -362,7 +360,6 @@ if(!outBuf.isEmpty())
 
  else
    {              
-  // qDebug()<<"isOpen"<<m_udpSocket.isOpen()<<Flags.get(DEVF_ethwaitack);
    if(m_udpSocket.isOpen()
    &&!Flags.get(fl_waitack))
        {
@@ -380,19 +377,16 @@ if(!outBuf.isEmpty())
 
          m_bufEth+=outBuf.mid(0,n);
 
-         //m_udpSocket.writeDatagram(m_outData.mid(0,n),m_HA,2020);
          outBuf=outBuf.mid(n);
          }
         else
          {
          m_bufEth+=outBuf;
-         //m_udpSocket.writeDatagram(outData,m_HA,2020);
          outBuf.clear();
          }
         sendEthData();
         }
-    //  else
-       // qDebug()<<"Busy Eth"<<m_udpSocket.isOpen()<<Flags.get(DEVF_ethwaitack);;
+
     }
 
 }
@@ -442,9 +436,9 @@ else
 if(!m_HA.isNull())
   {
   if(!m_udpSocket.open(QIODevice::ReadWrite)
-   ||!m_udpSocket.bind(2021))
+   ||!m_udpSocket.bind(UDPPORT))
    {
-   qDebug()<<"no init udp WLDevice";
+   qDebug()<<"no init udp WLDevice"<<m_udpSocket.open(QIODevice::ReadWrite)<<m_udpSocket.bind(UDPPORT);
    return false;
    }
   m_bufEth.clear();
@@ -566,7 +560,7 @@ else
 
    int n = m_udpSocket.readDatagram(bufData,sizeof(bufData),&HA,&port);
 
-   if(HA==m_HA&&port==2020)
+   if(HA==m_HA&&port==UDPPORT)
      {
      QByteArray byteArray(bufData,n);
 
@@ -583,7 +577,7 @@ else
      }
      else if(n>1)
         {
-        m_udpSocket.writeDatagram(byteArray.data(),1,m_HA,2020);
+        m_udpSocket.writeDatagram(byteArray.data(),1,m_HA,UDPPORT);
 
         if(m_countRxPacket!=(quint8)byteArray[0])
           {
