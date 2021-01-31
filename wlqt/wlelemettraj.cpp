@@ -35,7 +35,7 @@ Type=nomov;
 
 if(all)
 	{	
-	flags.reset();
+	Flags.reset();
     iTool=0;
     }
 MList.clear();
@@ -121,7 +121,6 @@ movDistance=(GModel->getFrame(endPoint).to3D()
             -GModel->getFrame(startPoint).to3D()).r();
 
 
-
 if(delta==0.0f||movDistance==0.0f)
  {
  Points+=GModel->getFrame(startPoint).to6D();
@@ -166,7 +165,7 @@ double dF;
 double dFxyz;
 double kF;
 
-if(!isLine())
+//if(!isLine()||isFast())
     {
     retList+=*this;
     return retList;
@@ -224,10 +223,14 @@ for(int i=1;i<=n;i++)
          ET.setF(dF/(dist/this->getF()));
 
     qDebug()<<"kF"<<kF<<"dF"<<dF<<"dFxyz"<<dFxyz<<"dist"<<dist<<"n"<<n<<"F="<<ET.getF()<<this->getF();
-    retList+=ET;
 
-    ET.clearM();
+    if(ET.getF()!=this->getF())
+      {
+      retList+=ET;
+      ET.clearMList();
+      }
     }
+
 
 if(ok) *ok=true;
 
@@ -331,7 +334,7 @@ bool WLElementTraj::setCircleXY(WLGPoint _startPoint,WLGPoint _centerPoint,WLGPo
 {
 Type=circ;
 
-flags.set(fl_ccw,CCW);
+Flags.set(fl_ccw,CCW);
 
  startPoint=_startPoint;
    endPoint=_endPoint;
@@ -406,8 +409,8 @@ radius=(R+R1)/2;
 A_st=startPoint.to3D().getAxy(centerPoint.to3D());
 A_en=endPoint.to3D().getAxy(centerPoint.to3D());
 
-if((flags.get(fl_ccw))&&(A_en<=A_st))  A_en+=2*M_PI;
-if((!flags.get(fl_ccw))&&(A_en>=A_st)) A_en-=2*M_PI;
+if((Flags.get(fl_ccw))&&(A_en<=A_st))  A_en+=2*M_PI;
+if((!Flags.get(fl_ccw))&&(A_en>=A_st)) A_en-=2*M_PI;
 
 movDistanceIJ=qAbs((A_en-A_st)*R);
 movDistanceK  =qAbs(endPoint.z-startPoint.z);
@@ -422,7 +425,7 @@ n=qAbs(A_en-A_st)*R/dl+1;
 const double da=qAbs(A_en-A_st)/n;
 const double dz=(endPoint.z-startPoint.z)/n;
 
-flags.set(fl_spiral,dz!=0);
+Flags.set(fl_spiral,dz!=0);
 
 WL6DPoint Point;
 
@@ -452,7 +455,7 @@ for(i=0;;i++)
  Points+=Point;
  
 //qDebug("Point  %f:%f:%f",Point.x,Point.y,Point.z);
- if(flags.get(fl_ccw))
+ if(Flags.get(fl_ccw))
    { 
    A_now+=da;
    if(A_now>=A_en) break;
@@ -471,7 +474,7 @@ for(i=0;;i++)
 //qDebug("endPoint  %f:%f:%f",endPoint.x,endPoint.y,endPoint.z);
 Points+=endPoint.to3D();
 
- WL3DPoint N(0,0,flags.get(fl_ccw)?-1:1);
+ WL3DPoint N(0,0,Flags.get(fl_ccw)?-1:1);
 
  WL3DPoint sV=(startPoint.to3D()-centerPoint.to3D());
  WL3DPoint eV=(endPoint.to3D()  -centerPoint.to3D());
@@ -484,7 +487,7 @@ Points+=endPoint.to3D();
  eV=eV.normalize();
  eV=eV*N;
 
- if(flags.get(fl_spiral))
+ if(Flags.get(fl_spiral))
   {
   float k=movDistanceIJ/movDistance;
 
@@ -551,8 +554,6 @@ int WLElementTraj::simpliTrajectory(QList<WLElementTraj> &simpliTraj
 								   ,float simpliDist
 								   ,bool oneSimpli,float simpliAngle,int Ar,int Br,int Cr)
 {
-qDebug()<<"SmoothTraj";
-
 QList <int> indexs;
 WL6DPoint A,B,O;
 
@@ -571,18 +572,16 @@ if(baseTraj.size()==1)
   return 1;
   }
 
-//if(startSmooth>=0) 	i=startSmooth; else i=0;
-
 for(i=0;i<baseTraj.size();i++)
 {
-indexs+=i; 
+indexs+=i;
+//if(baseTraj[i].Type!=WLElementTraj::circ)//если теущий элемент линия
 
-//qDebug()<<"smooth++"<<i<<indexs.size();
+//qDebug()<<"baseTraj[i].getG64Q()="<<baseTraj[i].getG64Q();
 
-if(baseTraj[i].Type!=WLElementTraj::circ)//если теущий элемент линия
-//if(baseTraj[i].isLine())//если теущий элемент линия
+if(baseTraj[i].isLine()    //если теущий элемент линия
+ &&baseTraj[i].isEmptyM()) //если нет M комманд
 {
-//if(Traj[i+1].isLine())     //если последующий элемент линия//необязательно лижбы текущий был линией
 if(indexs.size()==1)
   {
   A=baseTraj[indexs.first()].startPoint.to6D();//первая точка текущей пачки
@@ -613,17 +612,13 @@ if(indexs.size()>=2)
   if(baseTraj[i].isLine())
   for(j=0;j<(indexs.size()-1);j++) //по дистанции
      {	
-	// qDebug()<<"verify"<<j;
      O=baseTraj[indexs[j]].endPoint.to6D(); //перебор
      dist=fabs((O.to3D()-A.to3D()).r()*calcAngleRad((O.to3D()-A.to3D()),(B.to3D()-A.to3D()))); //находим расстояние от общей прямой до всех точек
 	 
-   //qDebug()<<"A:"<<A.x<<A.y<<" O:"<<O.x<<O.y<<" B:"<<B.x<<B.y;
-   //qDebug()<<"(O-A).r()="<<(O.to3D()-A.to3D()).r();
-   //qDebug()<<"dist"<<dist;
-
-     if(dist>simpliDist) //если нельзя дальше считать
+     //qDebug()<<"distSimpl"<<dist<<qMax(simpliDist,baseTraj[i].getG64Q());
+     if(baseTraj[i].getG64Q()==0.0f
+      ||dist>(qMax(simpliDist,baseTraj[i].getG64Q()))) //если нельзя дальше считать
 	     {
-		//qDebug()<<"dist"<<"!!!";
 		 endpack:
 		 indexs.removeLast();
 		 i--;
@@ -639,7 +634,6 @@ else
 
   if(!indexs.isEmpty()) //если 2 и больше
   {
-  //Traj[indexs.first()].endPoint=Traj[indexs.last()].endPoint; //склеиваем  
   simpliTraj+=baseTraj[indexs.first()];
     
   if(indexs.size()>1)
@@ -652,7 +646,6 @@ else
   }
 
   if(oneSimpli) return i;
-//  smoothTraj+=baseTraj[i];
   }
 }
 
@@ -665,32 +658,14 @@ else
    simpliTraj+=baseTraj[indexs.last()];	   	
    simpliTraj[simpliTraj.size()-2].endPoint=simpliTraj[simpliTraj.size()-1].startPoint;
    }
+
   indexs.clear(); 
   }
 
-   qDebug()<<"endsmooth";
 
-/*
-if(indexs.size()>=2) //если 2 и больше
- {
-  if(smoothTraj.isEmpty())
-	  smoothTraj.last().endPoint=baseTraj[indexs.last()].endPoint; //склеиваем
-  //Traj[indexs.first()].endPoint=Traj[indexs.last()].endPoint; //склеиваем
-  
-  //j=1
-  for(j=0;j<indexs.size();j++)
-	   {
-	   smoothTraj+=baseTraj[indexs[j]];
-	   //Traj.removeAt(indexs[1]);
-	   //i--;
-	   } 
- 
-  indexs.clear(); 
-  }
-*/
 return i;
 }
-///end smooth---
+
 
 void WLElementTraj::updateFS(QList<WLElementTraj> &Traj)
 {
@@ -702,8 +677,6 @@ for(int i=0;i<Traj.size();i++)
       else
 	    if(Traj[i].speedF>=0)  
 			curF=Traj[i].speedF;
-
- // qDebug()<<"F="<<Traj[i].speedF;
   }
 
 float curS=1;

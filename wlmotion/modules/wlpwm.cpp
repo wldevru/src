@@ -4,14 +4,9 @@ WLPWM::WLPWM(QObject *parent)
 	: WLElement(parent)
 {
 setTypeElement(typeEOutPWM);
-m_Power=0;
+m_value=0;
 m_Freq=0;
 error=0;
-
-connect(this,SIGNAL(changedPower(float)),SIGNAL(changed()));
-connect(this,SIGNAL(changedK(float)),SIGNAL(changed()));
-connect(this,SIGNAL(changedFreq(float)),SIGNAL(changed()));
-//connect(this,SIGNAL(changedEnable(bool)),SIGNAL(changed()));
 }
 
 WLPWM::~WLPWM()
@@ -19,24 +14,6 @@ WLPWM::~WLPWM()
 
 }
 
-void WLPWM::setData(quint8 _flag, float P, float F)
-{
-const auto last=Flags.m_Data;
-
-Flags.m_Data=_flag;
-
-if(last!=Flags.m_Data)
-  {
-  emit changed();
-  }
-
-if(m_Power!=P)
-  {
-  emit changedPower(m_Power=P);
-  }
-
-m_Freq=F;
-}
 
 
 bool WLPWM::setOut(float P)
@@ -91,7 +68,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLPWM::setPmax(float Pmax)
+bool WLPWM::sendGetData(typeDataPWM type)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -99,44 +76,19 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comPWM_setPmaxOut<<getIndex()<<Pmax;
+Stream<<(quint8)comPWM_getData<<getIndex()<<(quint8)type;
 
 emit sendCommand(data);
+
 return true;
 }
 
 bool WLPWM::sendGetData()
 {
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
+sendGetData(dataPWM_Fpwm);
+sendGetData(dataPWM_flag);
+sendGetData(dataPWM_value);
 
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)comPWM_getDataOut<<getIndex();
-
-emit sendCommand(data);
-
-return true;
-}	
-
-bool WLPWM::setKOut(float k)
-{
-if(k<0.0) return false;
-
-m_Kout=k;
-
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-qDebug()<<data.size();
-
-Stream<<(quint8)comPWM_setKOut<<getIndex()<<k;
-
-emit sendCommand(data);
 return true;
 }
 
@@ -166,8 +118,10 @@ Stream>>ui1;
 
 switch(ui1)
 {
-case dataPWM_Kpwm: Stream>>m_Kout; emit changedK(m_Kout); break;
-case dataPWM_Fpwm: Stream>>m_Freq; emit changedFreq(m_Freq); break;
+case dataPWM_Fpwm:    Stream>>m_Freq;   emit changedFreq(m_Freq);   emit changed(getIndex()); break;
+case dataPWM_value:   Stream>>m_value;  emit changedValue(m_value); emit changed(getIndex()); break;
+case dataPWM_flag:    Stream>>ui1;
+                      Flags.m_Data=ui1; emit changed(getIndex()); break;
 default: break;
 }
 

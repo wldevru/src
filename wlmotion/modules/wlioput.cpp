@@ -13,8 +13,6 @@ setComment(_comment);
 Flags.reset();
 Flags.set(IOPF_input,input);
 setObjectName("IO");
-
-connect(this,&WLIOPut::changedInv,this,&WLIOPut::changed);
 }
 
 void WLIOPut::setData(quint8 _flags)
@@ -32,7 +30,7 @@ void WLIOPut::setData(quint8 _flags)
 
  Flags.m_Data|=_flags;
 
- if(last!=Flags.m_Data)  emit changed();
+ if(last!=Flags.m_Data)  emit changed(getIndex());
 }
 
 
@@ -167,3 +165,4 @@ Stream<<(quint8)comIOPut_setOutputPulse<<getIndex()<<(quint8)_now<<time_ms;
 
 emit sendCommand(data);
 }
+

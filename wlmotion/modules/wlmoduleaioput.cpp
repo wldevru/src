@@ -31,7 +31,7 @@ if(sizeInputs>Inputs.size())
   ainput->setIndex(i);
   ainput->setParent(this);
   connect(ainput,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
-  connect(ainput,SIGNAL(changed()),SLOT(updateAIOPut()));
+  connect(ainput,SIGNAL(changed(int)),SIGNAL(changedInput(int)));
   Inputs+=ainput;
   }
 else
@@ -39,7 +39,7 @@ else
 	  {	  
       ainput=Inputs.takeLast();
       disconnect(ainput,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-      disconnect(ainput,SIGNAL(changed()),this,SLOT(updateAIOPut()));
+      disconnect(ainput,SIGNAL(changed()),this,SIGNAL(changedInput(int)));
       delete ainput;
       }
 
@@ -59,7 +59,7 @@ if(sizeOutputs>Outputs.size())
   aoutput->setIndex(i);
   aoutput->setParent(this);
   connect(aoutput,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
-  connect(aoutput,SIGNAL(changed()),this,SLOT(updateAIOPut()));
+  connect(aoutput,SIGNAL(changed(int)),this,SIGNAL(changedOutput(int)));
   Outputs+=aoutput;
   }
 else
@@ -67,7 +67,7 @@ else
       {
       aoutput=Outputs.takeLast();
       disconnect(aoutput,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-      disconnect(aoutput,SIGNAL(changed()),this,SLOT(updateAIOPut()));
+      disconnect(aoutput,SIGNAL(changed(int)),this,SIGNAL(changedOutput(int)));
       delete aoutput;
       }
 
@@ -99,19 +99,6 @@ foreach(WLAIOPut *aioput,Outputs)
        {
        aioput->sendGetData();
        }
-}
-
-void WLModuleAIOPut::updateAIOPut()
-{
-WLAIOPut *AIOPut=static_cast<WLAIOPut*>(sender());
-
-qDebug()<<"updateAIOPut()"<<AIOPut->getIndex();
-
-if(AIOPut->isInput())
-   emit changedInput(AIOPut->getIndex());
-else
-   emit changedOutput(AIOPut->getIndex());
-
 }
 
 void  WLModuleAIOPut::readCommand(QByteArray Data)

@@ -60,19 +60,18 @@ public:
     WLAIOPut (QString _comment="",bool input=false);
 	
 void setInv(bool _inv=true);
-void togInv()  {setInv(!Flags.get(AIOPF_inv));}
+void togInv()  {setInv(!isInv());}
 
 float getHist() {return m_histValue;}
 void setHist(float _hist) {if(_hist>0) m_histValue=_hist;}
-
 
 bool isInv(void)      {return Flags.get(AIOPF_inv);}
 bool isEnable()       {return Flags.get(AIOPF_enable);}
 bool isInvalid(void)  {return Flags.get(AIOPF_invalid);}
 
 QString toString() {
-                    QString ret=QString::number(getIndex());
-                    return ret;
+                   QString ret=QString::number(getIndex());
+                   return ret;
                    }
 void fromString(QString data) 
                     {
@@ -101,7 +100,7 @@ signals:
 
   void changedInv(bool);
 
-  void changed();
+  void changed(int);
 
 public:
 

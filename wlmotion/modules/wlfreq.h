@@ -16,8 +16,7 @@
 //Freq connect
 #define comFreq_setOut       1
 #define comFreq_setEnableOut 2
-#define comFreq_setKOut      3
-#define comFreq_setFmaxOut   4
+#define comFreq_setMaxOut   4
 
 #define comFreq_getDataOut 100
 
@@ -31,15 +30,13 @@ class WLFreq : public WLElement
 
 public:
 	
- WLFreq(QObject *parent=0);
+ WLFreq(QObject *parent=nullptr);
 ~WLFreq();
 
 private:
 
  float Freq;
-
  quint8 error;
-
  quint8 flag;
 
 public:
@@ -58,8 +55,7 @@ public:
 
 	bool setOut(float F);
     bool setEnable(bool enable);
-    bool setK(float k);
-	bool setFmax(float Fmax);
+    bool setMaxOut(float Fmax);
 
 	bool sendGetData();
 

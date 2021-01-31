@@ -17,7 +17,27 @@
    <double>1.000000000000000</double>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="2">
+    <widget class="QSpinBox" name="spinBox">
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::PlusMinus</enum>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
+    <widget class="QCheckBox" name="checkBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
     <widget class="QLabel" name="label">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -39,15 +59,11 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QSpinBox" name="spinBox">
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::PlusMinus</enum>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

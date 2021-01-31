@@ -17,9 +17,10 @@ delete m_IconOn;
 
 void WLIOWidget::setDevice(WLMotion *Device)
 {
-if(Device->getModuleIOPut()) setModuleIOPut(Device->getModuleIOPut());
-if(Device->getModulePWM())   setModulePWM(Device->getModulePWM());
-if(Device->getModuleAIOPut())setModuleAIOPut(Device->getModuleAIOPut());
+if(Device->getModuleIOPut())  setModuleIOPut(Device->getModuleIOPut());
+if(Device->getModulePWM())    setModulePWM(Device->getModulePWM());
+if(Device->getModuleAIOPut()) setModuleAIOPut(Device->getModuleAIOPut());
+if(Device->getModuleEncoder())setModuleEncoder(Device->getModuleEncoder());
 }
 
 void WLIOWidget::Init()
@@ -66,7 +67,7 @@ if(m_ainputViewModel)
 
   addTab(m_tableViewAIn ,"AIN");
 
-  //connect(m_tableViewIn,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableInput(QModelIndex)));
+  connect(m_tableViewAIn,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableAInput(QModelIndex)));
   connect(m_ainputViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewAIn,SLOT(update(QModelIndex)));
   }
 
@@ -81,6 +82,16 @@ if(m_aoutputViewModel)
   connect(m_aoutputViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewAOut,SLOT(update(QModelIndex)));
   }
 
+if(m_encoderViewModel)
+  {
+  m_tableViewEncoder=new QTableView();
+  m_tableViewEncoder->setModel(m_encoderViewModel);
+
+  addTab(m_tableViewEncoder,"ENC");
+
+  connect(m_tableViewEncoder,SIGNAL(doubleClicked(QModelIndex)),SLOT(setDCTableEncoder(QModelIndex)));
+  connect(m_encoderViewModel,SIGNAL(changedData(QModelIndex)), m_tableViewEncoder,SLOT(update(QModelIndex)));
+  }
 }
 
 void WLIOWidget::setDCTableInput(QModelIndex mindex)
@@ -125,13 +136,21 @@ WLEnterNum EN;
 
 switch(mindex.column())
 {
-case 1: EN.setMinMaxNow(0,100, m_outPWMViewModel->modulePWM()->getOutPWM(row)->power()*100.0);
+case 0: EN.setMinMaxNow(0,1, m_outPWMViewModel->modulePWM()->getOutPWM(row)->value());
         EN.setLabel(tr("Eneter value:"));
-        EN.setSuffix(tr("%"));
-
         if(EN.exec())
           {
           m_outPWMViewModel->modulePWM()->getOutPWM(row)->setOut(EN.getNow());
+          }
+        break;
+
+case 1: EN.setMinMaxNow(1,30000, m_outPWMViewModel->modulePWM()->getOutPWM(row)->freq());
+        EN.setLabel(tr("Eneter Frequency:"));
+        EN.setSuffix(tr("Hz"));
+
+        if(EN.exec())
+          {
+         m_outPWMViewModel->modulePWM()->getOutPWM(row)->setFreq(EN.getNow());
           }
         break;
 
@@ -141,15 +160,6 @@ case 2: if(QMessageBox::question(this,tr("Question"),tr("invert output")+" WLMot
         }
         break;
 
-case 3: EN.setMinMaxNow(1,30000, m_outPWMViewModel->modulePWM()->getOutPWM(row)->freq());
-        EN.setLabel(tr("Eneter Frequency:"));
-        EN.setSuffix(tr("Hz"));
-
-        if(EN.exec())
-          {
-         m_outPWMViewModel->modulePWM()->getOutPWM(row)->setFreq(EN.getNow());
-          }
-        break;
 }
 }
 
@@ -159,13 +169,39 @@ int row=mindex.row();
 
 WLEnterNum EN;
 
-EN.setMinMaxNow(0,1,m_aoutputViewModel->moduleAIOPut()->getOutput(row)->value());
-EN.setLabel(tr("Value (0-1):"));
-EN.setSuffix(tr(""));
+switch(mindex.column())
+{
+case 0: EN.setMinMaxNow(0,1, m_aoutputViewModel->moduleAIOPut()->getOutput(row)->value());
+        EN.setLabel(tr("Eneter value:"));
+        if(EN.exec())
+          {
+          m_aoutputViewModel->moduleAIOPut()->getOutput(row)->setValue(EN.getNow());
+          }
+        break;
 
-if(EN.exec())
-        {
-        m_aoutputViewModel->moduleAIOPut()->getOutput(row)->setValue(EN.getNow());
-        }
+case 1: if(QMessageBox::question(this,tr("Question"),tr("invert output")+" WLMotion "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
+         {
+         m_aoutputViewModel->moduleAIOPut()->getOutput(row)->togInv();
+         }
+        break;
+}
+}
+
+
+void WLIOWidget::setDCTableAInput(QModelIndex mindex)
+{
+int row=mindex.row();
+
+WLEnterNum EN;
+
+switch(mindex.column())
+{
+
+case 1: if(QMessageBox::question(this,tr("Question"),tr("invert input")+" WLMotion "+QString::number(row)+" ?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
+         {
+         m_aoutputViewModel->moduleAIOPut()->getInput(row)->togInv();
+         }
+        break;
+}
 }
 

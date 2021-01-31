@@ -48,6 +48,8 @@
 #define errorIOPut_addOutPulse 2 //error add task pulse
 
 #define IOPF_old       1<<0
+#define IOPF_defInv    1<<0 //for output basic inverse when out = 0
+
 #define IOPF_now       1<<1
 #define IOPF_inv       1<<2
 #define IOPF_enable    1<<3
@@ -89,7 +91,9 @@ bool isInvalid(void)  {return Flags.get(IOPF_invalid);}
 bool isInput(void)    {return Flags.get(IOPF_input);}
 bool isOutput(void)   {return !isInput();}
 
-void setBasicOutputInv() {if(isOutput()) setInv(Flags.get(IOPF_old));}
+bool isDefInvOut(void){return isInv()!=getDefInv();}
+bool getDefInv(void)  {return Flags.get(IOPF_defInv);}
+
 void setData(quint8 _flags);
 
 QString toString() {
@@ -120,20 +124,20 @@ void setNow(bool _now)     {
                              Flags.set(IOPF_old,getNow());
                              Flags.set(IOPF_now,_now);
 
-                             if(getCond()>1) emit changed();
+                             if(getCond()>1) emit changed(getIndex());
                              }
                            }
 
 void setOut(bool now);
 void setOutPulse(bool _now,quint32 time_ms);
+void setDefInvOut() {if(isOutput()&&!isDefInvOut()) togInv();}
 
 void setTogPulse(quint32 time_ms) {setOutPulse(!getNow(),time_ms);}
 void setTog()  {setOut(!getNow());}
 
 signals:
 
-  void changed();
-
+  void changed(int);
   void changedInv(bool);
 
 public:

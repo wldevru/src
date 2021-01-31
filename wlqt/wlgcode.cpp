@@ -15,6 +15,7 @@ setGCode(17);
 setGCode(02);
 setGCode(01);
 setGCode(54);
+setGCode(61);
 
 }
 
@@ -44,9 +45,23 @@ QString WLGCode::getActivGCodeString()
 {
 QString ret;
 
-for(int i=0;i<GCodeSize;i++)
+for(int i=0;i<GCodeSize;i++)    
    if(m_data.GCode[i])
-       ret+="G"+QString::number(i)+" ";
+       {
+       switch(i)
+       {
+       case 64: ret+="G64(P"+QString::number(getG64P())
+                        +"Q"+QString::number(getG64Q())
+                        +") ";
+                break;
+
+       case 61: ret+=isStopMode() ? "G61.1 " : "G61 ";
+
+                break;
+
+       default: ret+="G"+QString::number(i)+" ";
+       }
+       }
 
 if(m_data.G51Scale.x!=1.0
  ||m_data.G51Scale.y!=1.0
@@ -110,7 +125,13 @@ if(isGCode(51)) //Scale
 
   resetGValue();
   resetGCode(51);
-  }
+}
+}
+
+void WLGCode::verifyG43()
+{
+if((isGCode(43)||isGCode(44))
+  &&getValue('H')==0) setGCode("49");
 }
 
 void WLGCode::setData(const WLGCodeData &data)
@@ -127,7 +148,16 @@ void WLGCode::setHTool(int i, float h)
 {
 WLGTool Tool=getDataTool(i);
 
-Tool.h=h;
+if(i==0)
+ {
+ Tool.h=h;
+ }
+else
+ {
+ Tool.h=h-getDataTool(0).h;
+ }
+
+qDebug()<<"setHTool"<<i<<h<<Tool.h;
 
 setDataTool(i,Tool);
 }
@@ -138,8 +168,8 @@ setDataTool(i,Tool);
 
 void WLGCode::resetGValue()
 {
-    m_data.gX.activ=0;
-    m_data.gY.activ=0;
+m_data.gX.activ=0;
+m_data.gY.activ=0;
 m_data.gZ.activ=0;
 
 m_data.gI.activ=0;
@@ -153,12 +183,13 @@ m_data.gC.activ=0;
 m_data.gF.activ=0;
 
 m_data.gR.activ=0;
+m_data.gP.activ=0;
 m_data.gQ.activ=0;
 
 m_data.gS.activ=0;
 m_data.gT.activ=0;
 
-m_data.drillPlane=0;
+m_data.initDrillPlane=false;
 }
 
 void WLGCode::resetGCode(int iG)
@@ -186,23 +217,7 @@ for(int i=0;i<MCodeSize;i++)
 else
     m_data.MCode[iM]=false;
 }
-/*
-void WLGCode::pushCode()
-{
-for(int i=0;i<100;i++)
-GCodeBuf[i]=GCode[i];
-iSCBuf=iSC;
-resetGCode();
-}
 
-void WLGCode::popCode()
-{
-for(int i=0;i<100;i++)
-GCode[i]=GCodeBuf[i];
-iSC=iSCBuf;
-resetGCode();
-}
-*/
 
 int WLGCode::setGCode(QString val)
 {
@@ -310,6 +325,20 @@ switch(code)
             m_data.iSC=code-53;//"Check SK";
             }
            break;
+   //--smooth
+   case 61: m_data.GCode[61]=1; //"Increm SK";
+            m_data.GCode[64]=0;
+
+            if((List.size()>1)&&(List.at(1).toInt()==1))
+                m_data.stopMode=true;
+            else
+                m_data.stopMode=false;
+           break;
+
+   case 64:m_data.GCode[61]=0; //"Increm SK";
+           m_data.GCode[64]=1;
+           m_data.stopMode=false;
+           break;
    //**13
    case 80:m_data.GCode[80]=0;
            m_data.GCode[81]=0; //"Off Drill";
@@ -318,10 +347,12 @@ switch(code)
    case 81:m_data.GCode[81]=1; //"Drill";
            m_data.GCode[83]=0;
            m_data.GCode[80]=0;
+           m_data.initDrillPlane=true;
            break;
    case 83:m_data.GCode[83]=1; //"Long drill";
            m_data.GCode[81]=0;
            m_data.GCode[80]=0;
+           m_data.initDrillPlane=true;
            break;
    //**14
    case 90:if(List.size()==1)		    
@@ -342,7 +373,7 @@ switch(code)
 		    }
 		   else
 		    {
-            if(List[1].toInt()==1) m_data.absIJK=false;
+            if(List.at(1).toInt()==1) m_data.absIJK=false;
 		    }
            break;
    //**17
@@ -365,11 +396,9 @@ int WLGCode::setMCode(int code)
    {
    case 3: m_data.MCode[3]=1;
            m_data.MCode[4]=0;
-		   qDebug()<<"set M3";
 		   break; //вращение вперед
    case 4: m_data.MCode[3]=0;
            m_data.MCode[4]=1;
-		   qDebug()<<"set M4";
 		   break; //вращение назад
    case 5: m_data.MCode[3]=0;
            m_data.MCode[4]=0;break; //остановить вращение
@@ -412,6 +441,7 @@ switch(name)
   case 'B': m_data.gB.set(data); break;
   case 'C': m_data.gC.set(data); break;
   
+  case 'P': m_data.gP.set(data); break;
   case 'Q': m_data.gQ.set(data); break;
   case 'R': m_data.gR.set(data); break;
 	  	  
@@ -421,10 +451,10 @@ switch(name)
   case 'T': m_data.gT.set(data); break;
 
   case 'H': if(data>=0
-               &&data<sizeTools)   {
+               &&data<sizeTools)   {                
                 m_data.gH.set(data);
                 }
-           else {
+           else {              
                 return false;
                 }
 
@@ -492,6 +522,7 @@ double WLGCode::getValue(char name)
   case 'B': return m_data.gB.value;
   case 'C': return m_data.gC.value;
   
+  case 'P': return m_data.gP.value;
   case 'Q': return m_data.gQ.value;
   case 'R': return m_data.gR.value;
   
@@ -543,6 +574,7 @@ switch(name)
   case 'B': return m_data.gB.activ;
   case 'C': return m_data.gC.activ;
 
+  case 'P': return m_data.gP.activ;
   case 'Q': return m_data.gQ.activ;
   case 'R': return m_data.gR.activ;
 
@@ -777,19 +809,6 @@ else
   }
 }
  
-double WLGCode::getDrillPlaneValue(char name)
-{
-double ret;
-
-switch(name)
- {
- case 'R':  ret=getValue('R');break;//+offsetSC[iSC].z;  
- case 'Z':  ret=getValue('Z');break;//+offsetSC[iSC].z;  		  
- default:   ret=0;
- }
-
-return ret;
-}
 
 bool WLGCode::loadData(QString name_file)
 {

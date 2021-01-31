@@ -74,6 +74,7 @@ private slots:
 	void setLatchProbe2(qint32 *Pos,quint8);
 	void setLatchProbe3(qint32 *Pos,quint8);
 	void callDataAxis();
+    void callPosAxis();
 
 public slots:
 virtual void update();

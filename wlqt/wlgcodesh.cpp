@@ -49,7 +49,7 @@ WLGCodeSH::WLGCodeSH(QTextDocument *parent)
 	 classFormat.setFontWeight(QFont::Bold);
 	 classFormat.setForeground(Qt::darkYellow);
 	 //G[\s]*[-]?[\d]+([.]([\d]+)?)?
-     rule.pattern = QRegExp("[I,J,K]{1}[\\s]*[-]?(?:([\\d]+[.]?[\\d]*)|([\\d]?[.]?[\\d]+))");
+     rule.pattern = QRegExp("[I,J,K,P,Q]{1}[\\s]*[-]?(?:([\\d]+[.]?[\\d]*)|([\\d]?[.]?[\\d]+))");
      rule.format = classFormat;
      highlightingRules.append(rule);
 

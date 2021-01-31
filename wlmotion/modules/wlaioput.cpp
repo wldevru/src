@@ -11,9 +11,9 @@ Flags.set(AIOPF_input,input);
 setObjectName("AIO");
 
 
-connect(this,&WLAIOPut::changedValue,this,&WLAIOPut::changed);
-connect(this,&WLAIOPut::changedEnable,this,&WLAIOPut::changed);
-connect(this,&WLAIOPut::changedInv,this,&WLAIOPut::changed);
+ connect(this,&WLAIOPut::changedValue,this,[=](){emit changed(getIndex());});
+connect(this,&WLAIOPut::changedEnable,this,[=](){emit changed(getIndex());});
+   connect(this,&WLAIOPut::changedInv,this,[=](){emit changed(getIndex());});
 }
 
 void WLAIOPut::setInv(bool _inv)
@@ -26,7 +26,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)(isInput()? comAIOPut_getDataInput:comAIOPut_getDataOutput)
+Stream<<(quint8)(isInput()? comAIOPut_setDataInput:comAIOPut_setDataOutput)
 <<getIndex()<<(quint8)dataAIOPut_inv<<(quint8)_inv;
 
 emit sendCommand(data);
@@ -60,7 +60,6 @@ quint8 ui1;
 
 Stream>>ui1;
 
-qDebug()<<"setData Ainput";
 
 switch(ui1)
 {

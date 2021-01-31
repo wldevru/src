@@ -120,14 +120,16 @@ setBacklash(stream.attributes().value("Backlash").toString().toFloat());
 setRealPosition(getAxisPosition());
 }
 
-int WLMillDrive::updateAuto()
+void WLMillDrive::updateAuto()
 {
-if(isAuto())
- { 
- if(!WLDrive::updateAuto())	  QTimer::singleShot(0,this,SLOT(updateMillDriveAuto()));
- return true;
+if(isAuto()&&(autoTypeMDrive !=autoNo))
+ {
+ updateMillDriveAuto();
  }
-return false;
+else
+ {
+ WLDrive::updateAuto();
+ }
 }
 
 

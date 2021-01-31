@@ -20,6 +20,16 @@ WLModulePlanner::~WLModulePlanner()
 
 }
 
+quint8 WLModulePlanner::getISOut() const
+{
+    return m_iSout;
+}
+
+typeElement WLModulePlanner::getTypeSOut() const
+{
+    return m_typeSOut;
+}
+
 quint32 WLModulePlanner::getCountAddElement() const
 {
     return m_countAddElement;
@@ -88,7 +98,10 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLModulePlanner::setSOutPWMOut(quint8 i)
+bool WLModulePlanner::setElementSOut(typeElement telement,quint8 i)
+{
+if(telement==typeElement::typeEOutPWM
+ ||telement==typeElement::typeEAOutput)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -96,29 +109,20 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setSOutPWMOut<<i;
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setOutElementSOut<<(quint8)telement<<i;
 
 emit sendCommand(data);
+
+m_typeSOut=telement;
+m_iSout=i;
 
 return true;
 }
 
-bool WLModulePlanner::setSOutFreqOut(quint8 i)
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setSOutFreqOut<<i;
-
-emit sendCommand(data);
-return true;
+return false;
 }
 
-
-bool WLModulePlanner::resetSOutPWMOut()
+bool WLModulePlanner::resetElementSOut()
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -126,40 +130,13 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_resetSOutPWMOut;
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_resetOutElementSOut;
 
 emit sendCommand(data);
 
-return true;
-}
+m_typeSOut=typeEEmpty;
+m_iSout=0;
 
-bool WLModulePlanner::resetSOutFreqOut()
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_resetSOutFreqOut;
-
-emit sendCommand(data);
-return true;
-}
-
-bool WLModulePlanner::setParMov(float Aac,float Ade,float Fst,float Fma)
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setMPar<<Aac<<Ade<<Fst<<Fma;
-
-qDebug()<<"setMPar"<<" "<<Aac<<Ade<<Fst<<Fma;;
-
-emit sendCommand(data);
 return true;
 }
 
@@ -220,10 +197,9 @@ for(int i=0;i<size;i++)
 Stream<<S
 	  <<Fmov
 	  <<_id;
-/*
-qDebug()<<"index"<<m_lastIndexElementBuf<<m_free;
-qDebug()<<"addBufLine3D en:"<<endPos[0]<<endPos[1]<<endPos[2]<<"i:"<<_id<<"S:"<<S<<"F:"<<Fmov;
-*/
+
+//ebug()<<"index"<<m_lastIndexElementBuf<<m_free;
+qDebug()<<"addBufLine3D en:"<<endPos[0]<<endPos[1]<<endPos[2]<<endPos[3]<<"i:"<<_id<<"S:"<<S<<"F:"<<Fmov;
 m_free--;
 //emit ChangedFreeBuf(getFreeBuf());
 
@@ -326,9 +302,8 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_pause;
 
-qDebug()<<"pauseMov0";
 emit sendCommand(data);
-qDebug()<<"pauseMov1";
+
 return true;
 }
 
@@ -342,6 +317,25 @@ Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setKF<<_KF;
+
+emit sendCommand(data);
+return true;
+    }
+}
+
+bool WLModulePlanner::setKFpause(float _F)
+{
+if((0.0f<_F)&&(_F<=1.0f))
+{
+m_KFpause=_F;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setKFpause<<m_KFpause;
 
 emit sendCommand(data);
 return true;
@@ -419,19 +413,36 @@ return true;
 void WLModulePlanner::writeXMLData(QXmlStreamWriter &stream)
 {
 stream.writeAttribute("SmoothAngGr",QString::number(getSmoothAng()));
+stream.writeAttribute("KFpause",QString::number(getKFpause()));
+stream.writeAttribute("SOut",QString::number(getTypeSOut())
+                        +","+QString::number(getISOut()));
 }
 
 void WLModulePlanner::readXMLData(QXmlStreamReader &stream)
 {
 if(!stream.attributes().value("SmoothAngGr").isEmpty()) 
 	 setSmoothAng(stream.attributes().value("SmoothAngGr").toString().toFloat());
+
+if(!stream.attributes().value("KFpause").isEmpty())
+     setKFpause(stream.attributes().value("KFpause").toString().toFloat());
+
+if(!stream.attributes().value("SOut").isEmpty())
+   {
+   QStringList list=stream.attributes().value("SOut").toString().split(",");
+
+   if(list.size()==2)
+     {
+     setElementSOut(static_cast<typeElement>(list.at(0).toUShort())
+                   ,(quint8)list.at(1).toUShort());
+     }
+   }
 }
 
 void  WLModulePlanner::readCommand(QByteArray Data)
 {
 quint8 index,ui1,ui2,ui3,ui4;
 quint32 ui32;
-float f1;
+float f1,f2;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
 
@@ -452,16 +463,17 @@ switch(ui1)
                          Stream>>ui3;//status
  					     Stream>>ui4;//flags
 						 Stream>>ui32;									
-						 Stream>>f1;//Sout
-						//Stream>>f2;//Ftar
+                         Stream>>f1;//k element complete
+                         Stream>>f2;//Star
 
                         qDebug()<<"sendMBSize"<<m_lastIndexElementBuf<<ui32<<ui1<<ui2;
 
-                        emit changedSOut(f1);
+                        emit changedSOut(f2);
 
                         if(m_lastIndexElementBuf==ui2)
                              {
                              m_curIdElementBuf=ui32;
+                             emit changedCurIElement(m_curIdElementBuf);
 
                              Flags.m_Data=ui4;
 
@@ -481,7 +493,7 @@ switch(ui1)
 	case sendModule_error:   
 				                  Stream>>ui1;  //Error
 								  Stream>>index;
-
+                                  qDebug()<<"MPlanner err"<<ui1<<index;
                                   if(ui1>startIndexErrorModule)
 								   {
 								   emit sendMessage("WLModulePlanner "+getErrorStr(errorModule,ui1),"",-(int)(ui1));				     

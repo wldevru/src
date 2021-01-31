@@ -38,8 +38,8 @@ void WLWhell::setPulses(const quint16 &pulses)
 
 bool WLWhell::setEnable(bool enable)
 {
-    QByteArray data;
-    QDataStream Stream(&data,QIODevice::WriteOnly);
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
@@ -81,7 +81,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLWhell::setManualVmode(quint8 index)
+bool WLWhell::setVmode(quint8 index)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -95,7 +95,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLWhell::setManualIndexAxis(quint8 index)
+bool WLWhell::setIndexAxis(quint8 index)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -105,11 +105,13 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)comWhell_setManualIA<<getIndex()<<index;
 
+qDebug()<<"setManualIA"<<index;
+
 emit sendCommand(data);
 return true;
 }
 
-bool WLWhell::setManualIndexX(quint8 index)
+bool WLWhell::setIndexX(quint8 index)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);

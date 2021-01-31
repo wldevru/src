@@ -30,15 +30,19 @@ private:
     WLDrive *m_Drive;
     bool m_editVst;
 
+    QString m_unit;
 private slots:
     void updateTable();
     void remove();
     void add();
     void edit(int row,int count);
+    void edit();
 
     // QDialog interface
 public slots:
     void accept() {m_Drive->pad()->setDataList(getPadList());}
+
+    void setUnit(QString);
 };
 
 #endif // WLPAMLISTWIDGET_H

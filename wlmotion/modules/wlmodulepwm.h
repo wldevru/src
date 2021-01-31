@@ -31,8 +31,6 @@ public:
 public slots:
 virtual void update();
 
-private slots:
-void updatePWM();
 
 signals:
 void changedOutPWM(int n);

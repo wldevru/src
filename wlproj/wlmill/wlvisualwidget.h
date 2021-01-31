@@ -212,6 +212,8 @@ public slots:
     void setViewXYZ();
     void setViewGModel();
 
+    void updateViewGModel();
+
     void setViewOffsetModel()     {m_typeOffset=Model;setViewCenter();}
     void setViewOffsetTool()      {m_typeOffset=Tool; setViewCenter();}
     // QWidget interface

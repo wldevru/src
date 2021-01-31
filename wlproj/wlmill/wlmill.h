@@ -32,6 +32,8 @@
 #include "wlmcodesh.h"
 #include "wlmillcontrol.h"
 #include "wllog.h"
+#include "wltoolswidget.h"
+#include "wlmpgwidget.h"
 
 #define FileState    QCoreApplication::applicationDirPath()+"//state.dat"
 #define configWLMill QCoreApplication::applicationDirPath()+"//wlmillconfig//config.xml"
@@ -164,8 +166,9 @@ QPixmap PixG;
 //DockProgram
 QDockWidget *dockProgram;
 QDockWidget *dockPosition;
+QDockWidget *dockTools;
 QDockWidget *dockIOPut;
-QDockWidget *dockMillControl;
+QDockWidget *dockMPG;
 
 QDockWidget *dockManual;
 //WLSpindleWidget *DockSpindle;
@@ -198,6 +201,7 @@ QToolBar *TBScript;
 QToolBar *TBWireChild;
 
 WLMillControl *MillControl=nullptr;
+WLToolsWidget *ToolsWidget=nullptr;
 /*
 QToolBar *TBWireCorrect;
 QToolBar *TBWireEdit;
@@ -216,6 +220,7 @@ WLPositionWidget *PositionWidget=nullptr;
 WLVisualWidget *VisualWidget=nullptr;
 
 WLIOWidget *IOWidget;
+WLMPGWidget *MPGWidget;
 
 QToolButton *TButtonGo;
 QToolButton *TButtonStop;
@@ -240,17 +245,19 @@ private:
 
  void createDockPosition();
 
- void createDockControls();
+ void createDockMPG();
  void createDockProgram();
  void createDockManual();
  void createDockSpindle();
  void createDockMillControl();
+ void createDockTools();
  
  void createDockTime();
  
  void createTBControls();
 
  void createTBMcode();
+ void createTBControl();
  void createTBMessage();
  void createTBScript();
  void createMenuBar();
@@ -268,6 +275,18 @@ private slots:
   void saveConfig();
   void readyMachine();
 
+  void onGoHome();
+  void onPBSetG28();
+  void onPBGetG28();
+
+  void onPBRotSC();
+  void onPBSetP0();
+  void onPBSetP1();
+
+  void onPBStart();
+  void onPBStartAt();
+  void onPBStartContinue();
+
 protected:
 
 signals:
@@ -278,6 +297,7 @@ signals:
 
 private slots:
 
+    void measureHTool();
     void restoreState1();
     void restoreState2();
 

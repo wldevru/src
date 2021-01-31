@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>301</width>
+    <width>399</width>
     <height>320</height>
    </rect>
   </property>
@@ -23,63 +23,7 @@
    <enum>Qt::LeftToRight</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
-   <item row="1" column="1">
-    <widget class="QToolButton" name="pbUpdate">
-     <property name="minimumSize">
-      <size>
-       <width>40</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>40</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>redraw</string>
-     </property>
-     <property name="text">
-      <string notr="true"/>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="7">
-    <widget class="QToolButton" name="pbReload">
-     <property name="minimumSize">
-      <size>
-       <width>40</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>40</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>reload file</string>
-     </property>
-     <property name="text">
-      <string notr="true"/>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="6">
+   <item row="1" column="5">
     <widget class="QPushButton" name="pbBackup">
      <property name="minimumSize">
       <size>
@@ -93,11 +37,21 @@
        <height>40</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="toolTip">
       <string>backup</string>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="text">
       <string notr="true"/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../wlproj/wlmill/image.qrc">
+       <normaloff>:/data/icons/backup.png</normaloff>:/data/icons/backup.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -107,8 +61,8 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
-    <widget class="QPushButton" name="pbAccept">
+   <item row="1" column="11">
+    <widget class="QToolButton" name="pbTrack">
      <property name="minimumSize">
       <size>
        <width>40</width>
@@ -121,11 +75,18 @@
        <height>40</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="toolTip">
-      <string>accept</string>
+      <string>tracking</string>
      </property>
      <property name="text">
       <string notr="true"/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../wlproj/wlmill/image.qrc">
+       <normaloff>:/data/icons/tracktext.png</normaloff>:/data/icons/tracktext.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -133,28 +94,15 @@
        <height>30</height>
       </size>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QProgressBar" name="progressBar">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
-     <property name="value">
-      <number>24</number>
-     </property>
-     <property name="textVisible">
-      <bool>false</bool>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" rowspan="7" colspan="7">
+   <item row="2" column="2" rowspan="7" colspan="11">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -167,7 +115,7 @@
      </property>
      <widget class="QWidget" name="page">
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QListWidget" name="listProgram">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -213,7 +161,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QScrollBar" name="vsbProgram">
          <property name="pageStep">
           <number>50</number>
@@ -226,16 +174,6 @@
          </property>
          <property name="invertedControls">
           <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QSpinBox" name="sbPosition">
-         <property name="toolTip">
-          <string>enter number position</string>
-         </property>
-         <property name="buttonSymbols">
-          <enum>QAbstractSpinBox::NoButtons</enum>
          </property>
         </widget>
        </item>
@@ -255,7 +193,7 @@
      </widget>
     </widget>
    </item>
-   <item row="0" column="1" colspan="7">
+   <item row="0" column="2" colspan="11">
     <widget class="QLabel" name="labelName">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -277,16 +215,154 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="7" colspan="3">
+    <widget class="QProgressBar" name="progressBar">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="value">
+      <number>24</number>
+     </property>
+     <property name="textVisible">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="pbAccept">
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="toolTip">
+      <string>accept</string>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../wlproj/wlmill/image.qrc">
+       <normaloff>:/data/icons/save.png</normaloff>:/data/icons/save.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QToolButton" name="pbOpenFile">
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="toolTip">
+      <string>redraw</string>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../wlproj/wlmill/image.qrc">
+       <normaloff>:/data/icons/openFile.png</normaloff>:/data/icons/openFile.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QToolButton" name="pbReload">
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="toolTip">
+      <string>reload file</string>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../wlproj/wlmill/image.qrc">
+       <normaloff>:/data/icons/refresh.png</normaloff>:/data/icons/refresh.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2" colspan="10">
+    <widget class="QSpinBox" name="sbPosition">
+     <property name="toolTip">
+      <string>enter number position</string>
+     </property>
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::NoButtons</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
   <zorder>stackedWidget</zorder>
   <zorder>labelName</zorder>
+  <zorder>pbOpenFile</zorder>
+  <zorder>progressBar</zorder>
+  <zorder>pbAccept</zorder>
   <zorder>pbReload</zorder>
   <zorder>pbBackup</zorder>
-  <zorder>pbAccept</zorder>
-  <zorder>pbUpdate</zorder>
-  <zorder>progressBar</zorder>
+  <zorder>pbTrack</zorder>
+  <zorder>sbPosition</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../../wlproj/wlmill/image.qrc"/>
+ </resources>
  <connections/>
 </ui>

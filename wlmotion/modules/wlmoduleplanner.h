@@ -19,17 +19,20 @@
 #define comPlanner_setKF         8 //
 #define comPlanner_setSmoothAng  9 //установка предела сглаживания 
 #define comPlanner_setSOut         10 
-#define comPlanner_setMPar         11
+#define comPlanner_setKFpause       11
 #define comPlanner_setMaxNView     12
-#define comPlanner_setSOutPWMOut   13
-#define comPlanner_setSOutFreqOut  14
+//#define comPlanner_setSOutPWMOut   13
+//#define comPlanner_setSOutFreqOut  14
 #define comPlanner_setKSOut        15 
 #define comPlanner_addULine        16
 #define comPlanner_setISlaveAxis   17
 #define comPlanner_enableSOut      18
-#define comPlanner_resetSOutPWMOut   19
-#define comPlanner_resetSOutFreqOut  20
+//#define comPlanner_resetSOutPWMOut   19
+//#define comPlanner_resetSOutFreqOut  20
 #define comPlanner_setHPause         21 //set offset z detectpause;
+
+#define comPlanner_setOutElementSOut 22 //set selement
+#define comPlanner_resetOutElementSOut 23 //reset selement
 
 #define comPlanner_getDataPlanner    101
 
@@ -89,11 +92,6 @@ const QString errorElementPlanner("0,no error\
 #define PLF_chgdata   (1<<4)
 #define PLF_usehpause (1<<5)
 
-class WLModulePlanner : public WLModule
-{
-	Q_OBJECT
-
-public:
 enum statusPlanner{MPLANNER_stop
                   ,MPLANNER_run
                   ,MPLANNER_pause
@@ -103,8 +101,14 @@ enum statusPlanner{MPLANNER_stop
                   ,MPLANNER_continue};
 
 
+class WLModulePlanner : public WLModule
+{
+	Q_OBJECT
+
 public:
-	WLModulePlanner(QObject *parent=0);
+
+public:
+    WLModulePlanner(QObject *parent=nullptr);
 	~WLModulePlanner();
 
 
@@ -116,6 +120,8 @@ WLFlags Flags;
 int m_sizeBuf;
 int m_free;
 
+float m_KFpause=0;
+
 quint8  m_lastIndexElementBuf;
 quint32 m_curIdElementBuf;
 quint32 m_countAddElement;
@@ -124,26 +130,27 @@ float m_smoothAng;
 
 qint32  m_hPause;
 
+typeElement m_typeSOut;
+     quint8 m_iSout;
 public:
+
+
+typeElement getTypeSOut() const;
+     quint8 getISOut() const;
 
      int getSizeBuf() {return m_sizeBuf;}
      int getCountBuf() {return m_sizeBuf-m_free;}
 
+     float getKFpause() {return m_KFpause;}
      float getSmoothAng() {return m_smoothAng;}
 
 quint32 getCurIdElement() {return m_curIdElementBuf;}
 
     bool setIAxisSlave(quint8 *indexsAxis,quint8 size);
-  //void sendGetDataBuf();
     bool setHPause(quint8 enable,qint32 hPause);
 
-	bool setSOutPWMOut(quint8 i);
-    bool setSOutFreqOut(quint8 i);
-
-	bool resetSOutPWMOut();
-    bool resetSOutFreqOut();
-
-	bool setParMov(float Aac,float Ade,float Fst,float Fma);
+    bool setElementSOut(typeElement element,quint8 i);
+    bool resetElementSOut();
 
 	bool addULine(quint8 mask,quint8 size,quint8 indexs[],long endPos[],long midPos[],float S,float Fmov,quint32 _id);
 	bool addLine(quint8 mask,quint8 size,quint8 indexs[],long endPos[],float S,float Fmov,quint32 _id);
@@ -154,6 +161,7 @@ quint32 getCurIdElement() {return m_curIdElementBuf;}
 	bool pauseMov();
 
 	bool setKF(float _KF);
+    bool setKFpause(float _KF);
 
 	bool setSmoothAng(float ang_gr);
 
@@ -165,12 +173,14 @@ quint32 getCurIdElement() {return m_curIdElementBuf;}
      int getFree()   {return m_free;}
     void setSizeBuf(int value);
 
+
  quint32 getCountAddElement() const;
 
 statusPlanner getStatus()  const {return m_status;}
 
    bool isEmpty()  {return Flags.get(PLF_empty);}
    bool isMoving() {return Flags.get(PLF_moving);}
+   bool isBusy()  {return !isEmpty()||isMoving();}
 
 public slots:
 	void sendGetDataBuf();
@@ -181,6 +191,7 @@ public slots:
 signals:
     void changedFree(int);
     void changedStatus(int);
+    void changedCurIElement(int);
 
     void changedSOut(float);
 
@@ -192,8 +203,6 @@ virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 virtual void readCommand(QByteArray data); 
 
-
- };
-
-  #endif // WLModulePLANNER_H
+};
+#endif // WLModulePLANNER_H
 

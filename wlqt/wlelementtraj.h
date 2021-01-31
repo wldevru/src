@@ -14,42 +14,34 @@
 struct WLElementTraj 
 {
 private:
-	enum Flag {
-		       fl_spinCW=    1<<0, //шпиндель по часовой
-			   fl_spinCCW=   1<<1, //шпиндель против часовой
-			   fl_coolM=     1<<2, //охлаждение основное
-			   fl_coolS=     1<<3, //охлаждение дополнительное
-			   fl_smooth=    1<<4, //склейка
-			   fl_ccw=       1<<5, //склейка
-			   fl_spiral=    1<<6, //склейка
-			   fl_child=     1<<7, //склейка
+    enum Flag {
+               fl_smooth=      1<<4, //сглаживание
+               fl_ccw=         1<<5, //круг против часовой
+               fl_spiral=      1<<6, //признак спирали
+               fl_child=       1<<7, //дочерний элемент
+               fl_script=      1<<8  //порожден скриптом
 			   };	
  			 
-	WLFlags flags;
+    WLFlags Flags;
 public:
 	enum TypeElement {nomov,line,circ,uline};
+
 public:
+    void setG611(bool stop=false) {Flags.set(fl_smooth,!stop); m_P=0; m_Q=0;}
+    void setG64PQ(float P,float Q) {if(P>=0&&Q>=0) {m_P=P; m_Q=Q;Flags.set(fl_smooth); }}
 
-	void setSpindleCW(bool en=true)  {flags.set(fl_spinCW,en); /*if(en) flags.set(fl_spinCCW,false);*/}
-	//void setSpindleCCW(bool en=true) {flags.set(fl_spinCCW,en);if(en) flags.set(fl_spinCW,false);}
+    bool isSmooth() {return Flags.get(fl_smooth);}
+
+    void setScript(bool en) {Flags.set(fl_script,en);}
+    bool isScript() {return Flags.get(fl_script);}
+
+    float getG64P() {return m_P;}
+    float getG64Q() {return m_Q;}
+
+    bool isCCW() {return Flags.get(fl_ccw);}
 	
-	void setSpindleOff() {/*setSpindleCCW(false);*/}
-
-	bool isSpindleCW()  {return flags.get(fl_spinCW);}
-	bool isSpindleCCW() {return flags.get(fl_spinCCW);}
-
-	void setCoolM(bool en=true) {flags.set(fl_coolM,en);}
-	void setCoolS(bool en=true) {flags.set(fl_coolS,en);}
-    
-	bool isCoolM()  {return flags.get(fl_coolM);}
-	bool isCoolS()  {return flags.get(fl_coolS);}
-
-//	void setSmooth(bool en=true) {flags.set(fl_smooth,en);}		
-
-	bool isCCW() {return flags.get(fl_ccw);}
-	
-	void setChild(bool ch) {flags.set(fl_child,ch);}
-	bool isChild()         {return flags.get(fl_child);}
+    void setChild(bool ch) {Flags.set(fl_child,ch);}
+    bool isChild()         {return Flags.get(fl_child);}
 
 	bool isNoMov()         {return Type==nomov;}
 	bool isEmpty()         {return isNoMov()&&isEmptyM();}
@@ -101,14 +93,15 @@ inline bool isCirc()  {return Type==circ;}
 inline bool isLine()  {return Type==line;}
 inline bool isULine() {return Type==uline;}
 
-inline bool isSpiral() {return isCirc()&&flags.get(fl_spiral);}
-inline bool isFast()   {return speedF==-1;}
+inline bool isSpiral() {return isCirc()&&Flags.get(fl_spiral);}
+inline bool isFast()   {return (speedF==-1.0f);}
 
 void addM(int iM);
 
-inline void clearM()   {return MList.clear();}
+inline void clearMList()   {return MList.clear();}
 inline bool isEmptyM() {return MList.isEmpty();}
 inline int  takeM()    {return MList.takeFirst();}
+inline QList <int> getMList()    {return MList;}
 
 inline bool setTool(int iT) {iTool=iT;return true;}
 
@@ -139,6 +132,9 @@ bool blsh;
 float speedF;
 float speedS;
 float hcorr;
+
+float m_P=0;
+float m_Q=0;
 
 quint32  index;
 

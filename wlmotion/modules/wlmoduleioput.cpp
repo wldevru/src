@@ -40,7 +40,7 @@ if(Inputs.size()<sizeInputs)
 	  input->setIndex(i);	  
       input->setParent(this);
 	  connect(input,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
-      connect(input,SIGNAL(changed()),SLOT(updateIOPut()));
+      connect(input,SIGNAL(changed(int)),SIGNAL(changedInput(int)));
 	  Inputs+=input;  
       }
 else
@@ -48,7 +48,7 @@ else
 	  {	
 	  input = Inputs.takeLast();
 	  disconnect(input,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-      disconnect(input,SIGNAL(changed()),this,SLOT(updateIOPut()));
+      disconnect(input,SIGNAL(changed(int)),this,SIGNAL(changedInput(int)));
       delete input;
       }
 
@@ -75,14 +75,14 @@ if(Outputs.size()<sizeOutputs)
   output->setParent(this);
   Outputs+=output;
   connect(output,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-  connect(output,SIGNAL(changed()),SLOT(updateIOPut()));
+  connect(output,SIGNAL(changed(int)),SIGNAL(changedOutput(int)));
   }
 else
   while(Outputs.size()!=sizeOutputs) 
 	 {	  	 
      output = Outputs.takeLast();
 	 disconnect(output,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-     disconnect(output,SIGNAL(changed()),this,SLOT(updateIOPut()));
+     disconnect(output,SIGNAL(changed(int)),this,SIGNAL(changedOutput(int)));
 	 delete output;
      }
 
@@ -222,10 +222,10 @@ for(int i=1;i<Outputs.size();i++)
 return  ret;
 }
 
-void WLModuleIOPut::setBasicOutputsInv()
+void WLModuleIOPut::setDefInvOutputs()
 {
 for(int i=1;i<getSizeOutputs();i++)
-    getInput(i)->setBasicOutputInv();
+    getOutput(i)->setDefInvOut();
 }
 
 void WLModuleIOPut::updateAllInputData()
@@ -316,17 +316,6 @@ for(quint8 i=0;i<Outputs.size();i++)
 	i=(i+1)*8; 
     }
 }
-}
-
-void WLModuleIOPut::updateIOPut()
-{
-WLIOPut *IOPut=static_cast<WLIOPut*>(sender());
-
-qDebug()<<"updateIOPut()";
-if(IOPut->isInput())
-   emit changedInput(IOPut->getIndex());
-else
-   emit changedOutput(IOPut->getIndex());
 }
 
 void WLModuleIOPut::update()

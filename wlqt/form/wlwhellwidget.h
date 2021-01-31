@@ -32,6 +32,10 @@ private:
 private:
 
 void createInputs(WLModuleIOPut *MIOPut);
+
+private slots:
+
+void updateIndexs();
 };
 
 #endif // WLWHELLWIDGET_H

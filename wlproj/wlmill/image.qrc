@@ -37,5 +37,13 @@
         <file>data/icons/viewType.png</file>
         <file>data/icons/viewCenter.png</file>
         <file>data/icons/viewMov.png</file>
+        <file>data/icons/openFile.png</file>
+        <file>data/icons/pause.png</file>
+        <file>data/icons/play.png</file>
+        <file>data/icons/select.png</file>
+        <file>data/icons/save.png</file>
+        <file>data/icons/refresh.png</file>
+        <file>data/icons/tracktext.png</file>
+        <file>data/icons/HT.png</file>
     </qresource>
 </RCC>

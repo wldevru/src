@@ -22,9 +22,12 @@ private:
 
     WLMillDrive *m_MDrive;
 
+    QString m_unit;
     // QDialog interface
 public slots:
     void accept() {m_MDrive->setBacklash(ui->sbBacklash->value());}
+
+    void setUnit(QString);
 };
 
 #endif // WLMILLDRIVEDIALOG_H

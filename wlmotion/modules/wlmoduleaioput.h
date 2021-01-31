@@ -36,10 +36,6 @@ public:
 public slots:
 virtual void update();
 
-
-private slots:
-void  updateAIOPut();
-
 public:
 
 virtual void writeXMLData(QXmlStreamWriter &stream);

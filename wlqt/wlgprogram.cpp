@@ -201,6 +201,7 @@ for(qint32 index=0;(index<indexData.size())
       }
 
   indexData[index].offsetPoint=showPoints.size();
+
   Point.scolor=index;
 
   if(index%10000==0) emit ChangedShowProgress(50+((float)index*50)/indexData.size());
@@ -234,7 +235,8 @@ for(qint32 index=0;(index<indexData.size())
                fast=curListTraj[i].isFast();
            }
 
-     for(;j<Points.size();j++)
+     for(;j<Points.size()
+       &&(showPoints.size()<m_maxShowPoints);j++)
         {
         Point.pos=Points[j].to3Df();
         showPoints+=Point;
@@ -288,7 +290,7 @@ qDebug()<<minShowPoint.to3D().toString();
 emit ChangedShowTraj();
 emit ChangedShowProgress(100);
 
-qDebug()<<"end buildShowTraj"<<showPoints.size();
+qDebug()<<"end buildShowTraj"<<showPoints.size()<<m_maxShowPoints;
 
 }
 
@@ -458,7 +460,6 @@ QRegExp RegExp("[A-Z]{1}[\\s]*[-]?(?:([\\d]+[.]?[\\d]*)|([\\d]?[.]?[\\d]+))");
 
 RegExp.indexIn(data);
 
-
 QTextStream str(&data,QIODevice::ReadOnly);
 
 while ((pos = RegExp.indexIn(data, pos)) != -1)
@@ -492,6 +493,7 @@ switch(a)
 //#endif
 
  case 'R':
+ case 'P':
  case 'Q':
  case 'H':
 
@@ -512,6 +514,7 @@ switch(a)
 }
 
 GCode->verifyG51();
+GCode->verifyG43();
 
 if(GCode->isGCode(53))
 {
@@ -532,11 +535,25 @@ if(GCode->isValid('T')) ElementTraj.iTool=GCode->getValue('T');
 
 ElementTraj.setF(GCode->getValue('F'));
 ElementTraj.setS(GCode->getValue('S'));
-ElementTraj.setSpindleCW(GCode->isMCode(3));
-ElementTraj.setCoolM(GCode->isMCode(8));
-ElementTraj.setCoolS(GCode->isMCode(7));
 
 ElementTraj.hcorr=GCode->getHcorr();
+
+if(GCode->isGCode(64)
+&&(GCode->isValid('P')||GCode->isValid('Q')))
+ {
+ GCode->setG64PQ(GCode->isValid('P') ? GCode->getValue('P'):0
+                ,GCode->isValid('Q') ? GCode->getValue('Q'):0);
+ }
+
+if(GCode->isGCode(64))
+   {
+   ElementTraj.setG64PQ(GCode->getG64P(),GCode->getG64Q());
+   }
+else
+   {
+   ElementTraj.setG611(GCode->isStopMode());
+   }
+
 
 if(GCode->isValid('R') //Если R для круга то перещитываем в I и J
  &&GCode->isGCode(80)){                      
@@ -569,7 +586,7 @@ if(((GCode->isGCode(81)
     ||GCode->isValid('A')
     ||GCode->isValid('B')
     ||GCode->isValid('C'))))
-  {	  
+  {
   ok=calcDrill(ElementTraj,curListTraj,lastGPoint,GCode);
   curGPoint=lastGPoint;//т.к. меняет last в конце
   }
@@ -636,6 +653,8 @@ float F=ElementTraj.getF();
 
 Point=GCode->getPointGCode(lastGPoint);
 
+if(GCode->isInitDrillPlane())  GCode->setDrillPlane(lastGPoint.z);
+
 ElementTraj.Type=WLElementTraj::line;
 ElementTraj.setFast(true);            //Подходим над точкой
 ElementTraj.startPoint=GCode->getPointActivSC(lastGPoint);
@@ -656,7 +675,7 @@ ElementTraj.str=str+"//fast plane R";
 ElementTraj.startPoint=ElementTraj.endPoint;
 
 Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
-Point.z=GCode->getDrillPlaneValue('R');
+Point.z=GCode->getValue('R');
 
 ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
 
@@ -669,7 +688,7 @@ if(GCode->isGCode(81))               //простое сверление
   ElementTraj.startPoint=ElementTraj.endPoint;
 
   Point=GCode->getPointGCode(lastGPoint);
-  Point.z=GCode->getDrillPlaneValue('Z');
+  Point.z=GCode->getValue('Z');
 
   ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
 
@@ -680,14 +699,18 @@ if(GCode->isGCode(81))               //простое сверление
   ElementTraj.startPoint=ElementTraj.endPoint;
 
   Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
-  Point.z=GCode->getDrillPlaneValue('R');
+
+  if(GCode->isGCode(99))
+     Point.z=GCode->getValue('R');
+    else //98
+     Point.z=GCode->getDrillPlane();
 
   ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
 
   curListTraj+=ElementTraj;
 
   lastGPoint=GCode->getPointGCode(lastGPoint);
-  lastGPoint.z=GCode->getDrillPlaneValue('R');
+  lastGPoint.z=Point.z;
   return true;
   }
 else
@@ -704,7 +727,7 @@ if(GCode->isGCode(83))               //с подъёмами
   ElementTraj.startPoint=ElementTraj.endPoint;
 
   Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
-  Point.z=GCode->getDrillPlaneValue('R');
+  Point.z=GCode->getValue('R');
 
   for(int i=0;i<n;i++)
    {
@@ -724,27 +747,30 @@ if(GCode->isGCode(83))               //с подъёмами
    ElementTraj.startPoint=ElementTraj.endPoint;
 
    Point=GCode->getPointGCode(lastGPoint);
-   Point.z=GCode->getDrillPlaneValue('R');
+   Point.z=GCode->getValue('R');
 
    ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
    curListTraj+=ElementTraj;
    }
    }
 
-
   ElementTraj.setFast(true);              //подъём
   ElementTraj.str=str+"//back R";
   ElementTraj.startPoint=ElementTraj.endPoint;
 
   Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
-  Point.z=GCode->getDrillPlaneValue('R');
+
+  if(GCode->isGCode(99))
+     Point.z=GCode->getValue('R');
+    else //98
+     Point.z=GCode->getDrillPlane();
 
   ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
 
   curListTraj+=ElementTraj;
 
   lastGPoint=GCode->getPointGCode(lastGPoint);
-  lastGPoint.z=GCode->getDrillPlaneValue('R');
+  lastGPoint.z=Point.z;
   return true;
   }
 

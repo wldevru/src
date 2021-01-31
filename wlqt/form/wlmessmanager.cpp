@@ -83,8 +83,6 @@ errData nData;
 
 bool add=false;
 
-emit saveLog("WLMessageManager",name+";"+mess+";"+QString::number(code));
-
 mutex.lock();
 
 nData.time=QTime::currentTime();
@@ -98,7 +96,12 @@ for(int i=0;i<List.size();i++)//find
   &&nData.mess==List[i].mess
   &&nData.code==List[i].code)
    {
-   if(List[i].count<=100) ++List[i].count;
+   if(List[i].count<=100)
+     {
+     List[i].count++;
+     emit saveLog("WLMessageManager",name+";"+mess+";"+QString::number(code));
+     }
+
    List[i].time=nData.time; 
    nData.count=List[i].count;
    add=true;

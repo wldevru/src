@@ -13,8 +13,8 @@ inSDStop=&WLIOPut::In0;
 inProbe=&WLIOPut::In0;
 
 updateTimer= new QTimer;
-connect(updateTimer,SIGNAL(timeout()),SLOT(callDataAxis()));
-updateTimer->start(30);
+connect(updateTimer,SIGNAL(timeout()),SLOT(callPosAxis()));
+updateTimer->start(100);
 
 Init(1);
 }
@@ -94,13 +94,23 @@ Flags.set(MAF_latchProbe3);
 
 void WLModuleAxis::callDataAxis()
 {
-    for(int i=0;i<getSizeAxis();i++)	Axis[i]->sendGetData();
+for(int i=0;i<getSizeAxis();i++) Axis[i]->sendGetDataAxis();
+}
+
+void WLModuleAxis::callPosAxis()
+{
+for(int i=0;i<getSizeAxis();i++)
+  {
+  Axis[i]->getData(typeDataAxis::dataAxis_pos);
+  Axis[i]->getData(typeDataAxis::dataAxis_F);
+  }
+
 }
 
 void WLModuleAxis::update()
 {
 foreach(WLAxis *A,Axis)
-      A->sendGetData();
+      A->sendGetDataAxis();
 }
 
 void WLModuleAxis::readCommand(QByteArray Data)
@@ -120,6 +130,11 @@ Stream>>ui1;
 
 switch(ui1)
 {
+ case comAxis_setData:  Stream>>index;//index8
+
+                       if(index<getSizeAxis()) Axis[index]->setData(Stream);
+                       break;
+
  case sendAxis_data:   Stream>>index;//index8
  	                   Stream>>ui1;  //Status4|Mode4
  				       Stream>>ui2;  //Flag8
@@ -127,21 +142,8 @@ switch(ui1)
  				       Stream>>f1;   //Freq32
                         
 					   if(index<getSizeAxis())
-					    {
- 				        Axis[index]->setData(ui1,ui2,l1,qAbs(f1));
- 				        
- 				        if(ui2&AF_latch2)
- 				            {
-                            Stream>>l1;
-                            qDebug()<<"ch Latch2"<<l1;
- 					        Axis[index]->setLatch2(l1);
- 				            }
- 				        if(ui2&AF_latch3)
- 				            {
-                            Stream>>l1;
-                            qDebug()<<"ch Lacth3"<<l1;
- 					        Axis[index]->setLatch3(l1);
- 				            }
+					    { 				   		
+                        Axis[index]->setDataAxis(ui1,ui2,l1,qAbs(f1));
 					    }
 					    else
                        qDebug()<<"Error indexAxis";
@@ -226,27 +228,33 @@ return true;
 
 void  WLModuleAxis::setInEMGStop(int index)
 {
-disconnect(inEMGStop,SIGNAL(changed()),this,SIGNAL(changedInEMGStop()));
+disconnect(inEMGStop,SIGNAL(changed(int)),this,SIGNAL(changedInEMGStop()));
 
 inEMGStop->removeComment("inEMGStop");
+
+if(index>=ModuleIOPut->getSizeInputs()) index=0;
+
 inEMGStop=ModuleIOPut->getInput(index);;
 inEMGStop->addComment("inEMGStop");
 
-connect(inEMGStop,SIGNAL(changed()),this,SIGNAL(changedInEMGStop()));
+connect(inEMGStop,SIGNAL(changed(int)),this,SIGNAL(changedInEMGStop()));
 
 setInputMAxis(IO_inEMGStop,index);
 }
 
 void  WLModuleAxis::setInSDStop(int index)
 {
-disconnect(inSDStop,SIGNAL(changed()),this,SIGNAL(changedInSDStop()));
+disconnect(inSDStop,SIGNAL(changed(int)),this,SIGNAL(changedInSDStop()));
 
 inSDStop->removeComment("inSDStop");
+
+if(index>=ModuleIOPut->getSizeInputs()) index=0;
+
 inSDStop=ModuleIOPut->getInput(index);;
 inSDStop->addComment("inSDStop");
 
 
-connect(inSDStop,SIGNAL(changed()),this,SIGNAL(changedInSDStop()));
+connect(inSDStop,SIGNAL(changed(int)),this,SIGNAL(changedInSDStop()));
 
 setInputMAxis(IO_inSDStop,index);
 }
@@ -254,6 +262,9 @@ setInputMAxis(IO_inSDStop,index);
 void  WLModuleAxis::setInProbe(int index)
 {
 inProbe->removeComment("inProbe");
+
+if(index>=ModuleIOPut->getSizeInputs()) index=0;
+
 inProbe=ModuleIOPut->getInput(index);;
 inProbe->addComment("inProbe");
 

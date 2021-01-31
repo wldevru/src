@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QFile>
 #include <QTextCodec>
+#include <QNetworkInterface>
 #include "modules/wlmodule.h"
 #include "modules/wlmoduleconnect.h"
 #include "wlflags.h"
@@ -26,6 +27,7 @@
 #define comDev_getModule   4 //call modules
 #define comDev_getUID      5 //call	UID
 #define comDev_getStatus   6 //call status
+#define comDev_getVersionProtocol  7 //call protocol
 
 #define comDev_setStatus   10 //set status
 #define comDev_reboot      11 //rebooting
@@ -36,12 +38,17 @@
 #define sendDev_UID      102 //send uid
 #define sendDev_status   103 //send status
 #define sendDev_version  104 //send version
+#define sendDev_versionProtocol 105//send version protocol
 
 #define errorDevice_nomodule 20
+
+#define DEFINE_TIMERWAITUSB  1
 
 #ifndef UDPPORT
  #define UDPPORT 2020
 #endif
+
+#define VERSION_PROTOCOL 0x0100
 
 const QString errorDevice("0,no error\
 ,20,no module");
@@ -58,7 +65,7 @@ quint32 version;
 bool isValid(WLDeviceInfo info)
                               {
                                return name==info.name
-                                   &&UID96==info.UID96;
+                                    &&UID96==info.UID96;
                               }
 };
 
@@ -89,6 +96,7 @@ private:
 
     QString  m_UID96;
     quint32  m_version;
+    quint16  m_versionProtocol;
 
     QMutex InputDataMutex;
     QMutex OutDataMutex;
@@ -118,7 +126,11 @@ private:
     quint8    m_countTxPacket;
     quint8    m_countRxPacket;
 
+    QTimer *m_timerUSB;
+
 public:
+
+bool isValidProtocol() {return m_versionProtocol==VERSION_PROTOCOL;}
 
 bool initSerialPort(QString portName="");
 bool initUdpSocket(QHostAddress HA);
@@ -147,7 +159,9 @@ bool isConnect() {return Flags.get(fl_connect);}
 statusDevice getStatus() {return status;}
 
 quint32 getVersion() {return m_version;}
+
 void    setVersion(quint32 _ver) {m_version=_ver; emit changedVersion(m_version);}
+void    setVersionProtocol(quint16 _ver);
 
 void readData(int wait);
 
@@ -164,6 +178,9 @@ public:
 
 private slots:	
 void updateModules() {qDebug()<<"update Modules";
+
+                      callStatus();
+
                       foreach(WLModule *Module,m_modules)
                            {
                            qDebug()<<Module->metaObject()->className();
@@ -182,6 +199,7 @@ public slots:
 	void removeModules();
 	void callModules();  
     void callVersion();
+    void callVersionProtocol();
 	void reconnectSerialPort();
 
     void closeConnect();
@@ -202,6 +220,7 @@ signals:
     void changedStatus(statusDevice);
     void changedUID96(QString);
     void changedVersion(quint32);
+    void changedVersionProtocol(quint16);
 
 private:
 

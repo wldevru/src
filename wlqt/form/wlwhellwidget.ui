@@ -105,15 +105,25 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_7">
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="vLayoutInputX"/>
-      </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="cbInXbianry">
         <property name="text">
          <string>binary</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="labelX">
+        <property name="text">
+         <string notr="true">iX</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="vLayoutInputX"/>
       </item>
      </layout>
     </widget>
@@ -127,15 +137,25 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="vLayoutInputAxis"/>
-      </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="cbInAbianry">
         <property name="text">
          <string>binary</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="labelA">
+        <property name="text">
+         <string notr="true">iA</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="vLayoutInputAxis"/>
       </item>
      </layout>
     </widget>

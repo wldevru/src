@@ -15,10 +15,13 @@ WLPamListWidget::WLPamListWidget(WLDrive *_drive,QWidget *parent) :
 
     connect(ui->pbAdd,SIGNAL(clicked()),SLOT(add()));
     connect(ui->pbRem,SIGNAL(clicked()),SLOT(remove()));
+    connect(ui->pbEdit,SIGNAL(clicked()),SLOT(edit()));
     connect(ui->tableWidget,SIGNAL(cellDoubleClicked(int,int)),SLOT(edit(int,int)));
 
     updateTable();
     setWindowTitle(windowTitle()+" : "+m_Drive->getName());
+
+    setUnit("1");
 }
 
 WLPamListWidget::~WLPamListWidget()
@@ -31,7 +34,11 @@ void WLPamListWidget::updateTable()
 ui->tableWidget->setColumnCount(5);
 ui->tableWidget->setRowCount(padList.size());
 
-ui->tableWidget->setHorizontalHeaderLabels(QString(tr("Name")+",Vst(1/s),Aac(1/s^2),Vma(1/s),Ade(1/s^2)").split(","));
+QString uV=m_unit+"/"+tr("s");
+QString uA=m_unit+"/"+tr("s^2");
+
+ui->tableWidget->setHorizontalHeaderLabels(QString(tr("Name")+",Vst("+uV+"),Aac("+uA+"),Vma("+uV+"),Ade("+uA+")").split(","));
+
 QTableWidgetItem *item;
 
 for(int i=0;i<ui->tableWidget->rowCount();i++)
@@ -95,12 +102,15 @@ if(PW.exec())
 
 void WLPamListWidget::edit(int row, int count)
 {
+if(row<0
+ ||row>=padList.size()) return;
+
 WLPamWidget PW(padList[row],10000,this);
 
 if(padList[row].name.toLower()=="main") PW.setEnabledEditName(false);
 
 PW.setEnabledEditVst(m_editVst);
-
+PW.setUnit(m_unit);
 PW.show();
 
 if(PW.exec())
@@ -108,6 +118,19 @@ if(PW.exec())
  padList[row]=PW.getPad();
  }
 
+updateTable();
+}
+
+void WLPamListWidget::edit()
+{
+qDebug()<<ui->tableWidget->currentRow();
+edit(ui->tableWidget->currentRow()
+    ,ui->tableWidget->currentColumn());
+}
+
+void WLPamListWidget::setUnit(QString unit)
+{
+m_unit=unit;
 updateTable();
 }
 

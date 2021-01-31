@@ -22,6 +22,7 @@ private:
 	Ui::WLPamWidget ui;
 
     dataPad curPad;
+    QString m_unit;
 
 protected:
 
@@ -40,6 +41,8 @@ private slots:
 public slots:
   void setEnabledEditName(bool enable) {ui.cbEditName->setEnabled(enable);}
   void setEnabledEditVst(bool enable)  {ui.sbVst->setEnabled(enable);}
+
+  void setUnit(QString);
 };
 
 #endif // WLPAMWIDGET_H

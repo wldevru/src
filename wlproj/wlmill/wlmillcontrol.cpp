@@ -23,13 +23,13 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 
 	MillMachine=_MillMachine;
 	Program=_Program;
-
+/*
 	connect(ui.sbSmoothDist,SIGNAL(valueChanged(double)),MillMachine,SLOT(setSmoothDist(double)));
 	ui.sbSmoothDist->setValue(MillMachine->getSmoothDist());
 
 	connect(ui.sbSimpliDist,SIGNAL(valueChanged(double)),MillMachine,SLOT(setSimpliDist(double)));
 	ui.sbSimpliDist->setValue(MillMachine->getSimpliDist());
-
+*/
     connect(ui.cbAutoStart,SIGNAL(toggled(bool)),MillMachine,SLOT(setAutoStart(bool)));    
 
 	connect(ui.cbSmooth,SIGNAL(toggled(bool)),MillMachine,SLOT(setSmooth(bool)));    
@@ -39,23 +39,6 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 
 	connect(ui.cbBLNextMov,SIGNAL(toggled(bool)),MillMachine,SLOT(setBLNextMov(bool)));
 	connect(ui.pushButtonOnProgram,SIGNAL(clicked()),SLOT(onSendProgramTraj()));
-
-    ui.labelF->setPrefix("F:");
-    ui.labelF->setDataN(0);
-
-
-    ui.labelS->setPrefix("S:");
-    ui.labelS->setDataN(0);
-
-    connect(ui.sbFper,SIGNAL(valueChanged(double)),MillMachine,SLOT(setPercentSpeed(double)));
-    MillMachine->setPercentSpeed(100);
-
-    connect(ui.sbSper,SIGNAL(valueChanged(double)),MillMachine,SLOT(setPercentSOut(double)));
-    MillMachine->setPercentSOut(100);
-
-
-    connect(ui.pbS100,SIGNAL(clicked()),SLOT(onSetS100Per()));
-    connect(ui.pbF100,SIGNAL(clicked()),SLOT(onSetF100Per()));
 
 	QTimer *timer= new QTimer;
     QTimer *timer1= new QTimer;
@@ -98,6 +81,7 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
     connect(MillMachine,SIGNAL(changedOn(bool)),SLOT(updateWhellAxis()));
 
     WLWhell *Whell=MillMachine->getWhell();
+
     if(Whell)
      {
      qDebug()<<"Whell connect";
@@ -269,7 +253,7 @@ void WLMillControl::updateLabelBuffer()
 	ui.labelProgram->setText(QString(tr("Program:%1 (%2%)").arg(MillMachine->getIProgram())
                                                            .arg((float)(MillMachine->getIProgram())
                                                                /(float)(Program->getElementCount())*100.0,0,'f',3)));
-	ui.labelBufPC-> setText(tr("PC     :")+QString::number(MillMachine->getTrajSize()));
+	ui.labelBufPC-> setText(tr("PC     :")+QString::number(MillMachine->getMillTrajSize()));
     ui.labelBufDev->setText(tr("Device :")+QString::number(MillMachine->getMotionDevice()->getModulePlanner()->getSizeBuf()
                                                           -MillMachine->getMotionDevice()->getModulePlanner()->getFree()));
 }
@@ -334,9 +318,9 @@ if(ret==QMessageBox::Ok)
  {
  MillMachine->clearSCorList();
  }
-
-
 }
+
+
 void WLMillControl::updateLabelInProbe()
 {
 WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->getMotionDevice()->getModule(typeMAxis));
@@ -388,7 +372,7 @@ if(ready)
     {
     ui.stackedWidget->setCurrentIndex(1);
     ui.gbFcor->setVisible(true);
-    MillMachine->setEnableManualWhell(false);
+    //MillMachine->setEnableManualWhell(false);
     }
 else
 	{
@@ -420,7 +404,7 @@ void WLMillControl::updateProbeButtons()
 {
 QString name=this->sender()->objectName();
 
-MillMachine->stop();
+MillMachine->Stop();
 
 if(QMessageBox::question(this, tr("Question:"),tr("are you sure?"),QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
 {
@@ -481,7 +465,6 @@ void WLMillControl::updateWhellAxis()
 if((ui.tabWidget->currentIndex()==1)
  &&(ui.tabWidgetManual->currentIndex()==1))
 {
-MillMachine->setEnableManualWhell(true);
 MillMachine->setDriveManualWhell(ui.comboBoxWhellAxis->currentText(),ui.buttonGroupWhellX->checkedId(),ui.rbWhellVMode->isChecked());
 
   WLWhell *Whell=MillMachine->getWhell();
@@ -500,7 +483,7 @@ MillMachine->setDriveManualWhell(ui.comboBoxWhellAxis->currentText(),ui.buttonGr
 }
 else
 {
-MillMachine->setEnableManualWhell(false);
+//MillMachine->setEnableManualWhell(false);
 }
 
 }
@@ -684,7 +667,7 @@ case Qt::Key_PageDown:ui.pbMinusZ->setDown(false); onChangedPBMinusZ(); break;
 case Qt::Key_PageUp:  ui.pbPlusZ->setDown(false);  onChangedPBPlusZ();break;
 
 case Qt::Key_Shift:   ui.pbFast->setDown(false);
-                     on_pbFast_released();
+                      on_pbFast_released();
                       break;
  
 
@@ -746,8 +729,6 @@ else {
 
 void WLMillControl::on_pbMinusFman_pressed()
 {
-
-
 int index=ListFper.indexOf(ui.sbFman->value());
 
 if(index!=-1)
@@ -773,7 +754,7 @@ else {
 
 void WLMillControl::on_pbStopTouch_pressed()
 {
-MillMachine->stop();
+MillMachine->Stop();
 }
 
 

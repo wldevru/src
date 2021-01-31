@@ -5,6 +5,10 @@ WLModuleEncoder::WLModuleEncoder(QObject *parent)
 {
 setType(typeMEncoder);
 Init(1);
+
+//QTimer *updateTimer = new QTimer;
+//connect(updateTimer,SIGNAL(timeout()),SLOT(update()));
+//updateTimer->start(200);
 }
 
 WLModuleEncoder::~WLModuleEncoder()
@@ -26,6 +30,7 @@ if(sizeEncoder>Encoder.size())
   enc->setIndex(i);
   enc->setParent(this);
   connect(enc,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
+  connect(enc,SIGNAL(changed(int)),this,SIGNAL(changedEncoder(int)));
   Encoder+=enc;
   }
 else
@@ -33,6 +38,7 @@ else
 	  {	  
 	  enc=Encoder.takeLast();
 	  disconnect( enc,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
+      connect(enc,SIGNAL(changed(int)),this,SIGNAL(changedEncoder(int)));
 	  delete  enc;  
       }
 
@@ -48,7 +54,7 @@ return index<getSizeEncoder() ? Encoder[index]:nullptr;
 
 void WLModuleEncoder::update()
 {
-    foreach(WLEncoder *encoder,Encoder)
+foreach(WLEncoder *encoder,Encoder)
         encoder->sendGetData();
 }
 
@@ -66,12 +72,9 @@ Stream>>ui1;
 
 switch(ui1)
 {
-case   sendEnc_data  : Stream>>index;//index8
-   	                   Stream>>i32;
-					   if(index<getSizeEncoder()) Encoder[index]->setData(i32);
-					  // qDebug()<<"ChangedDataOutFreq"<<index<<f1;
-   				       //emit ChangedDataOutFreq(index,f1);				      
-   			           break;
+case   comEnc_setData  : Stream>>index;//index8
+                         if(index<getSizeEncoder()) Encoder[index]->setData(Stream);
+                        break;
 
 case  sendModule_prop: Stream>>ui1;					                      
 					   Init(ui1);
@@ -92,6 +95,15 @@ case  sendModule_error:Stream>>ui1;  //Error
 }
 
 }
+
+
+void WLModuleEncoder::updateEncoder()
+{
+WLEncoder *Encoder=static_cast<WLEncoder*>(sender());
+
+emit changedEncoder(Encoder->getIndex());
+}
+
 
 void WLModuleEncoder::writeXMLData(QXmlStreamWriter &stream)
 {

@@ -20,6 +20,7 @@ public:
     void setDrive(WLMillDrive *_drive);
     void setGCode(WLGCode *_gcode);
 
+    bool isChecked() {return m_checked;}
 private:
    WLMillDrive *m_drive=nullptr;
    WLGCode     *m_gcode=nullptr;
@@ -31,16 +32,21 @@ private:
    QRect rF;
    QRect rOfst;
 
+   bool m_checked=false;
+
 signals:
    void changedPress(QString name,int type);
 
 public slots:
 
+   void setChecked(bool ch) {m_checked=ch; update();}
    void setGPos(double gpos) {m_GPos=gpos;}
 
+       // QWidget interface
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
+ //   void resizeEvent(QResizeEvent *event);
 };
 
 #endif // WLGAXISLABEL_H

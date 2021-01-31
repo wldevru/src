@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSerialPortInfo>
+#include <QButtonGroup>
 
 #include "wlmillmachine.h"
 #include "ui_wleditmillwidget.h"
@@ -16,7 +17,7 @@ public:
 	WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent = 0);
 	~WLEditMillWidget();
 
-void saveData();
+bool saveData();
 
 QString verifyError();
 

@@ -72,6 +72,7 @@ WLMill::WLMill(QWidget *parent)
     createDockProgram();	
 
 	createTBMcode();
+    createTBControl();
 	createTBMessage();
 
     QTimer *autoSaveTimer = new QTimer;
@@ -85,7 +86,7 @@ WLMill::WLMill(QWidget *parent)
     setTabPosition(Qt::TopDockWidgetArea,QTabWidget::South);
     setTabPosition(Qt::BottomDockWidgetArea,QTabWidget::North);
 
-	createMenuBar();
+
 }
 
 
@@ -120,13 +121,232 @@ TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFu
 TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc4.png"),("userFunc4()"),MillMachine,SLOT(runUserFunc4()));
 TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc5.png"),("userFunc5()"),MillMachine,SLOT(runUserFunc5()));
 
-connect(MillMachine,SIGNAL(changedReadyRunList(bool)),TBMCode,SLOT(setDisabled(bool)));
+connect(MillMachine,&WLMillMachine::changedPossibleManual,TBMCode,&QToolBar::setEnabled);
 
 TBMCode->setObjectName("tbMCode");
 addToolBar(TBMCode);
 }
 
+void WLMill::createTBControl()
+{
+QAction *Action;
+QAction *menuAct;
+QToolBar *TBControl = new QToolBar(tr("tollbar Control"));
+QFont font;
 
+font=TBControl->font();
+font.setPixelSize(24);
+
+TBControl->setFont(font);
+
+TBControl->setBaseSize(QSize(32,32));
+TBControl->setIconSize(QSize(32,32));
+
+Action=TBControl->addAction(QIcon(":/data/icons/play.png"),tr("start GCode (program)"),this,SLOT(onPBStart()));
+QMenu *menuStart = new QMenu();
+menuStart->addAction((tr("start at...")),this,SLOT(onPBStartAt()));
+menuStart->addAction((tr("continue...")),this,SLOT(onPBStartContinue()));
+Action->setMenu(menuStart);
+
+connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
+
+Action=TBControl->addAction(QIcon(":/data/icons/pause.png"),tr("pause"),MillMachine,SLOT(Pause()));
+Action->setShortcut(QKeySequence("Space"));
+
+Action=TBControl->addAction(QIcon(":/data/icons/H.png"),tr("h probe"),MillMachine,[=](){MillMachine->goHProbe(MillMachine->VProbe(),false);});
+connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
+
+Action=TBControl->addAction(QIcon(":/data/icons/HT.png"),tr("h tool probe"),this,SLOT(measureHTool()));
+connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
+
+
+/*
+TBControl->setFont(font);
+
+TBControl->setBaseSize(QSize(32,32));
+TBControl->setIconSize(QSize(32,32));
+
+Action=TBControl->addAction(QIcon(":/data/icons/power_on.png"),tr("on wlmill"));
+Action->setCheckable(true);
+connect(Action,SIGNAL(toggled(bool)),MillMachine,SLOT(setOn(bool)));
+
+Action=TBControl->addAction(tr("R"),MillMachine,SLOT(reset()));
+Action->setShortcut((QKeySequence(Qt::Key_Escape)));
+
+Action=TBControl->addAction(QIcon(":/data/icons/home.png"),tr("find all axis position"),MillMachine,SLOT(goFindDrivePos()));
+
+Action=TBControl->addAction("G28",this,SLOT(onGoHome()));
+
+QMenu *menuPBG28 = new QMenu();
+menuPBG28->addAction((tr("set G28 position")),this,SLOT(onPBSetG28()));
+menuPBG28->addAction((tr("get G28 position")),this,SLOT(onPBGetG28()));
+Action->setMenu(menuPBG28);
+*/
+/*
+TBMCode->addAction(QIcon(":/data/icons/M4.png"),tr("run spindle ccw")+"(F4)",MillMachine,SLOT(runScriptM4()))->setShortcut(QKeySequence("F4"));;
+TBMCode->addAction(QIcon(":/data/icons/M5.png"),tr("stop spindle")+"(F5)",MillMachine,SLOT(runScriptM5()))->setShortcut(QKeySequence("F5"));;
+TBMCode->addAction(QIcon(":/data/icons/M7.png"),tr("run additional cooling")+"(F7)",MillMachine,SLOT(runScriptM7()))->setShortcut(QKeySequence("F7"));;
+TBMCode->addAction(QIcon(":/data/icons/M8.png"),tr("run cooling")+"(F8)",MillMachine,SLOT(runScriptM8()))->setShortcut(QKeySequence("F8"));;
+TBMCode->addAction(QIcon(":/data/icons/M9.png"),tr("stop cooling")+"(F9)",MillMachine,SLOT(runScriptM9()))->setShortcut(QKeySequence("F9"));
+
+TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc1.png"),("userFunc1()"),MillMachine,SLOT(runUserFunc1()));
+TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc2.png"),("userFunc2()"),MillMachine,SLOT(runUserFunc2()));
+TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc3.png"),("userFunc3()"),MillMachine,SLOT(runUserFunc3()));
+TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc4.png"),("userFunc4()"),MillMachine,SLOT(runUserFunc4()));
+TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc5.png"),("userFunc5()"),MillMachine,SLOT(runUserFunc5()));
+
+connect(MillMachine,SIGNAL(changedReadyRunList(bool)),TBMCode,SLOT(setDisabled(bool)));
+*/
+
+TBControl->setObjectName("tbControl");
+addToolBar(TBControl);
+
+}
+
+void WLMill::onPBSetG28()
+{
+WLGPoint GP;
+WLEditPoint EP;
+QString nameDrive;
+
+EP.setNameData("X,Y,Z,A,B,C");
+
+QList <double> List;
+
+GP=MillMachine->getGCode()->getG28Position();
+
+
+EP.setLabel(tr("enter G28 position"));
+
+EP.setValueStr(GP.toString());
+
+EP.show();
+
+if(EP.exec())
+    {
+    GP.fromString(EP.getValueStr());
+    MillMachine->getGCode()->setG28Position(GP);
+    }
+    ///emit ChangedHomePosition(Program->GCode.getSC(iSC-1).toM()*EP.getFrame().toM());
+
+}
+
+void WLMill::onPBGetG28()
+{
+if(QMessageBox::question(this, tr("Question:"),tr("are you sure?"),QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
+                   MillMachine->getGCode()->setG28Position(MillMachine->getCurrentPosition(1));
+}
+
+
+void WLMill::onPBRotSC()
+{
+//if(disButton) return;
+
+WLEnterNum  EnterNum (this);
+EnterNum.setLabel("A=");
+EnterNum.setSuffix(tr("gr"));
+
+if(EnterNum.exec())
+ {
+ MillMachine->rotAboutRotPointSC(MillMachine->getGCode()->getActivSC(),EnterNum.getNow());
+ }
+
+}
+
+
+void WLMill::onPBSetP0()
+{
+WLEditPoint EP;
+
+WLGPoint  GP=MillMachine->getGCode()->getRefPoint0SC(MillMachine->getGCode()->getActivSC(),0);
+
+EP.setNameData("X,Y,Z");
+EP.setValueStr(GP.toString());
+
+EP.show();
+
+if(EP.exec())
+    {
+    qDebug("update rotPoint");
+    GP.fromString(EP.getValueStr());
+    MillMachine->getGCode()->setRefPoint0SC(MillMachine->getGCode()->getActivSC(),GP);
+    }
+};
+
+void WLMill::onPBSetP1()
+{
+WLEditPoint EP;
+
+WLGPoint  GP=MillMachine->getGCode()->getRefPoint1SC(MillMachine->getGCode()->getActivSC());
+
+EP.setNameData("X,Y,Z");
+EP.setValueStr(GP.toString());
+
+EP.show();
+
+if(EP.exec())
+    {
+    qDebug("update rotPoint");
+    GP.fromString(EP.getValueStr());
+    MillMachine->getGCode()->setRefPoint1SC(MillMachine->getGCode()->getActivSC(),GP);
+}
+}
+
+void WLMill::onPBStart()
+{
+if(!MillMachine->isEmptyMotion()) MillMachine->Start();
+else
+    {
+    MillMachine->runGProgram();
+    }
+}
+
+void WLMill::onPBStartAt()
+{
+if(MillMachine->isActiv()) return;
+
+WLEnterNum EnterNum(this);
+EnterNum.setMinMaxNow(0,Program->getElementCount(),Program->getActivElement());
+EnterNum.setDecimals(0);
+EnterNum.setLabel(tr("Which element to start processing?:"));
+EnterNum.show();
+if(EnterNum.exec())
+ {
+ MillMachine->runGProgram(EnterNum.getNow());
+ }
+}
+
+void WLMill::onPBStartContinue()
+{
+if(MillMachine->isActiv()) return;
+
+if(Program->getLastMovElement()!=0)
+  {
+  MillMachine->runGProgram(Program->getLastMovElement());
+}
+}
+
+void WLMill::measureHTool()
+{
+if(MillMachine->isActiv()) return;
+
+WLEnterNum EnterNum(this);
+EnterNum.setMinMaxNow(0,sizeTools,MillMachine->getGCode()->getValue('H'));
+EnterNum.setDecimals(0);
+EnterNum.setLabel(tr("Which instrument will be measured (H)?:"));
+EnterNum.show();
+
+if(EnterNum.exec())
+ {
+ if(EnterNum.getNow()==0)
+  {
+  if(QMessageBox::question(this, tr("Question:"),tr("are you sure?"),QMessageBox::Yes|QMessageBox::No)!=QMessageBox::Yes) return;
+  }
+
+ MillMachine->getGCode()->setValue('H',EnterNum.getNow());
+ MillMachine->goHTool(MillMachine->VProbe(),false);
+ }
+};
 
 void WLMill::createTBScript()
 {
@@ -174,15 +394,25 @@ MFile->addSeparator();
 MenuBar->addMenu(MFile);
 
 QMenu *MEdit= new QMenu(tr("Edit")); 
+MEdit->addAction(("WLMill"),this,SLOT(onEditWLMill()));
+MEdit->addSeparator();
 MEdit->addAction((tr("Drive")+" X"),this,SLOT(onEditDriveX()));
 MEdit->addAction((tr("Drive")+" Y"),this,SLOT(onEditDriveY()));
 MEdit->addAction((tr("Drive")+" Z"),this,SLOT(onEditDriveZ()));
-MEdit->addAction((tr("Drive")+" A"),this,SLOT(onEditDriveA()));
-MEdit->addAction((tr("Drive")+" B"),this,SLOT(onEditDriveB()));
+
+if(MillMachine->getDrive("A"))
+   MEdit->addAction((tr("Drive")+" A"),this,SLOT(onEditDriveA()));
+
+if(MillMachine->getDrive("B"))
+   MEdit->addAction((tr("Drive")+" B"),this,SLOT(onEditDriveB()));
 
 MEdit->addSeparator();
-MEdit->addAction(("WLMill"),this,SLOT(onEditWLMill()));
-MEdit->addAction(tr("Whell"),this,SLOT(onEditWhell()));
+MEdit->addAction(tr("Script"),this,SLOT(onEditScript()));
+//connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
+
+if(MillMachine->getWhell())
+  MEdit->addAction(tr("Whell")+" (MPG)",this,SLOT(onEditWhell()));
+
 MEdit->addAction(tr("Device"),this,SLOT(onEditDevice()));
 MEdit->addAction(("GModel"),this,SLOT(onEditGModel()));
 
@@ -231,6 +461,7 @@ ProgramWidget = new WLGProgramWidget(Program,this);
 //connect(ProgramWidget,SIGNAL(changed()),this,SLOT(setStarChangedProgram()));
 //connect(ProgramWidget,&WLGProgramWidget::changed,this,&WLMill::sendProSLOT(sendProgramToShow()));
 
+connect(ProgramWidget,&WLGProgramWidget::pressOpenFile,this,&WLMill::onLoadProgram);
 
 connect(VisualWidget,&WLVisualWidget::changedEditElement,ProgramWidget,&WLGProgramWidget::setEditElement);
 
@@ -259,8 +490,7 @@ dockPosition->setWindowTitle(tr("Positions"));
 dockPosition->setObjectName("DPosition");
 
 PositionWidget=new WLPositionWidget(MillMachine,Program,this);
-
-PositionWidget->show();
+//PositionWidget->show();
 
 dockPosition->setWidget(PositionWidget);
 dockPosition->setFeatures(QDockWidget::DockWidgetFloatable
@@ -271,32 +501,51 @@ addDockWidget(Qt::RightDockWidgetArea,dockPosition);
 
 }
 
+void WLMill::createDockTools()
+{
+dockTools=new QDockWidget(this);
+
+dockTools->setWindowTitle(tr("Tools"));
+dockTools->setObjectName("DTools");
+
+ToolsWidget = new WLToolsWidget(MillMachine->getGCode(),this);
+//ToolsWidget->show();
+
+dockTools->setWidget(ToolsWidget);
+
+dockTools->setFeatures(QDockWidget::DockWidgetFloatable
+                      |QDockWidget::DockWidgetMovable
+                      |QDockWidget::DockWidgetClosable);
+
+addDockWidget(Qt::LeftDockWidgetArea,dockTools);
+
+}
 
 void WLMill::createDockMillControl()
 {
-dockMillControl=new QDockWidget(this);
+dockMPG=new QDockWidget(this);
 
-dockMillControl->setWindowTitle(tr("Mill Control"));
-dockMillControl->setObjectName("DMillControl");
+dockMPG->setWindowTitle(tr("Mill Control"));
+dockMPG->setObjectName("DMillControl");
 
 MillControl = new WLMillControl(MillMachine,Program,this);
-MillControl->show();
+//MillControl->show();
 
 
-dockMillControl->setWidget(MillControl);
+dockMPG->setWidget(MillControl);
 
-dockMillControl->setFeatures(QDockWidget::DockWidgetFloatable
+dockMPG->setFeatures(QDockWidget::DockWidgetFloatable
                             |QDockWidget::DockWidgetMovable
                             |QDockWidget::DockWidgetClosable);
 
-addDockWidget(Qt::LeftDockWidgetArea,dockMillControl);
+addDockWidget(Qt::LeftDockWidgetArea,dockMPG);
 
 }
 
 
 void WLMill::createDockIOPut()
 {
-qDebug()<<"createDock";
+qDebug()<<"createDockIOPut";
 
 dockIOPut=new QDockWidget(this);
 
@@ -324,8 +573,25 @@ Q_UNUSED(en)
 }
 
 
-void WLMill::createDockControls()
+void WLMill::createDockMPG()
 {
+if(!MillMachine->getWhell()) return;
+
+qDebug()<<"createDockMPG";
+
+dockMPG=new QDockWidget(this);
+
+dockMPG->setWindowTitle("MPG");
+dockMPG->setObjectName("MPGDock");
+
+MPGWidget =new WLMPGWidget(MillMachine->getWhell(),this);
+
+dockMPG->setWidget(MPGWidget);
+dockMPG->setFeatures(QDockWidget::DockWidgetFloatable
+                    |QDockWidget::DockWidgetMovable
+                    |QDockWidget::DockWidgetClosable);
+
+addDockWidget(Qt::LeftDockWidgetArea,dockMPG);
 }
 
 void WLMill::setStateButtonGo(bool state)
@@ -372,6 +638,9 @@ if(MillMachine->getDrive(nameDrive))
 
   AW.addTabWidget(&MDW,tr("other"));
 
+  MDW.setUnit(AW.getUnit());
+  connect(&AW,SIGNAL(changedUnit(QString)),&MDW,SLOT(setUnit(QString)));
+
   AW.show();
 
   if(AW.exec())
@@ -391,7 +660,11 @@ EditMill.show();
 
 if(EditMill.exec())
    {
-   EditMill.saveData();
+   if(EditMill.saveData())
+    {
+    QMessageBox::information(this,tr("Attention"),tr("Please restart WLMill"));
+    close();
+    }
    }
 }
 
@@ -455,7 +728,6 @@ if(EditText.exec())
   {
   EVMScript->setCode(EditText.getText());
   }
-
 }
 
 void WLMill::onLoadSC()
@@ -546,6 +818,8 @@ if(FileXML.open(QIODevice::ReadOnly))
 
 void WLMill::onLoadProgram()
 {
+if(MillMachine->isActiv())  return;
+
 QString fileName = QFileDialog::getOpenFileName(this, tr("Load program"),Program->getNameFile(),("g-code (*.ncc *.nc *.tap);;all type(*.*)"));
 
 if(!fileName.isEmpty())
@@ -677,9 +951,12 @@ void WLMill::readyMachine()
 {	
 loadConfig();
 
+createMenuBar();
+
 createDockIOPut();
-createDockMillControl();
 createDockPosition();
+createDockTools();
+createDockMPG();
 
 loadDataState();
 
@@ -691,6 +968,14 @@ updateTitle();
 
 if(MillMachine->getMotionDevice()->getUID96().isEmpty())
     QTimer::singleShot(1000,this,SLOT(onEditDevice()));
+}
+
+void WLMill::onGoHome()
+{
+qDebug()<<"onGOHome";
+MillMachine->runGCode("G28 Z0");
+MillMachine->runGCode("G28 X0 Y0");
+MillMachine->runGCode("G28 A0 B0 C0");
 }
 
 void WLMill::restoreState1()
@@ -743,7 +1028,7 @@ GMW.show();
 
 if(GMW.exec())
  {
- Program->setGModelData(MillMachine->getGModel()->getData());
+ VisualWidget->updateViewGModel();
  qDebug()<<"updateGModel";
  }
 }
@@ -762,6 +1047,8 @@ WhellWidget.show();
 if(WhellWidget.exec())
   {
   WhellWidget.saveData();
+
+  if(MPGWidget) QTimer::singleShot(200,MPGWidget,SLOT(update()));
   }
 }
 

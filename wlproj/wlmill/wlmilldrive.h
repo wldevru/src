@@ -36,6 +36,7 @@ virtual int setMot(double p);//движение в заданное положение в размере
 
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
+virtual	void  resetAuto() {autoTypeMDrive=autoNo; WLDrive::resetAuto();}
 
 void setInputs(WLIOPut *PEL,WLIOPut *MEL,WLIOPut *ORG);
 
@@ -45,13 +46,17 @@ public:
 
 protected:
  virtual int waitAfterMotion();
- virtual int updateAuto();
+ // int updateAuto();
 
 private:
  int updateTouch();
 
 private slots:
- void updateMillDriveAuto();
+         void updateMillDriveAuto();
+
+public slots:
+
+  virtual void updateAuto();
 
 private:
 

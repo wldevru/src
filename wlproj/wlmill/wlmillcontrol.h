@@ -122,17 +122,14 @@ private slots:
      void on_pbPlusFman_pressed();
 
      void on_pbMinusF_clicked();
-
      void on_pbPlusF_clicked();
 
      void on_pbMinusS_clicked();
-
      void on_pbPlusS_clicked();
 
      void on_sbFman_valueChanged(double arg1);
 
      void on_pbFast_pressed();
-
      void on_pbFast_released();
 
 public slots:

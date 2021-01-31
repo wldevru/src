@@ -91,12 +91,14 @@ double offset;
 
 WLDrivePosition() {step=0;offset=0;}
 
+qint32 getStepI32L() {return (qint32)(step&0x00000000FFFFFFFF);}
+
 double get(WLDriveDim dim) {return (dim.value*step+offset);}
   void set(double val,WLDriveDim dim)   {step=qRound64(val/dim.value);
                                       offset=val-step*dim.value;}
 };
 
-
+#define MAXSLAVEAXIS 4
 class WLDrive : public QObject
 {
  Q_OBJECT
@@ -120,9 +122,9 @@ private:
 	enum FlagDrive
 	           {
 		       fl_activ=      1<<0 , //активен - ожидает разрешения
-			   fl_motion=     1<<1 , //движется
-               fl_latch2=     1<<2 ,
-               fl_latch3=     1<<3 ,
+              // fl_motion=     1<<1 , //движется
+              // fl_latch2=     1<<2 ,
+               //fl_latch3=     1<<3 ,
                fl_lastrot=    1<<4 ,
 			   fl_rot=        1<<5 , //направление + 1 / - 0
 			   fl_auto=       1<<6 ,//автоматический режим
@@ -156,10 +158,15 @@ private:
   QString m_name;
   int autoTypeDrive;
 
-  double m_startPosition;
-  double m_maxPosition;
-  double m_minPosition;
-  double m_homePosition;
+  double m_startPosition=0;
+
+  double m_maxPosition=100;
+  double m_minPosition=0;
+  double m_homePosition=0;
+
+  double m_orgSize=2;
+
+  double m_ofstSlaveAxis[MAXSLAVEAXIS];
 
   WLDrivePosition m_nowPosition;  //current pos
   WLDrivePosition m_nextPosition; //next pos
@@ -195,6 +202,9 @@ public:
    void setFeedVFind(double Vfind) {if(Vfind>0) m_feedVFind=Vfind;}
  double feedVFind() {return m_feedVFind;}
 
+ double getOffsetAxis(quint8 index) {return index<MAXSLAVEAXIS ? m_ofstSlaveAxis[index]:0;}
+   void setOffsetAxis(quint8 index,double value) {if(index<MAXSLAVEAXIS)  {m_ofstSlaveAxis[index]=value;qDebug()<<value;}}
+
 void setType(enum typeDrive _type=Linear) {m_type=_type; setTruPosition(false);}
 enum typeDrive getType() {return m_type;}
 
@@ -229,7 +239,7 @@ protected:
    dataPad  interPad;
    float curKSpeed;
 
- WLAxis        *m_Axis;
+ QList <WLAxis*>  m_AxisList;
  WLModuleAxis  *m_ModuleAxis;
 
 protected:
@@ -239,7 +249,7 @@ public:
 static void resets();
 
 static bool isActivs();
-static bool isMotions();
+static bool isMotionDrives();
 
 static WLDrive *getDrive(QString name);
 static QList<WLDrive*> driveList;
@@ -271,12 +281,17 @@ QString getFullName() {return metaObject()->className()+getName();}
 QString getName() {return m_name;}
 
 void setName(QString _name) {m_name=_name; emit changedName(m_name);}
-void setModuleAxis(WLModuleAxis *_ModuleAxis) {m_ModuleAxis=_ModuleAxis; m_Axis=nullptr;}
-void setIndexModuleAxis(quint8  _indexMAxis) {m_Axis=m_ModuleAxis->getAxis(_indexMAxis);}
+void setModuleAxis(WLModuleAxis *_ModuleAxis) {m_ModuleAxis=_ModuleAxis; m_AxisList.clear();}
+void setIndexModuleAxisStr(QString str);
+QString getIndexModuleAxisStr();
 
 //WLModuleAxis *getModuleAxis() {return ModuleAxis;}
 
-WLAxis *getAxis() {return m_Axis;}
+
+WLAxis* getAxis(quint8 i=0) {return i<m_AxisList.size()? m_AxisList.at(i):nullptr;}
+
+QList <WLAxis*> getAxisList() {return m_AxisList;}
+QList <WLAxis*> getSubAxisList() {return getAxisList().mid(1);}
 
 void addSyhData(double pos);
 
@@ -318,7 +333,7 @@ inline double minPosition() {return m_minPosition;}
 inline double distance()    {return  nextPosition()-position();}
 //inline double getDistanceL() {return  getNextPositionL()-getPositionL();}
 
-quint8 indexMAxis(){return getAxis()->getIndex();}
+//quint8 indexMAxis(){return getAxis()->getIndex();}
 
 inline double position()     {return positionDrive().get(dim);}
 inline double nextPosition() {return nextPositionDrive().get(dim);}
@@ -330,8 +345,8 @@ inline void   setOrgPosition(double pos) {m_orgPosition=pos;}
 inline double getOrgPosition()           {return m_orgPosition;}
 inline int    corPosition(double pos)    {return setPosition(position()-(pos-getOrgPosition()));}
 
-inline double getORGSize() {return getAxis()->getORGSize()*dimension();}
-inline void   setORGSize(double size) {if(size>0) getAxis()->setORGSize(size/dimension());}
+inline double getORGSize()            {return m_orgSize;}
+inline void   setORGSize(double size) {if(size>0) m_orgSize=size;}
 
 inline double getOffset() {return positionDrive().offset;}
 
@@ -339,30 +354,33 @@ inline double getOffset() {return positionDrive().offset;}
 
 inline double getStartPosition() {return m_startPosition;}
 
-inline bool isLatch2() {return Flag.get(fl_latch2);}
-inline bool isLatch3() {return Flag.get(fl_latch3);}
+inline bool isLatch2();
+inline bool isLatch3();
 
-inline double getLatch2Pos() {return getLatch2PosL()*dimension();}
-inline double getLatch3Pos() {return getLatch2PosL()*dimension();}
+inline double getLatch2Pos(quint8 i=0) {return getLatch2PosL(i)*dimension();}
+inline double getLatch3Pos(quint8 i=0) {return getLatch3PosL(i)*dimension();}
 
- inline long getLatch2PosL() {return getAxis()->getLatch2();}
- inline long getLatch3PosL() {return getAxis()->getLatch3();}
+ inline long getLatch2PosL(quint8 i=0) {return i<m_AxisList.size() ? m_AxisList[i]->getLatch2() : 0;}
+ inline long getLatch3PosL(quint8 i=0) {return i<m_AxisList.size() ? m_AxisList[i]->getLatch3() : 0;}
 
 
 double homePosition()         {return m_homePosition;}
   int  setHomePosition(double pos);
 
-inline bool isActiv()             {return Flag.get(fl_activ)||Flag.get(fl_auto);}
+inline bool isActiv()                  {return Flag.get(fl_activ)||Flag.get(fl_auto);}
 inline void setActiv(bool enable=true) {Flag.set(fl_activ,enable);}
-inline bool isMotion()            {return Flag.get(fl_motion);}
-
+inline bool isMotion()                 {return getAxis()? getAxis()->isMotion(): false;}// {return Flag.get(fl_motion);}
+       bool isMotionSubAxis();
+/*
 inline void setMotion(bool mot=true) {bool last=Flag.get(fl_motion); 
                                       Flag.set(fl_motion,mot); 
                                      if(last!=mot) emit changedMotion(mot);}
+*/
 
 inline bool isManual() {return Flag.get(fl_manual);}
 
 inline bool isAuto()  {return Flag.get(fl_auto);}
+inline bool isAutoDrive()  {return isAuto()&&(autoTypeDrive!=autoNo);}
 //inline bool isUseFB() {return Flag.get(fl_usefb);}
 
 
@@ -398,9 +416,7 @@ virtual int waitAfterStartMotion()    {return 0;}
 virtual int waitAfterMotion()         {return 0;}
 virtual int waitAfterUpdatePosition() {emit changedPosition(m_nowPosition.get(dim)); return 0;}
 
-virtual int updateAuto();
-
-virtual  void updatePosition();
+virtual void updatePosition();
 
 public:
 virtual int setTruPosition(bool tru=true) { int ret;
@@ -408,8 +424,9 @@ virtual int setTruPosition(bool tru=true) { int ret;
 	                                        if(Flag.get(fl_truPos)&&!tru) ret=-1; else ret=0;
 
                                             Flag.set(fl_truPos,tru);
-                                            qDebug()<<tru<<(!tru)<<isInfinity();
-                                            getAxis()->setDisableLimit((!tru)||isInfinity());
+
+                                            if(getAxis())
+                                               getAxis()->setDisableLimit((!tru)||isInfinity());
 
                                             emit changedTruPosition(tru);
                                             return ret;}
@@ -425,12 +442,18 @@ virtual void  readXMLData(QXmlStreamReader &stream);
 
 protected: 
 
-virtual	void resetAuto() {Flag.set(fl_auto,0); autoTypeDrive=autoNo;}
-        bool setAuto()   {if(Flag.get(fl_auto))
+virtual	void resetAuto() {
+                          Flag.set(fl_auto,0);
+                          autoTypeDrive=autoNo;
+                          if(getAxis()) getAxis()->setDisableManual(false);
+                         }
+        bool setAuto()   {qDebug()<<"Drive::setAuto";
+                          if(Flag.get(fl_auto))
                               return false;
                            else
                               {
                               Flag.set(fl_auto,1);
+                              if(getAxis()) getAxis()->setDisableManual(true);
                               return true;
                               }
                          }
@@ -443,6 +466,12 @@ public:
 int setMovHome() {return setMot(homePosition());}
 
 public:
+    bool getInput(typeInputAxis type);
+
+    bool getInputPEL() {return getInput(AXIS_inPEL);}
+    bool getInputMEL() {return getInput(AXIS_inMEL);}
+    bool getInputORG() {return getInput(AXIS_inORG);}
+    bool getInputALM() {return getInput(AXIS_inALM);}
 
     int setPosition(double pos);//задание текущего значения/положения
     //int setPositionL(long pos,double offset=0);//задание текущего значения/положения
@@ -472,11 +501,15 @@ private slots:
 
    void setError(quint8 error);  
 
+
 public slots:
 
-   void setEnable(bool enable) {getAxis()->setEnable(enable);}
+virtual void updateAuto();
+        void setEnable(bool enable);
 
-virtual void startTask()  {if(!isWait()&&!isMotion()) 
+virtual void startTask()  {
+                          qDebug()<<"startTask"<<isWait()<<isMotion()<<Flag.get(fl_auto);
+                          if(!isWait()&&!isMotion())
                              {
 						     if(Flag.get(fl_auto)) 
 							    startAuto(); 
@@ -492,13 +525,13 @@ virtual void startTask()  {if(!isWait()&&!isMotion())
                              }
                           }
 public:
-   void startMovPos(double pos,float V) {if(setMot(pos)==1) startMotion(V);}
+   bool startMovPos(double pos,float V) {if(setMot(pos)==1) {startMotion(V); return true;} return false;}
    void startMovVel(float V)            {startMotion(V);}
 
 protected:
    
-    int startAuto() {if(!isMotion()) updateAuto(); return 0;} //Начало работы в автоматическом режиме
-    int startMotion(float m_Vmov=-1); //начало движения
+    int startAuto() {qDebug()<<"startAuto"<<isMotion(); if(!isMotion()) updateAuto(); return 0;} //Начало работы в автоматическом режиме
+   bool startMotion(float m_Vmov=-1); //начало движения
 
 private:
 	void toStartAccel(); //ускорение

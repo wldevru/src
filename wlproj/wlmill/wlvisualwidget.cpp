@@ -1539,6 +1539,11 @@ m_Program->setGModelData(m_MillMachine->getGModel()->getData());
 QTimer::singleShot(200,this,SLOT(setViewCenter()));
 }
 
+void WLVisualWidget::updateViewGModel()
+{
+if(m_typeView==GModel) setViewGModel();
+}
+
 void WLVisualWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)

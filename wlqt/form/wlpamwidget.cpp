@@ -6,7 +6,7 @@ WLPamWidget::WLPamWidget(dataPad Pad,float Vmax,QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
-	 
+
 	qDebug()<<Pad.toString();
 	qDebug()<<"Vmax"<<Vmax;
 
@@ -36,6 +36,7 @@ WLPamWidget::WLPamWidget(dataPad Pad,float Vmax,QWidget *parent)
     connect(timer,SIGNAL(timeout()),SLOT(repaint()));
     timer->start(100);
 
+    setUnit("1");
 	setModal(true);
 
 }
@@ -52,7 +53,17 @@ ui.sbVma->setRange(val,ui.sbVma->maximum());
 
 void WLPamWidget::updateVmaLabel(double val)
 {
-ui.sbVst->setRange(0,val);
+    ui.sbVst->setRange(0,val);
+}
+
+void WLPamWidget::setUnit(QString unit)
+{
+m_unit=unit;
+
+ui.labelVst->setText("Vst("+m_unit+"/"+tr("s)"));
+ui.labelVma->setText("Vma("+m_unit+"/"+tr("s)"));
+ui.labelAac->setText("Aac("+m_unit+"/"+tr("s^2)"));
+ui.labelAde->setText("Ade("+m_unit+"/"+tr("s^2)"));
 }
 
 void WLPamWidget::updateAccelLabel(int index)

@@ -54,10 +54,10 @@
    <item row="5" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>A-&gt;Z,B-&gt;Y,C-&gt;Y</string>
+      <string>A-&gt;Z,B-&gt;Y,C-X</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>

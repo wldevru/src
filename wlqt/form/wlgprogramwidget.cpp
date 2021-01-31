@@ -1,5 +1,4 @@
 #include "wlgprogramwidget.h"
-#include <QMessageBox>
 
 WLGProgramWidget::WLGProgramWidget(WLGProgram *_Program,QWidget *parent)
 	: QWidget(parent)
@@ -19,12 +18,11 @@ WLGProgramWidget::WLGProgramWidget(WLGProgram *_Program,QWidget *parent)
 
     //connect(ui.listProgram,SIGNAL(//
 	
-    ui.pbUpdate->setVisible(false);
-
-    ui.pbUpdate->setIcon(QIcon(":/data/icons/update.png"));
-    ui.pbAccept->setIcon(QIcon(":/data/icons/accept.png"));
-    ui.pbBackup->setIcon(QIcon(":/data/icons/backup.png"));
-    ui.pbReload->setIcon(QIcon(":/data/icons/reload.png"));
+    ui.progressBar->setVisible(false);
+    //ui.pbUpdate->setIcon(QIcon(":/data/icons/update.png"));
+    //ui.pbAccept->setIcon(QIcon(":/data/icons/accept.png"));
+    //ui.pbBackup->setIcon(QIcon(":/data/icons/backup.png"));
+    //ui.pbReload->setIcon(QIcon(":/data/icons/reload.png"));
 	
     connect(ui.vsbProgram,SIGNAL(valueChanged(int)),SLOT(setEditElement(int)));
 
@@ -39,13 +37,19 @@ WLGProgramWidget::WLGProgramWidget(WLGProgram *_Program,QWidget *parent)
 	connect(ui.pbAccept,SIGNAL(clicked()),SLOT(onAccept()));
 	connect(ui.pbBackup,SIGNAL(clicked()),SLOT(onBackup()));
 	connect(ui.pbReload,SIGNAL(clicked()),SLOT(onReload()));
-	connect(ui.pbUpdate,SIGNAL(clicked()),SLOT(onUpdate()));
+    connect(ui.pbOpenFile,SIGNAL(clicked()),SLOT(onOpenFile()));
+    connect(ui.pbTrack,SIGNAL(toggled(bool)),SLOT(setTrack(bool)));
 	
 	connect(this,SIGNAL(changed(bool)),ui.pbAccept,SLOT(setEnabled(bool)));
 	connect(this,SIGNAL(changed(bool)),ui.pbBackup,SLOT(setEnabled(bool)));	
 		
 	ui.textProgram->setEnabled(false);
     m_GCodeSH = new WLGCodeSH(ui.textProgram->document());
+
+    QTimer *timer=new QTimer;
+
+    connect(timer,SIGNAL(timeout()),this,SLOT(updateTrack()));
+    timer->start(100);
 }
 
 WLGProgramWidget::~WLGProgramWidget()
@@ -164,7 +168,7 @@ else
  {
  int iShow=m_startIProgram+ui.listProgram->currentRow();
  ui.stackedWidget->setCurrentIndex(0);
- ui.sbPosition->setRange(0,m_GProgram->getElementCount());
+
  ui.vsbProgram->setRange(0,m_GProgram->getElementCount());
  ui.vsbProgram->setPageStep(m_sizeListProgram);
 
@@ -174,9 +178,23 @@ else
      showListProgram(0);
  }
 
+ui.sbPosition->setRange(0,m_GProgram->getElementCount());
 
 m_changedProgram=false;
 emit changed(m_changedProgram);
+}
+
+void WLGProgramWidget::updateTrack()
+{
+static long lastTrack=0;
+
+if(m_trackElementF
+ &&ui.textProgram->isReadOnly()
+ &&lastTrack!=m_GProgram->getLastMovElement())
+  {
+  setEditElement(lastTrack=m_GProgram->getLastMovElement());
+  ui.sbPosition->setValue(m_GProgram->getLastMovElement());
+  }
 }
 
 void WLGProgramWidget::saveTextProgram()
@@ -195,6 +213,7 @@ void WLGProgramWidget::onReload()
 {
 m_GProgram->reloadFile(true);
 }
+
 
 void WLGProgramWidget::onChangedTextProgram()
 {
@@ -218,7 +237,7 @@ ui.textProgram->setReadOnly(dis);
 
 void WLGProgramWidget::setEditElement(int iElement)
 {
-qDebug()<<"set iElement"<<iElement<<ui.stackedWidget->currentIndex()<<m_changedProgram;
+//qDebug()<<"set iElement"<<iElement<<ui.stackedWidget->currentIndex()<<m_changedProgram;
 
 if(iElement>=0)
 {
@@ -242,7 +261,7 @@ if(iElement>=0)
   cursor.select(QTextCursor::LineUnderCursor);
 
   blockSignals(true);
-  ui.textProgram->setTextCursor(cursor);
+   ui.textProgram->setTextCursor(cursor);
   blockSignals(false);
  }
  else

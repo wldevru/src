@@ -58,13 +58,14 @@ const QString errorAxis("0,no error\
 #define MASK_fline     1<<4 //fast line
 #define MASK_ensmooth  1<<5 //enable smooth
 #define MASK_dir       1<<6 //dir vel mode
+#define MASK_disubaxis 1<<7 //disable mov subaxis
 
 //Axis
 #define comAxis_movPos      1 //mov position mode Axis
-#define comAxis_sdStop      2 //slow down stop
-#define comAxis_emgStop     3 //emergency stop
-#define comAxis_addSyhData  4 //set syh position
-#define comAxis_setKSTCurve 5 //old s curve
+#define comAxis_sdStop      2  //slow down stop
+#define comAxis_emgStop     3  //emergency stop
+#define comAxis_addSyhData  4
+#define comAxis_setKSTCurve 5
 #define comAxis_reset       6 //reset
 #define comAxis_acc         7 //start acceleration to Fmov
 #define comAxis_newF        8 //set new Fmov
@@ -90,16 +91,25 @@ const QString errorAxis("0,no error\
 #define comAxis_setEnable     26//enable Axis
 
 #define comAxis_setDelaySCurve     27//set inertion time (S curve)
-#define comAxis_movVel      28 //mov vellocity mode Axis
+#define comAxis_movVel             28 //mov vellocity mode Axis
 
-#define comAxis_getData   100 //call data Axis
+#define comAxis_setModeSub        29 //set Sub Axis
+#define comAxis_setDisableManual  30//disable manual control Axis
+
+#define comAxis_getDataAxis   100 //call data Axis
+
+#define comAxis_setData 128
+#define comAxis_getData 129
 
 #define sendAxis_signal 200
-/*enum signalsAxis
-  {
 
-    }
-*/
+enum typeDataAxis{
+     dataAxis_pos
+    ,dataAxis_F
+    ,dataAxis_latch2
+    ,dataAxis_latch3
+  };
+
 #define sendAxis_data          202 //send data Axis
 #define sendAxis_rInProbe      203 //send position inProbe (rise / front)
 #define sendAxis_fInProbe      204 //send position inProbe (fall \ front)
@@ -127,9 +137,9 @@ const QString errorAxis("0,no error\
 
 //Axis flags
 #define AF_dir           1<<0  //direction
-#define AF_latch2        1<<1  //latch rise
-#define AF_latch3        1<<2  //latch false
-#define AF_update        1<<3  //update state
+#define AF_disableManual 1<<1  //disable manual mov (whell,input)
+
+//#define AF_update        1<<3  //update state
 #define AF_enable        1<<4  //enable
 #define AF_sdstop        1<<5  //stop when F=Fst
 #define AF_typePulseABxx 1<<6  //type out AB_ (AB,ABx2,ABx4)
@@ -145,8 +155,9 @@ enum typeActIOPutAxis{AXIS_actNo,AXIS_actSdStop,AXIS_actEmgStop};
 enum typeInputAxis{AXIS_inORG,AXIS_inALM,AXIS_inPEL,AXIS_inMEL};//_inEMG
 enum typeOutputAxis{AXIS_outENB,AXIS_outRALM};//
 
-enum statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec,AXIS_wait};
-enum   modeAxis{AXIS_standby,AXIS_pos,AXIS_slave,AXIS_vel,AXIS_traxis} ;
+enum  statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec,AXIS_wait};
+enum   stateAxis{AXIS_standby,AXIS_pos,AXIS_vel} ;
+enum    modeAxis{AXIS_alone,AXIS_slave,AXIS_sub,AXIS_track};
 
 enum   typeMParAxis{AXIS_MParAll
                    ,AXIS_MParPlus
@@ -183,8 +194,8 @@ statusAxis status;
    WLFlags Flags;
 
   float Freq;
- qint32 latchPos2;
- qint32 latchPos3;
+ qint32 m_latchPos2;
+ qint32 m_latchPos3;
 
  qint32 homePosition;
  qint32 orgSize;
@@ -211,6 +222,8 @@ WLModuleIOPut *m_ModuleIOPut;
 
 typeActIOPutAxis actIn[4];
 
+bool m_validLatch2;
+bool m_validLatch3;
 
 public:
 
@@ -218,6 +231,12 @@ enum modeAxis   getMode()   {return mode;}
 enum statusAxis getStatus() {return status;}
 
  void init(WLModuleIOPut *_ModuleIOPut,quint8 _index);
+
+
+ void resetLatch() {m_validLatch2=m_validLatch3=false;}
+
+ bool isLatch2() {return m_validLatch2;}
+ bool isLatch3() {return m_validLatch3;}
 
  bool isEnable() {return Flags.get(AF_enable);}
  //void setIOPut(int index);
@@ -229,11 +248,8 @@ enum statusAxis getStatus() {return status;}
  void setOutENB(int m_index);
  void setOutRALM(int m_index);
 
- void setLatch2(qint32 pos) {emit changedLatch2(latchPos2=pos);}
- void setLatch3(qint32 pos) {emit changedLatch3(latchPos3=pos);}
-
- long getLatch2() {return latchPos2;}
- long getLatch3() {return latchPos3;}
+ long getLatch2() {return m_latchPos2;}
+ long getLatch3() {return m_latchPos3;}
 
  void setError(quint8 err)  {emit changedError(error=err);}
 
@@ -259,8 +275,12 @@ qint32 getORGSize() {return orgSize;}
 
 void setORGSize(qint32 size) {if(size>0) orgSize=size;}
 bool setHomePos(qint32 pos) {if(minPosition<=pos&&pos<=maxPosition) {homePosition=pos; return true;} else return false;}
-	
-	void setData(quint8 statMode,quint8 flags,qint32 pos,float F);
+bool isMotion() {return status!=AXIS_stop;}
+
+void setDataAxis(quint8 statMode,quint8 flags,qint32 pos,float F); //old function
+
+void setData(QDataStream &data);
+void getData(typeDataAxis type);
 
 signals:
 
@@ -281,7 +301,7 @@ private:
     bool setOutput(typeOutputAxis type,quint8 num);
 
 public:
-	bool sendGetData();
+    bool sendGetDataAxis();
     bool setParMov(float Aac,float Ade,float Fst,float Fma,typeMParAxis type=typeMParAxis::AXIS_MParAll);
     bool movPos(quint8 mask,qint32 Dist,float Fmov);
     bool movVel(quint8 mask,float Fmov);
@@ -296,6 +316,7 @@ public:
 	bool setKF(float _KFA);
 	void reset();	
 	bool setDisableLimit(bool dis);
+    bool setDisableManual(bool dis);
     bool setLatchSrc(quint8 In);
 	bool setActIn(typeInputAxis type,typeActIOPutAxis typeAct);
 	bool setTypePulse(typePulseAxis type,quint8 SDinv);
@@ -303,6 +324,7 @@ public:
 	bool setDelaySCurve(float delayScurve);
 	bool setKGear(float kGear);
 	bool setEnable(bool enable);
+    bool setModeSub(quint8 imasterAxis);
 
 public:
 virtual void writeXMLData(QXmlStreamWriter &stream);

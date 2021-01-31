@@ -13,7 +13,7 @@ minPosition=std::numeric_limits<qint32>::min();
 homePosition=0;
 
 status=AXIS_stop;
-mode=AXIS_standby;
+mode=AXIS_alone;
 
 orgSize=1;
 
@@ -22,8 +22,8 @@ delaySCurve=0;
 kGear=1;
 
 Freq=0;
-latchPos2=0;
-latchPos3=0;
+m_latchPos2=0;
+m_latchPos3=0;
 
 error=0;
 
@@ -44,6 +44,8 @@ outENB=&WLIOPut::Out;
 actIn[AXIS_inALM]=AXIS_actEmgStop;
 actIn[AXIS_inPEL]=AXIS_actEmgStop;
 actIn[AXIS_inMEL]=AXIS_actEmgStop;
+
+resetLatch();
 }
 
 WLAxis::~WLAxis()
@@ -90,6 +92,9 @@ void  WLAxis::setInALM(int index)
 {
 inALM->removeComment("inALM"+QString::number(getIndex()));
 disconnect(inALM,&WLIOPut::changed,this,&WLAxis::changedInALM);
+
+if(index>=m_ModuleIOPut->getSizeInputs()) index=0;
+
 inALM=m_ModuleIOPut->getInput(index);
 inALM->addComment("inALM"+QString::number(getIndex()));
 
@@ -101,6 +106,9 @@ connect(inALM,&WLIOPut::changed,this,&WLAxis::changedInALM,Qt::QueuedConnection)
 void  WLAxis::setInORG(int index)
 {
 inORG->removeComment("inORG"+QString::number(getIndex()));
+
+if(index>=m_ModuleIOPut->getSizeInputs()) index=0;
+
 inORG=m_ModuleIOPut->getInput(index);
 inORG->addComment("inORG"+QString::number(getIndex()));
 
@@ -111,6 +119,9 @@ setInput(AXIS_inORG,index);
 void  WLAxis::setInPEL(int index)
 {
 inPEL->removeComment("inPEL"+QString::number(getIndex()));
+
+if(index>=m_ModuleIOPut->getSizeInputs()) index=0;
+
 inPEL=m_ModuleIOPut->getInput(index);
 inPEL->addComment("inPEL"+QString::number(getIndex()));
 
@@ -120,6 +131,9 @@ setInput(AXIS_inPEL,index);
 void  WLAxis::setInMEL(int index)
 {
 inMEL->removeComment("inMEL"+QString::number(getIndex()));
+
+if(index>=m_ModuleIOPut->getSizeInputs()) index=0;
+
 inMEL=m_ModuleIOPut->getInput(index);
 inMEL->addComment("inMEL"+QString::number(getIndex()));
 
@@ -130,6 +144,9 @@ setInput(AXIS_inMEL,index);
 void  WLAxis::setOutRALM(int index)
 {
 outRALM->removeComment("outRALM"+QString::number(getIndex()));
+
+if(index>=m_ModuleIOPut->getSizeOutputs()) index=0;
+
 outRALM=m_ModuleIOPut->getOutput(index);
 outRALM->addComment("outRALM"+QString::number(getIndex()));
 }
@@ -138,6 +155,9 @@ outRALM->addComment("outRALM"+QString::number(getIndex()));
 void  WLAxis::setOutENB(int index)
 {
 outENB->removeComment("outENB"+QString::number(getIndex()));
+
+if(index>=m_ModuleIOPut->getSizeOutputs()) index=0;
+
 outENB=m_ModuleIOPut->getOutput(index);
 outENB->addComment("outENB"+QString::number(getIndex()));
 
@@ -239,6 +259,20 @@ emit sendCommand(data);
 return true;
 }
 
+bool WLAxis::setModeSub(quint8 imasterAxis)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comAxis_setModeSub<<getIndex()<<imasterAxis;
+
+emit sendCommand(data);
+return true;
+}
+
 bool WLAxis::setInput(typeInputAxis type,quint8 num)
 {
 QByteArray data;
@@ -283,6 +317,22 @@ emit sendCommand(data);
 return true;
 }
 
+bool WLAxis::setDisableManual(bool dis)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comAxis_setDisableManual<<getIndex()<<(quint8)dis;
+
+Flags.set(AF_disableManual);
+
+emit sendCommand(data);
+return true;
+}
+
 bool WLAxis::setLatchSrc(quint8 num)
 {
 QByteArray data;
@@ -313,15 +363,17 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLAxis::sendGetData()
+bool WLAxis::sendGetDataAxis()
 {
+qDebug()<<"sendGetDataAxis()"<<getIndex();
+
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_getData<<getIndex();
+Stream<<(quint8)comAxis_getDataAxis<<getIndex();
 
 emit sendCommand(data);
 return true;
@@ -353,6 +405,8 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)comAxis_movPos<<mask<<getIndex()<<Dist<<Fmov;
 
+status=AXIS_wait;
+
 emit sendCommand(data);
 return true;
 }
@@ -366,6 +420,8 @@ Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)comAxis_movVel<<mask<<getIndex()<<Fmov;
+
+status=AXIS_wait;
 
 emit sendCommand(data);
 return true;
@@ -525,7 +581,7 @@ Stream<<(quint8)comAxis_reset<<(quint8)getIndex();
 emit sendCommand(data);
 }
 
-void WLAxis::setData(quint8 statusMode,quint8 _flag,qint32 Pos,float F)
+void WLAxis::setDataAxis(quint8 statusMode,quint8 _flag,qint32 Pos,float F)
 {
 Flags.m_Data=_flag;
 
@@ -533,26 +589,70 @@ statusAxis lstatus=status;
 statusAxis nstatus=static_cast<statusAxis>(statusMode>>4);
   modeAxis nmode  =static_cast<modeAxis>(statusMode&0x0F);
 
-if(Flags.get(AF_update)||nowPosition!=Pos)
+if(nowPosition!=Pos)
                        emit changedPosition(nowPosition=Pos);
-if(Flags.get(AF_update)||mode!=nmode)       
-                       emit changedMode(mode=nmode);
-if(Flags.get(AF_update)||status!=nstatus)   
+
+if(status!=nstatus)
                        {
                        emit changedStatus(status=nstatus);
 
-                       if((lstatus!=statusAxis::AXIS_stop)
+                      if((lstatus!=statusAxis::AXIS_stop)
                         &&(nstatus==statusAxis::AXIS_stop)
-                        &&(mode==modeAxis::AXIS_standby)) emit finished();
+                        &&(mode!=modeAxis::AXIS_slave))  emit finished();
+
 
                        if((lstatus==statusAxis::AXIS_stop)
                         &&(nstatus!=statusAxis::AXIS_stop)
-                        &&(mode!=modeAxis::AXIS_standby)) emit started();
+                        &&(mode!=modeAxis::AXIS_slave)) emit started();
 
                        }
 
-if(Flags.get(AF_update)||Freq!=F)
-                       emit changedFreq(Freq=F);
+if(mode!=nmode)    emit changedMode(mode=nmode);
+
+
+if(Freq!=F)    emit changedFreq(Freq=F);
+}
+
+void WLAxis::setData(QDataStream &data)
+{
+quint8 type;
+
+//qDebug()<<"Axis::setData";
+data>>type;
+
+switch((typeDataAxis)type)
+ {
+ case dataAxis_pos:    data>>nowPosition;
+                       emit changedPosition(nowPosition);
+                       break;
+
+ case dataAxis_F:      data>>Freq;
+                       emit changedFreq(Freq);
+                       break;
+
+ case dataAxis_latch2: data>>m_latchPos2;
+                       m_validLatch2=true;
+                       emit changedLatch2(m_latchPos2);
+                       break;
+
+ case dataAxis_latch3: data>>m_latchPos3;
+                       m_validLatch3=true;
+                       emit changedLatch3(m_latchPos3);
+                       break;
+}
+}
+
+void WLAxis::getData(typeDataAxis type)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comAxis_getData<<(quint8)getIndex()<<(quint8)type;
+
+emit sendCommand(data);
 }
 
 void WLAxis::readXMLData(QXmlStreamReader &stream)

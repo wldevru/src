@@ -147,32 +147,26 @@ if(!List.isEmpty())
          ||List[2]=="WLM100S")*/ ui.pbReboot->setEnabled(enable);
     }
 
- connect(DFW->getModuleFW(),SIGNAL(changedProgress(int)),ui.progressBar,SLOT(setValue(int)));;
- connect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(saveProgram()));
+ if(DFW->getModuleFW())
+  {
+  connect(DFW->getModuleFW(),SIGNAL(changedProgress(int)),ui.progressBar,SLOT(setValue(int)));;
+  connect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(saveProgram()));
 
- connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.progressBar,SLOT(setEnabled(bool)));
- connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbRead,SLOT(setDisabled(bool)));
- connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWrite,SLOT(setDisabled(bool)));
- connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWriteCloud,SLOT(setDisabled(bool)));
+  connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.progressBar,SLOT(setEnabled(bool)));
+  connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbRead,SLOT(setDisabled(bool)));
+  connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWrite,SLOT(setDisabled(bool)));
+  connect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWriteCloud,SLOT(setDisabled(bool)));
 
- connect(DFW->getModuleFW(),SIGNAL(endWriteFW()),this,SLOT(showEndWrite()),Qt::QueuedConnection);
- connect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(showEndRead()),Qt::QueuedConnection);
+  connect(DFW->getModuleFW(),SIGNAL(endWriteFW()),this,SLOT(showEndWrite()),Qt::QueuedConnection);
+  connect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(showEndRead()),Qt::QueuedConnection);
+  }
 
  if(DFW->getModuleConnect())
      DFW->getModuleConnect()->setEnableHeart(false);
 }
 else
  {
- disconnect(DFW->getModuleFW(),SIGNAL(changedProgress(int)),ui.progressBar,SLOT(setValue(int)));;
- disconnect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(saveProgram()));
-  
- disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.progressBar,SLOT(setEnabled(bool)));
- disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbRead,SLOT(setDisabled(bool)));
- disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWrite,SLOT(setDisabled(bool)));
- disconnect(DFW->getModuleFW(),SIGNAL(changedActiv(bool)),ui.pbWriteCloud,SLOT(setDisabled(bool)));
-
- disconnect(DFW->getModuleFW(),SIGNAL(endWriteFW()),this,SLOT(showEndWrite()));
- disconnect(DFW->getModuleFW(),SIGNAL(endReadFW()),this,SLOT(showEndRead()));
+ if(DFW->getModuleFW())   disconnect(DFW->getModuleFW(),nullptr);
 
  ui.gbReadWrite->setEnabled(enable);
  ui.pbFileDevice->setEnabled(enable);

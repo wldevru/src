@@ -9,20 +9,6 @@
 #include "wlmodule.h"
 #include "wlencoder.h"
 
-//Encoder
-#define comEnc_setASendData   1 //set autosend data
-#define comEnc_setEnable      2 //set enable encoder
-#define comEnc_setScale       3 //set scale count
-#define comEnc_setPos         4 //set cur position
-
-#define comEnc_getData  100 //call data encoder
-
-#define sendEnc_data 200 //send data encoder
-
-#define ENCF_enable  1<<0
-#define ENCF_asend   1<<1
-
-
 class WLModuleEncoder : public WLModule
 {
 	Q_OBJECT
@@ -41,6 +27,9 @@ public:
     WLEncoder* getEncoder(int m_index);
 
 
+private slots:
+void  updateEncoder();
+
 public slots:
 virtual void update();
 
@@ -50,6 +39,10 @@ virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 
 virtual void readCommand(QByteArray data); 
+
+
+signals:
+  void changedEncoder(int);
 };
 
 #endif // WLModuleEncoder_H

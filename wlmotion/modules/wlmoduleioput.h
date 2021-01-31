@@ -66,7 +66,7 @@ public slots:
     void outputReset(int index) {outputSetTo(index,0);}
     void outputTog(int index)   {getOutput(index)->setTog();}
 
-    void setBasicOutputsInv();
+    void setDefInvOutputs();
 
 public:
     void callInputData(quint8 m_index);
@@ -80,8 +80,6 @@ private slots:
     void updateAllOutputData();
 
 	void sendSetOData(bool all=true);
-
-    void updateIOPut();
 
 public slots:
 virtual void update();

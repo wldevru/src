@@ -88,8 +88,13 @@ public:
    quint8* getIndexInAxis() {return iInAxis;}
    quint8* getIndexInX()    {return iInX;}
 
-   quint8 getCurIndexAxis();
-   quint8 getCurIndexX();
+   quint8 getCurIndexAxis() {return curIndexAxis;}
+   quint8 getCurIndexX()    {return curIndexX;}
+   quint8 getCurVmode()     {return curVmode;}
+
+    bool isManualAxis() {return getFlag()&WHF_manualA;}
+    bool isManualX()    {return getFlag()&WHF_manualX;}
+    bool isManualV()    {return getFlag()&WHF_manualV;}
 
 signals:
  
@@ -106,9 +111,9 @@ public:
 
 	bool setEncoder(quint8 _iEncoder);
 
-    bool setManualIndexAxis(quint8 m_index);
-    bool setManualIndexX(quint8 m_index);
-    bool setManualVmode(quint8 m_index);
+    bool setIndexAxis(quint8 m_index);
+    bool setIndexX(quint8 m_index);
+    bool setVmode(quint8 m_index);
 
     bool setInAxis(quint8 *indexs,quint8 size);
     bool setInX(quint8 *indexs,quint8 size);
@@ -119,7 +124,7 @@ public:
 
     bool setFlag(quint8 flag);
 
-    bool setEnable(bool enable);
+    bool setEnable(bool enable);                                 
 
     bool setDataAxis(quint8 m_index,quint8 iAxis,float kTrack);
 

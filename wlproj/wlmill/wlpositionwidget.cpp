@@ -1,7 +1,7 @@
 #include "wlpositionwidget.h"
 
 WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Program,QWidget *parent)
-	: QWidget(parent)
+    : QWidget(parent)
 {
 	MillMachine=_MillMachine;
     Program=_Program;
@@ -10,35 +10,23 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
 
 	ui.setupUi(this);
 
-
 	QTimer *timer = new QTimer;
     connect(timer,SIGNAL(timeout()),this,SLOT(updatePosition()));
     timer->start(100);
 
-    ui.gALabelX->setDrive(MillMachine->getDrive("X"));
-    ui.gALabelY->setDrive(MillMachine->getDrive("Y"));
-    ui.gALabelZ->setDrive(MillMachine->getDrive("Z"));
-    ui.gALabelA->setDrive(MillMachine->getDrive("A"));
-    ui.gALabelB->setDrive(MillMachine->getDrive("B"));
+    QTimer *timerProgres = new QTimer;
+    connect(timerProgres,SIGNAL(timeout()),this,SLOT(updateProgress()));
+    timerProgres->start(1000);
 
-    ui.gALabelX->setGCode(MillMachine->getGCode());
-    ui.gALabelY->setGCode(MillMachine->getGCode());
-    ui.gALabelZ->setGCode(MillMachine->getGCode());
-    ui.gALabelA->setGCode(MillMachine->getGCode());
-    ui.gALabelB->setGCode(MillMachine->getGCode());
+    QTimer *timerOnButton = new QTimer;
+    connect(timerOnButton,SIGNAL(timeout()),this,SLOT(updateOnButton()));
+    timerOnButton->start(500);
 
-    connect(ui.gALabelX,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
-    connect(ui.gALabelY,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
-    connect(ui.gALabelZ,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
-    connect(ui.gALabelA,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
-    connect(ui.gALabelB,SIGNAL(changedPress(QString,int)),this,SLOT(onSetDrive(QString,int)));
-/*
-    ui.qwAxisLabelPosX->rootObject()->setProperty("p_name","X:");
-    ui.qwAxisLabelPosY->rootObject()->setProperty("p_name","Y:");
-    ui.qwAxisLabelPosZ->rootObject()->setProperty("p_name","Z:");
-    ui.qwAxisLabelPosA->rootObject()->setProperty("p_name","A:");
-    ui.qwAxisLabelPosB->rootObject()->setProperty("p_name","B:");
-    */
+    listFper<<0.1<<0.25<<1<<5<<10<<25<<50<<75<<100;
+    listManDist = QString("JOG,5.00,1.00,0.10,0.01").split(",");
+
+    m_buttonSize=QSize(32,32);
+
 	connect(ui.pbOnMachine,SIGNAL(toggled(bool)),MillMachine,SLOT(setOn(bool)));
 
     ui.pbG28->setPopupMode(QToolButton::DelayedPopup);
@@ -57,43 +45,15 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
 	menuPBRot->addAction((tr("set verify postion")),this,SLOT(onPBsetP1()));
 	menuPBRot->addAction((tr("rotation correction")),this,SLOT(onPBRotSK()));
     ui.pbRotSC->setMenu(menuPBRot);	
-/*
-    connect(ui.qwAxisLabelPosX->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetX(int)));
-    connect(ui.qwAxisLabelPosY->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetY(int)));
-*/
+
     connect(ui.cbExGCode->lineEdit(),SIGNAL(returnPressed()),this,SLOT(onExGCode()));
 
-    connect(ui.pbFindDrivePos,SIGNAL(clicked()),this,SLOT(oPBFindDrivePos()));
+    connect(ui.pbFindDrivePos,SIGNAL(clicked()),this,SLOT(onPBFindDrivePos()));
 
     connect(ui.pbReset,SIGNAL(clicked()),MillMachine,SLOT(reset()),Qt::DirectConnection);
 
     connect(MillMachine,SIGNAL(changedReadyRunList(bool)),SLOT(updateEnableMoved(bool)));
 
-/*
-    if(!MillMachine->getDrive("Z"))
-        {
-        ui.qwAxisLabelPosZ->setVisible(false);
-        }
-    else {
-          connect(ui.qwAxisLabelPosZ->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetZ(int)));
-         }
-
-    if(!MillMachine->getDrive("A"))
-        {
-        ui.qwAxisLabelPosA->setVisible(false);
-        }
-    else {
-         connect(ui.qwAxisLabelPosA->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetA(int)));
-         }
-
-    if(!MillMachine->getDrive("B"))
-        {
-        ui.qwAxisLabelPosB->setVisible(false);
-        }
-    else {
-         connect(ui.qwAxisLabelPosB->rootObject(),SIGNAL(qmlSignalClick(int)),this,SLOT(onPBsetB(int)));
-         }
-*/
     ui.cbExGCode->setToolTip(
                  tr(
                 "<b>GCode:</font></b>"
@@ -106,11 +66,46 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
                   "<li>G51(XYZ scale)</li>"
                   "<li>G53(no modal)</li>"
                   "<li>G54-G59</li>"
+                  "<li>G64,G61.1,G64(P,Q)</li>"
                   "<li>G80,G81,G83(Z,R,Q)</li>"
                   "<li>G90,G91</li>"
+                  "<li>G98,G99</li>"
                 "</ol>"
                   )
                 );
+
+initElementControls();
+
+QTimer *timerFS= new QTimer;
+
+connect(timerFS,SIGNAL(timeout()),SLOT(updateFSLabel()));
+timerFS->start(50);
+
+WLWhell *Whell=MillMachine->getWhell();
+
+if(Whell)
+ {
+ connect(Whell,&WLWhell::changedCurIndexAxis,this,[=](quint8 i){if(gALabelX) gALabelX->setChecked(i==1);
+                                                                if(gALabelY) gALabelY->setChecked(i==2);
+                                                                if(gALabelZ) gALabelZ->setChecked(i==3);
+                                                                if(gALabelA) gALabelA->setChecked(i==4);
+                                                                if(gALabelB) gALabelB->setChecked(i==5);});
+
+
+ if(gALabelX) gALabelX->setChecked(Whell->getCurIndexAxis()==1);
+ if(gALabelY) gALabelY->setChecked(Whell->getCurIndexAxis()==2);
+ if(gALabelZ) gALabelZ->setChecked(Whell->getCurIndexAxis()==3);
+ if(gALabelA) gALabelA->setChecked(Whell->getCurIndexAxis()==4);
+ if(gALabelB) gALabelB->setChecked(Whell->getCurIndexAxis()==5);
+
+ //connect(Whell,&WLWhell::changedCurIndexX,this,[=](quint8 i){cbTypeManual->setCurrentIndex(i);});
+ //connect(Whell,&WLWhell::changedCurVmode,ui.rbWhellVMode,&QRadioButton::setChecked);
+ }
+
+setFocusElement('J');
+
+ui.pbOnMachine->setBaseSize(m_buttonSize);
+
 }
 
 WLPositionWidget::~WLPositionWidget()
@@ -118,7 +113,654 @@ WLPositionWidget::~WLPositionWidget()
 
 }
 
-void WLPositionWidget::oPBFindDrivePos()
+void WLPositionWidget::initElementControls()
+{
+QList <WLMillDrive*> list=MillMachine->getDrives();
+
+//QWidget *widgetEL = new QWidget(this);
+//QWidget *widgetPM = new QWidget(this);
+//ui.gridLayout->addLayout(ui.horLayoutTop0,0,0);
+//ui.gridLayout->addLayout(ui.horLayoutTop1,0,1);
+
+QSizePolicy sizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+//sizePolicy.setHeightForWidth(true);
+
+//QSplitter *spliter= new QSplitter(this);
+//
+//spliter->setOrientation(Qt::Horizontal);
+//spliter->addWidget(widgetEL);
+//spliter->addWidget(widgetPM);
+
+QHBoxLayout *horLayout;
+
+//QVBoxLayout *verLayoutEL=new QVBoxLayout(this);
+//QVBoxLayout *verLayoutPM=new QVBoxLayout(this);
+//
+//widgetEL->setLayout(verLayoutEL);
+//widgetPM->setLayout(verLayoutPM);
+
+QVBoxLayout *verLayoutEL = ui.verLayoutControl;
+//ui.horLayoutControl->addWidget(spliter);
+//ui.horLayoutControl->addWidget(widgetEL);
+//ui.horLayoutControl->addWidget(widgetPM);
+
+gALabelX=new WLGAxisLabel(this);
+gALabelY=new WLGAxisLabel(this);
+gALabelZ=new WLGAxisLabel(this);
+gALabelA=new WLGAxisLabel(this);
+gALabelB=new WLGAxisLabel(this);
+gALabelC=new WLGAxisLabel(this);
+
+bgMinusAxis = new QButtonGroup();
+int row=1;
+QFont font;
+
+foreach(WLMillDrive *mdrive,list)
+ {
+ WLGAxisLabel *AL=nullptr;
+
+ if(mdrive->getName()=="X")       AL=gALabelX;
+ else if(mdrive->getName()=="Y")  AL=gALabelY;
+ else if(mdrive->getName()=="Z")  AL=gALabelZ;
+ else if(mdrive->getName()=="A")  AL=gALabelA;
+ else if(mdrive->getName()=="B")  AL=gALabelB;
+
+ if(AL==nullptr) continue;
+
+ horLayout=new QHBoxLayout(this);
+
+ AL->setDrive(mdrive);
+ AL->setGCode(MillMachine->getGCode());;
+
+ connect(AL,SIGNAL(changedPress(QString,int)),this,SLOT(onPushDrive(QString,int)));
+ //verLayoutEL->addWidget(AL);
+ horLayout->addWidget(AL);
+
+ QToolButton *TBM = new QToolButton(this);
+ TBM->setIcon(QPixmap(":/data/icons/minus1.png"));
+ TBM->setIconSize(m_buttonSize);
+ TBM->setAutoRepeat(false);
+ TBM->setSizePolicy(sizePolicy);
+ font=TBM->font();
+ font.setPointSize(12);
+
+ bgMinusAxis->addButton(TBM);
+ //connect(TBM,&QToolButton::pressed(),)
+ connect(TBM,&QToolButton::pressed,this,[=](){onPBAxis(mdrive->getName(),-1,1);});
+ connect(TBM,&QToolButton::released,this,[=](){onPBAxis(mdrive->getName(),-1,0);});
+
+ horLayout->addWidget(TBM);
+
+ QToolButton *TBP = new QToolButton(this);
+ TBP->setIcon(QPixmap(":/data/icons/plus2.png"));
+ TBP->setIconSize(m_buttonSize);
+ TBP->setAutoRepeat(false);
+ TBP->setSizePolicy(sizePolicy);
+
+ connect(TBP,&QToolButton::pressed,this,[=](){onPBAxis(mdrive->getName(),1,1);});
+ connect(TBP,&QToolButton::released,this,[=](){onPBAxis(mdrive->getName(),1,0);});
+ horLayout->addWidget(TBP);
+
+ connect(MillMachine,&WLMillMachine::changedOn,TBP,&QToolButton::setEnabled);
+ connect(MillMachine,&WLMillMachine::changedOn,TBM,&QToolButton::setEnabled);
+
+ connect(MillMachine,&WLMillMachine::changedPossibleManual,TBP,&QToolButton::setEnabled);
+ connect(MillMachine,&WLMillMachine::changedPossibleManual,TBM,&QToolButton::setEnabled);
+
+ TBM->setEnabled(MillMachine->isOn());
+ TBP->setEnabled(MillMachine->isOn());
+
+ TBPDriveList+=TBP;
+ TBMDriveList+=TBM;
+
+ if(mdrive->getName()=="X") {pbPlusX=TBP;pbMinusX=TBM;}
+ else if(mdrive->getName()=="Y") {pbPlusY=TBP;pbMinusY=TBM;}
+ else if(mdrive->getName()=="Z") {pbPlusZ=TBP;pbMinusZ=TBM;}
+
+ verLayoutEL->addLayout(horLayout);
+
+ row++;
+ }
+
+QSizePolicy sizePolicyE = sizePolicy;
+
+sizePolicyE.setHorizontalPolicy(QSizePolicy::Expanding);
+//F
+
+horLayout=new QHBoxLayout(this);
+
+labelF = new WLLabel(this);
+labelF->setPrefix("F:");
+labelF->setDataN(0);
+labelF->setFont(font);
+labelF->setSizePolicy(sizePolicyE);
+
+horLayout->addWidget(labelF);
+
+QToolButton *TB100 = new QToolButton(this);
+TB100->setIcon(QPixmap(":/data/icons/100.png"));
+TB100->setIconSize(m_buttonSize);
+TB100->setSizePolicy(sizePolicy);
+horLayout->addWidget(TB100);
+
+sbFper = new QDoubleSpinBox(this);
+sbFper->setAlignment(Qt::AlignLeft);
+sbFper->setRange(0.1,300);
+sbFper->setSingleStep(0.05);
+sbFper->setValue(100);
+sbFper->setPrefix("F:");
+sbFper->setSuffix("%");
+sbFper->setButtonSymbols(QAbstractSpinBox::NoButtons);
+sbFper->setSizePolicy(sizePolicyE);
+sbFper->setFont(font);
+
+connect(sbFper,SIGNAL(valueChanged(double)),MillMachine,SLOT(setPercentSpeed(double)));
+MillMachine->setPercentSpeed(100);
+
+horLayout->addWidget(sbFper);
+
+connect(TB100,&QToolButton::clicked,this,[=](){sbFper->setValue(100);});
+
+verLayoutEL->addLayout(horLayout);
+
+//horLayout=new QHBoxLayout(this);
+
+QToolButton *TBM = new QToolButton(this);
+TBM->setIcon(QPixmap(":/data/icons/minus1.png"));
+TBM->setIconSize(m_buttonSize);
+TBM->setAutoRepeat(true);
+TBM->setSizePolicy(sizePolicy);
+//TBM->setMinimumSize(m_sizeButton);
+connect(TBM,&QToolButton::clicked,this,&WLPositionWidget::on_pbMinusFper_pressed);
+horLayout->addWidget(TBM);
+
+QToolButton *TBP = new QToolButton(this);
+TBP->setIcon(QPixmap(":/data/icons/plus2.png"));
+TBP->setIconSize(m_buttonSize);
+TBP->setAutoRepeat(true);
+TBP->setSizePolicy(sizePolicy);
+//TBP->setMinimumSize(m_sizeButton);
+connect(TBP,&QToolButton::clicked,this,&WLPositionWidget::on_pbPlusFper_pressed);
+horLayout->addWidget(TBP);
+
+verLayoutEL->addLayout(horLayout);
+
+row++;
+//S
+horLayout=new QHBoxLayout(this);
+
+labelS = new WLLabel(this);
+labelS->setPrefix("S:");
+labelS->setDataN(0);
+labelS->setFont(font);
+labelS->setToolTip(tr("press for edit"));
+labelS->setSizePolicy(sizePolicyE);
+horLayout->addWidget(labelS);
+
+TB100 = new QToolButton(this);
+TB100->setIcon(QPixmap(":/data/icons/100.png"));
+TB100->setIconSize(m_buttonSize);
+TB100->setSizePolicy(sizePolicy);
+//TB100->setMinimumSize(m_sizeButton);
+connect(TB100,&QToolButton::clicked,this,[=](){MillMachine->setPercentSOut(100);});
+horLayout->addWidget(TB100);
+
+sbSper = new QDoubleSpinBox(this);
+sbSper->setAlignment(Qt::AlignLeft);
+sbSper->setRange(0.1,300);
+sbSper->setSingleStep(0.05);
+sbSper->setValue(100);
+sbSper->setPrefix("S:");
+sbSper->setSuffix("%");
+sbSper->setButtonSymbols(QAbstractSpinBox::NoButtons);
+sbSper->setFont(font);
+sbSper->setSizePolicy(sizePolicyE);
+
+connect(sbSper,SIGNAL(valueChanged(double)),MillMachine,SLOT(setPercentSOut(double)));
+MillMachine->setPercentSOut(100);
+horLayout->addWidget(sbSper);
+
+connect(TB100,&QToolButton::clicked,this,[=](){sbSper->setValue(100);});
+
+verLayoutEL->addLayout(horLayout);
+//ui.laElementControl->addLayout(horLayout);
+
+//horLayout=new QHBoxLayout(this);
+
+TBM = new QToolButton(this);
+TBM->setIcon(QPixmap(":/data/icons/minus1.png"));
+TBM->setIconSize(m_buttonSize);
+TBM->setAutoRepeat(true);
+TBM->setSizePolicy(sizePolicy);
+//TBM->setMinimumSize(m_sizeButton);
+connect(TBM,&QToolButton::clicked,this,&WLPositionWidget::on_pbMinusSper_pressed);
+horLayout->addWidget(TBM);
+
+TBP = new QToolButton(this);
+TBP->setIcon(QPixmap(":/data/icons/plus2.png"));
+TBP->setIconSize(m_buttonSize);
+TBP->setAutoRepeat(true);
+TBP->setSizePolicy(sizePolicy);
+//TBP->setMinimumSize(m_sizeButton);
+connect(TBP,&QToolButton::clicked,this,&WLPositionWidget::on_pbPlusSper_pressed);
+horLayout->addWidget(TBP);
+
+//ui.laElementControl->addLayout(horLayout);
+verLayoutEL->addLayout(horLayout);
+
+//JOG
+horLayout=new QHBoxLayout(this);
+
+labelTypeManual = new QLabel(this);
+labelTypeManual->setFont(font);
+labelTypeManual->setText("JOG");
+labelTypeManual->setSizePolicy(sizePolicyE);
+
+horLayout->addWidget(labelTypeManual);
+
+pbFast = new QToolButton(this);
+pbFast->setFont(font);
+pbFast->setText(tr("fast"));
+pbFast->setIconSize(m_buttonSize);
+pbFast->setSizePolicy(sizePolicy);
+
+connect(pbFast,&QToolButton::pressed,this,&WLPositionWidget::on_pbFast_pressed);
+connect(pbFast,&QToolButton::pressed,this,&WLPositionWidget::on_pbFast_released);
+
+horLayout->addWidget(pbFast);
+
+sbFman = new QDoubleSpinBox(this);
+sbFman->setAlignment(Qt::AlignLeft);
+sbFman->setRange(0,100);
+sbFman->setValue(10);
+sbFman->setPrefix("");
+sbFman->setSuffix("%");
+sbFman->setButtonSymbols(QAbstractSpinBox::NoButtons);
+sbFman->setSizePolicy(sizePolicyE);
+sbFman->setFont(font);
+
+connect(sbFper,SIGNAL(valueChanged(double)),MillMachine,SLOT(setPercentSpeed(double)));
+
+horLayout->addWidget(sbFman);
+
+verLayoutEL->addLayout(horLayout);
+//ui.laElementControl->addLayout(horLayout);
+
+//horLayout=new QHBoxLayout(this);
+
+TBM = new QToolButton(this);
+TBM->setIcon(QPixmap(":/data/icons/minus1.png"));
+TBM->setIconSize(m_buttonSize);
+TBM->setAutoRepeat(true);
+TBM->setSizePolicy(sizePolicy);
+connect(TBM,&QToolButton::clicked,this,&WLPositionWidget::on_pbMinusFman_pressed);
+horLayout->addWidget(TBM);
+
+
+TBP = new QToolButton(this);
+TBP->setIcon(QPixmap(":/data/icons/plus2.png"));
+TBP->setIconSize(m_buttonSize);
+TBP->setAutoRepeat(true);
+TBP->setSizePolicy(sizePolicy);
+connect(TBP,&QToolButton::clicked,this,&WLPositionWidget::on_pbPlusFman_pressed);
+horLayout->addWidget(TBP);
+
+verLayoutEL->addLayout(horLayout);
+//ui.laElementControl->addLayout(horLayout);
+row++;
+}
+
+float WLPositionWidget::calcStepMov()
+{
+if(m_curIndexListMan==0)
+    return 0.0;
+ else
+    return labelTypeManual->text().toFloat();
+}
+
+void WLPositionWidget::setFocusElement(char f)
+{
+if(sbFper->suffix().back()=="*") {sbFper->setSuffix(sbFper->suffix().chopped(1));}
+else if(sbFman->suffix().back()=="*") {sbFman->setSuffix(sbFman->suffix().chopped(1));}
+else if(sbSper->suffix().back()=="*") {sbSper->setSuffix(sbSper->suffix().chopped(1));}
+
+if(f=='F') sbFper->setSuffix(sbFper->suffix()+"*");
+else if(f=='S') sbSper->setSuffix(sbSper->suffix()+"*");
+else if(f=='J') sbFman->setSuffix(sbFman->suffix()+"*");
+
+focusElement=f;
+}
+
+
+void WLPositionWidget::keyPressEvent ( QKeyEvent * event )
+{
+if(!event->isAutoRepeat())
+{
+switch(event->key())
+   {
+   case Qt::Key_Left:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(true);onPBAxis("X", -1,1);} break;
+   case Qt::Key_Right:   if(pbPlusX->isEnabled())  {pbPlusX->setDown(true); onPBAxis("X",  1,1);} break;
+   case Qt::Key_Down:    if(pbMinusY->isEnabled()) {pbMinusY->setDown(true);onPBAxis("Y", -1,1);} break;
+   case Qt::Key_Up:      if(pbPlusY->isEnabled())  {pbPlusY->setDown(true); onPBAxis("Y",  1,1);} break;
+   case Qt::Key_PageDown:if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(true);onPBAxis("Z", -1,1);} break;
+   case Qt::Key_PageUp:  if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(true); onPBAxis("Z",  1,1);} break;
+   }
+
+switch(event->key())
+   {
+   case Qt::Key_Shift:   pbFast->setDown(true);
+                         on_pbFast_pressed();
+                         break;
+
+   case Qt::Key_F:       setFocusElement('F'); break;
+   case Qt::Key_S:       setFocusElement('S'); break;
+   case Qt::Key_J:       setFocusElement('J'); break;
+   }
+}
+
+switch(event->key())
+   {
+   case Qt::Key_Plus:    on_pbPlus_pressed();    break;
+   case Qt::Key_Minus:   on_pbMinus_pressed();   break;
+   }
+
+
+event->accept();
+}
+
+void WLPositionWidget::keyReleaseEvent ( QKeyEvent * event )
+{
+if(!event->isAutoRepeat())
+{
+  switch(event->key())
+  {
+  case Qt::Key_Left:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);} break;
+  case Qt::Key_Right:   if(pbPlusX->isEnabled())  {pbPlusX->setDown(false);  onPBAxis("X", 1,0);} break;
+  case Qt::Key_Down:    if(pbMinusY->isEnabled()) {pbMinusY->setDown(false); onPBAxis("Y", 1,0);} break;
+  case Qt::Key_Up:      if(pbPlusY->isEnabled())  {pbPlusY->setDown(false);  onPBAxis("Y", 1,0);} break;
+  case Qt::Key_PageDown:if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(false); onPBAxis("Z", 1,0);} break;
+  case Qt::Key_PageUp:  if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(false);  onPBAxis("Z", 1,0);} break;
+  }
+
+  switch(event->key())
+  {
+  case Qt::Key_Shift:   pbFast->setDown(false);
+                        on_pbFast_released();
+                        break;
+  }
+}
+
+event->accept();
+}
+
+void WLPositionWidget::focusOutEvent(QFocusEvent *event)
+{
+Q_UNUSED(event);
+
+if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);}
+if(pbPlusX->isEnabled())  {pbPlusX->setDown(false);  onPBAxis("X", 1,0);}
+if(pbMinusY->isEnabled()) {pbMinusY->setDown(false); onPBAxis("Y", 1,0);}
+if(pbPlusY->isEnabled())  {pbPlusY->setDown(false);  onPBAxis("Y", 1,0);}
+if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(false); onPBAxis("Z", 1,0);}
+if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(false);  onPBAxis("Z", 1,0);}
+
+ pbFast->setDown(false);
+}
+
+void WLPositionWidget::resizeEvent(QResizeEvent *event)
+{
+    qDebug()<<"resize PositionWidget";
+}
+
+void WLPositionWidget::mousePressEvent(QMouseEvent *event)
+{
+QMenu menu(this);
+QAction *act;
+
+if(labelS->geometry().contains(event->pos())) {
+ act=menu.addAction(tr("set S correct"),this,SLOT(onSetSCor()));
+ act=menu.addAction(tr("clear correct"),this,SLOT(onClearSCorList()));
+
+ menu.exec(labelS->mapToGlobal(pos()));
+ }else  if (labelTypeManual->geometry().contains(event->pos()))
+        {
+        if(++m_curIndexListMan==listManDist.size())
+          {
+          m_curIndexListMan=0;
+          }
+
+        labelTypeManual->setText(listManDist[m_curIndexListMan]);
+        }
+
+return;
+}
+
+void WLPositionWidget::updateProgress()
+{
+QString str;
+
+ui.proBar->setVisible(MillMachine->isRunProgram());
+ui.labelTime->setVisible(MillMachine->isRunProgram());
+ui.cbExGCode->setVisible(!MillMachine->isRunProgram());
+
+if(!MillMachine->isRunProgram())  return;
+
+long           made=MillMachine->getIProgram();
+long          order=Program->getElementCount();
+double timeElement=MillMachine->getTimeElement()/1000;
+
+long time_s=timeElement*(order-made+MillMachine->getMotionDevice()->getModulePlanner()->getCountBuf()
+                                   +MillMachine->getTrajIProgramSize());
+
+long h,m,s,d;
+
+h=time_s/3600;
+time_s-=h*3600;
+
+m=time_s/60;
+time_s-=m*60;
+
+s=time_s;
+
+str=(QString(("%1:%2:%3")).arg(h).arg(m).arg(s));
+
+if(h<0)
+/*
+QTime curTime;
+
+curTime=QTime::currentTime();
+
+s+=curTime.second();
+if(s>=60) {m++; s-=60;}
+
+m+=curTime.minute();
+if(m>=60) {h++; m-=60;}
+
+d=0;
+h+=curTime.hour();
+while(h>=24)
+     {h-=24;d++;}
+*/
+str+=(QString(("/%1:%2:%3:%4")).arg(d).arg(h).arg(m).arg(s));
+
+ui.labelTime->setText(str);
+
+ui.proBar->setValue((float)(Program->getLastMovElement())
+                   /(float)(Program->getElementCount())*100.0);
+/*
+ui.labelBufPC-> setText(tr("PC     :")+QString::number(MillMachine->getTrajSize()));
+ui.labelBufDev->setText(tr("Device :")+QString::number(MillMachine->getMotionDevice()->getModulePlanner()->getSizeBuf()
+                                                      -MillMachine->getMotionDevice()->getModulePlanner()->getFree()));
+*/
+}
+
+void WLPositionWidget::updateOnButton()
+{
+bool ntryPos=false;
+static bool flash=false;
+
+ui.pbOnMachine->setStyleSheet(flash
+                           &&(!ui.pbOnMachine->isChecked()) ? "background-color: rgb(255, 100, 100);border-style: solid;"
+                               :(MillMachine->isRunScript() ? "background-color: yellow ;border-style: solid;"
+                                                           :"border-style: solid;"));
+
+foreach(WLMillDrive *MD,MillMachine->getDrives())
+ {
+ if(!MD->isTruPosition())   {ntryPos=true; break;}
+ }
+
+ui.pbFindDrivePos->setStyleSheet(ntryPos
+                               &&flash
+                               &&ui.pbOnMachine->isChecked() ? "background-color: rgb(255, 100, 100);border-style: solid;"
+                                                                            :"border-style: solid;");
+flash=!flash;
+}
+
+
+void WLPositionWidget::onTeachAxis(QString nameDrive)
+{
+WLMillDrive *Drive=MillMachine->getDrive(nameDrive);
+if(Drive!=nullptr)
+ {
+ WLEnterNum  EnterNum (this);
+ EnterNum.setLabel(tr("Current position Drive ")+nameDrive+" = ");
+ EnterNum.setNow(Drive->getAxisPosition());
+
+ if(EnterNum.exec())
+        {
+        Drive->setPosition(EnterNum.getNow());
+        MillMachine->goDriveTeach(nameDrive);
+        }
+ }
+}
+
+void WLPositionWidget::onSetSCor()
+{
+if(MillMachine->isUseCorrectSOut())  {
+ MillMachine->addCurrentSCor();
+ sbSper->setValue(100);
+ }
+else {
+     QMessageBox::information(this,tr("information"),tr("S correct is off, please on in Edit->WLMill"));
+     }
+}
+
+void WLPositionWidget::onClearSCorList()
+{
+auto ret=QMessageBox::question(this,tr("Question")
+                              ,tr("Delete all data correct S?")
+                              ,QMessageBox::Ok|QMessageBox::Cancel);
+if(ret==QMessageBox::Ok)
+ {
+ MillMachine->clearSCorList();
+ }
+}
+
+void WLPositionWidget::on_pbFast_pressed()
+{
+MillMachine->setPercentManual(100.0);
+}
+
+void WLPositionWidget::on_pbFast_released()
+{
+MillMachine->setPercentManual(sbFman->value());
+}
+
+
+void WLPositionWidget::on_pbPlusFman_pressed()
+{
+int index=listFper.indexOf(sbFman->value());
+
+if(index!=-1)
+ {
+ index++;
+ if(index<listFper.size())  sbFman->setValue(listFper[index]);
+ }
+else {
+ for(int i=0;i<listFper.size();i++)
+  {
+  if(sbFman->value()<listFper[i])
+      {
+      sbFman->setValue(listFper[i]);
+      break;
+      }
+  }
+}
+
+
+}
+
+void  WLPositionWidget::on_pbMinusFman_pressed()
+{
+int index=listFper.indexOf(sbFman->value());
+
+if(index!=-1)
+  {
+  index--;
+  if(index>=0)  sbFman->setValue(listFper[index]);
+  }
+else {
+ for(int i=listFper.size()-1;i>=0;i--)
+  {
+  if(sbFman->value()>listFper[i])
+      {
+      sbFman->setValue(listFper[i]);
+      break;
+      }
+  }
+}
+}
+
+void WLPositionWidget::on_pbPlus_pressed()
+{
+switch(focusElement)
+{
+case 'F': on_pbPlusFper_pressed(); break;
+case 'S': on_pbPlusSper_pressed(); break;
+case 'J': on_pbPlusFman_pressed(); break;
+}
+
+}
+
+void WLPositionWidget::on_pbMinus_pressed()
+{
+switch(focusElement)
+{
+case 'F': on_pbMinusFper_pressed(); break;
+case 'S': on_pbMinusSper_pressed(); break;
+case 'J': on_pbMinusFman_pressed(); break;
+}
+
+}
+
+void WLPositionWidget::onPBAxis(QString name, int rot,bool press)
+{
+
+if(press)
+    {
+    if(pbFast->isDown())
+        MillMachine->setPercentManual(100.0f);
+    else
+        MillMachine->setPercentManual(sbFman->value());
+
+    MillMachine->goDriveManual(name,rot,calcStepMov());
+    }
+ else
+    {
+    if(calcStepMov()==0)
+        MillMachine->goDriveManual(name,0,0);
+    }
+}
+
+
+
+void WLPositionWidget::updateFSLabel()
+{
+labelF->setData(MillMachine->getCurSpeed()*60);
+labelS->setData(MillMachine->getCurSOut());
+}
+
+void WLPositionWidget::onPBFindDrivePos()
 {
 MillMachine->goFindDrivePos();
 }
@@ -190,11 +832,11 @@ QPalette blckPalette,redPalette;
 blckPalette.setColor(QPalette::WindowText, Qt::black);
  redPalette.setColor(QPalette::WindowText, Qt::red);
 
-ui.gALabelX->setGPos(GP.x);
-ui.gALabelY->setGPos(GP.y);
-ui.gALabelZ->setGPos(GP.z-MillMachine->getGCode()->getHcorr());
-ui.gALabelA->setGPos(GP.a);
-ui.gALabelB->setGPos(GP.b);
+gALabelX->setGPos(GP.x);
+gALabelY->setGPos(GP.y);
+gALabelZ->setGPos(GP.z-MillMachine->getGCode()->getHcorr());
+gALabelA->setGPos(GP.a);
+gALabelB->setGPos(GP.b);
 
 /*
 ui.qwAxisLabelPosX->rootObject()->setProperty("p_data53",QString("%1").arg((GP53.x),0,'f',2));
@@ -236,14 +878,13 @@ ui.qwAxisLabelPosB->rootObject()->setProperty("p_feed",QString("%1").arg(MillMac
 
 }*/
 
-ui.gALabelX->update();
-ui.gALabelY->update();
-ui.gALabelZ->update();
-ui.gALabelA->update();
-ui.gALabelB->update();
+gALabelX->update();
+gALabelY->update();
+gALabelZ->update();
+gALabelA->update();
+gALabelB->update();
 
-ui.rotSK->setData(MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).a);
-
+ui.pbRotSC->setText(QString::number(MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).a,'f',2));
 
 ui.labelActivGCode->setText(MillMachine->m_GCode.getActivGCodeString());
 
@@ -252,6 +893,19 @@ if(MillMachine->m_motDevice->getModuleConnect())
  ui.labelConnect->setEnabled(MillMachine->m_motDevice->getModuleConnect()->isConnect());
 else
  ui.labelConnect->setEnabled(false);
+
+if(MillMachine->m_motDevice->getModuleConnect())
+ ui.labelConnect->setEnabled(MillMachine->m_motDevice->getModuleConnect()->isConnect());
+else
+ ui.labelConnect->setEnabled(false);
+
+
+WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->getMotionDevice()->getModule(typeMAxis));
+
+if(ModuleAxis->getInput(MAXIS_inProbe)->getNow())
+    ui.labelInProbe->setPixmap(QPixmap(":/data/icons/ion.png"));
+else
+    ui.labelInProbe->setPixmap(QPixmap(":/data/icons/ioff.png"));
 
 #ifdef DEF_5D
 P=MillMachine->getCurrentPosition();
@@ -265,7 +919,7 @@ E1->setData(EPos.e1.pos,5);
 #endif
 }
 
-void WLPositionWidget::onSetDrive(QString nameDrive,int type)
+void WLPositionWidget::onPushDrive(QString nameDrive,int type)
 {
 if(disButton) return;
 
@@ -274,18 +928,34 @@ if(type==WLGAxisLabel::typeName)
  QMenu menu(this);
  QAction *act;
 
- act=menu.addAction(tr("Find"));
+ act=menu.addAction(tr("0"));
+ connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->setCurPositionSC(nameDrive,0);});
+
+ act=menu.addAction(tr("1/2"));
+ connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->setCurPositionSC(nameDrive,MillMachine->getCurPositionSC(nameDrive)/2);});
+
+ QMenu menuOper(this);
+ menuOper.setTitle(tr("action"));
+
+ act=menuOper.addAction(tr("Find"));
  connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->goDriveFind(nameDrive);});
 
- act=menu.addAction(tr("Reset Find"));
+ act=menuOper.addAction(tr("Reset Find"));
  connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->getDrive(nameDrive)->setTruPosition(false);});
 
+ act=menuOper.addAction(tr("Teach"));
+ connect(act, &QAction::triggered,this,[=](){onTeachAxis(nameDrive);});
 
-      if(nameDrive=="X") menu.exec(ui.gALabelX->mapToGlobal(pos()));
- else if(nameDrive=="Y") menu.exec(ui.gALabelY->mapToGlobal(pos()));
- else if(nameDrive=="Z") menu.exec(ui.gALabelZ->mapToGlobal(pos()));
- else if(nameDrive=="A") menu.exec(ui.gALabelA->mapToGlobal(pos()));
- else if(nameDrive=="B") menu.exec(ui.gALabelB->mapToGlobal(pos()));
+ menu.addMenu(&menuOper);
+ //act=menu.addAction(tr("Set Plus  Limit"));
+ //act=menu.addAction(tr("Set Minus Limit"));
+
+
+      if(nameDrive=="X") menu.exec(gALabelX->mapToGlobal(pos()));
+ else if(nameDrive=="Y") menu.exec(gALabelY->mapToGlobal(pos()));
+ else if(nameDrive=="Z") menu.exec(gALabelZ->mapToGlobal(pos()));
+ else if(nameDrive=="A") menu.exec(gALabelA->mapToGlobal(pos()));
+ else if(nameDrive=="B") menu.exec(gALabelB->mapToGlobal(pos()));
 
  return;
  }
@@ -293,7 +963,6 @@ if(type==WLGAxisLabel::typeName)
 WLEnterNum  EnterNum (this);
 
 EnterNum.setLabel(nameDrive+"=");
-
 
 if(EnterNum.exec())  setPosition(nameDrive,EnterNum.getNow(),type);
 }

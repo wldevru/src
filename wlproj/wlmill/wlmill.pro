@@ -100,7 +100,11 @@ SOURCES += \
     wlpositionwidget.cpp \
     wlvisualwidget.cpp \
     wlgaxislabel.cpp \
-    ../../wlqt/form/wlgmodelwidget.cpp
+    ../../wlqt/form/wlgmodelwidget.cpp \
+    wlelementcontrol.cpp \
+    wltoolswidget.cpp \
+    ../../wlqt/form/wlaxiswidget.cpp \
+    ../../wlqt/form/wlmpgwidget.cpp
 
 
 HEADERS += \
@@ -171,7 +175,11 @@ HEADERS += \
     wlvisualwidget.h \
     ../../wlmotion/wlmotion.h \
     wlgaxislabel.h \
-    ../../wlqt/form/wlgmodelwidget.h
+    ../../wlqt/form/wlgmodelwidget.h \
+    wlelementcontrol.h \
+    wltoolswidget.h \
+    ../../wlqt/form/wlaxiswidget.h \
+    ../../wlqt/form/wlmpgwidget.h
 
 
 FORMS += \
@@ -193,7 +201,11 @@ FORMS += \
     wlmilldrivewidget.ui \
     wlpositionwidget.ui \
     ../../wlqt/form/wlframewidget.ui \
-    ../../wlqt/form/wlgmodelwidget.ui
+    ../../wlqt/form/wlgmodelwidget.ui \
+    wlelementcontrol.ui \
+    wltoolswidget.ui \
+    ../../wlqt/form/wlaxiswidget.ui \
+    ../../wlqt/form/wlmpgwidget.ui
 
 
 RESOURCES += \

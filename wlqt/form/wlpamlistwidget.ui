@@ -17,7 +17,7 @@
    <string>motion parameters</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0" colspan="3">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -27,11 +27,18 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0" colspan="3">
     <widget class="QTableWidget" name="tableWidget">
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
      </attribute>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="pbRem">
+     <property name="text">
+      <string>remove</string>
+     </property>
     </widget>
    </item>
    <item row="0" column="0">
@@ -42,9 +49,9 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QPushButton" name="pbRem">
+    <widget class="QPushButton" name="pbEdit">
      <property name="text">
-      <string>remove</string>
+      <string>edit</string>
      </property>
     </widget>
    </item>

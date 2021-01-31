@@ -7,11 +7,37 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 
 	MillMachine=_MillMachine;
 
-    ui.sbIndexOutPWM->setRange(0,MillMachine->getMotionDevice()->getModulePWM()->getSizeOutPWM()-1);
-    ui.sbIndexOutPWM->setValue(MillMachine->getIndexSOutPWM());
+    ui.editOutSPWM->setModule(MillMachine->getMotionDevice()->getModulePWM(),false);
+    ui.editOutSAOUT->setModule(MillMachine->getMotionDevice()->getModuleAIOPut(),false);
 
-	ui.sbFreqPWM->setValue(MillMachine->getOutPWM()->freq());
-	ui.cbInvPWM->setChecked(MillMachine->getOutPWM()->isInv());
+    QButtonGroup *group=new QButtonGroup(this);
+
+    if(ui.editOutSPWM->isEnable()) group->addButton(ui.editOutSPWM->getButton());
+    if(ui.editOutSAOUT->isEnable()) group->addButton(ui.editOutSAOUT->getButton());
+
+    ui.gbSOut->setChecked(true);
+
+    ui.editOutSPWM ->setCheckable(true);
+    ui.editOutSAOUT->setCheckable(true);
+
+    switch(MillMachine->getMotionDevice()->getModulePlanner()->getTypeSOut())
+    {
+    case typeEOutPWM:   ui.editOutSPWM->setChecked(true);
+                        ui.editOutSPWM->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getISOut());
+                        break;
+
+    case typeEAOutput:  ui.editOutSAOUT->setChecked(true);
+                        ui.editOutSAOUT->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getISOut());
+                        break;
+
+    default: ui.gbSOut->setChecked(false);
+             ui.editOutSPWM->setChecked(true);
+             break;
+    }
+
+    ui.sbPerFpause->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getKFpause()*100);
+
+    group->setExclusive(true);
 
 	ui.sbSmax->setValue(MillMachine->Smax());
     ui.sbSmin->setValue(MillMachine->Smin());
@@ -35,18 +61,39 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
     ui.editInSD->   setValue(ModuleAxis->getInput(MAXIS_inSDStop)->getIndex());
     ui.editInProbe->setValue(ModuleAxis->getInput(MAXIS_inProbe)->getIndex());
 
+    ui.editInEMG->  setCheckable(true);
+    ui.editInSD->   setCheckable(true);
+    ui.editInProbe->setCheckable(true);
+
+    ui.editInEMG->  setChecked(ui.editInEMG->  value()!=0);
+    ui.editInSD->   setChecked(ui.editInSD->   value()!=0);
+    ui.editInProbe->setChecked(ui.editInProbe->value()!=0);
+
     ui.sbSmoothAng->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getSmoothAng());
+    ui.sbHeartMs->setValue(MillMachine->getMotionDevice()->getModuleConnect()->getTimeHeartVal());
+    ui.sbTimeoutMs->setValue(MillMachine->getMotionDevice()->getModuleConnect()->getTimeoutConnectVal());
 
     ui.cbHPause->setChecked(MillMachine->isUseHPause());
     ui.sbHPause->setValue(MillMachine->HPause());
     ui.sbHPause->setEnabled(ui.cbHPause->isChecked());
 
 	ui.sbFbls->setValue(MillMachine->VBacklash());
+    ui.sbFprobe->setValue(MillMachine->VProbe());
 
 	ui.sbTabletHProbe->setValue(MillMachine->getHProbeData().hTablet);
 	ui.sbBackZHProbe->setValue(MillMachine->getHProbeData().zPos);
 
-	ui.gbPWMOut->setChecked(MillMachine->isUsePWMS());
+    ui.gbPWMOut->setChecked(MillMachine->getMotionDevice()->getModulePlanner()->getTypeSOut()!=typeElement::typeEEmpty);
+
+    ui.cbAutoStart->setChecked(MillMachine->isAutoStart());
+
+    ui.cbUseMPG->setChecked(MillMachine->isUseMPG());
+
+    ui.cbUseDriveA->setChecked(MillMachine->getDrive("A")!=nullptr);
+    ui.cbUseDriveB->setChecked(MillMachine->getDrive("B")!=nullptr);
+    ui.cbUseGModel->setChecked(MillMachine->isUseGModel());
+
+    ui.sbZH0ToolProbe->setValue(MillMachine->getGCode()->getHvalue(0));
 
 	initTableCorrectS();
 
@@ -144,11 +191,9 @@ for(int i=0;i<ui.twCorrectS->rowCount()&&i<correctSList.size();i++)
  }
 }
 
-void WLEditMillWidget::saveData()
+bool WLEditMillWidget::saveData()
 {
-MillMachine->setIndexSOutPWM(ui.sbIndexOutPWM->value());
-MillMachine->getOutPWM()->setFreq(ui.sbFreqPWM->value());
-MillMachine->getOutPWM()->setInv(ui.cbInvPWM->isChecked());
+bool ret=false;
 
 MillMachine->setRangeS(ui.sbSmin->value(),ui.sbSmax->value());
 MillMachine->setRangeSOut(ui.sbSminOut->value(),ui.sbSmaxOut->value());
@@ -157,11 +202,14 @@ WLModuleAxis *ModuleAxis=static_cast<WLModuleAxis*>(MillMachine->getMotionDevice
 
 MillMachine->setHPause(ui.sbHPause->value());
 
-ModuleAxis->setInEMGStop(ui.editInEMG->value());
-ModuleAxis->setInSDStop (ui.editInSD->value());
-ModuleAxis->setInProbe  (ui.editInProbe->value());
+ModuleAxis->setInEMGStop(ui.editInEMG->isChecked()  ? ui.editInEMG->value()  :0);
+ModuleAxis->setInSDStop (ui.editInSD->isChecked()   ? ui.editInSD->value()   :0);
+ModuleAxis->setInProbe  (ui.editInProbe->isChecked()? ui.editInProbe->value():0);
 
 MillMachine->getMotionDevice()->getModulePlanner()->setSmoothAng(ui.sbSmoothAng->value());
+
+MillMachine->getMotionDevice()->getModuleConnect()->setTimersConnect(ui.sbTimeoutMs->value(),ui.sbHeartMs->value());
+
 MillMachine->setFeedVBacklash(ui.sbFbls->value());
 
 SHProbeData hPData;
@@ -170,13 +218,69 @@ hPData.zPos=ui.sbBackZHProbe->value();
 
 MillMachine->setHProbeData(hPData);
 
-MillMachine->setEnablePWMS(ui.gbPWMOut->isChecked());
 MillMachine->setEnableHPause(ui.cbHPause->isChecked());
 
 MillMachine->setHPause(ui.sbHPause->value());
+MillMachine->setUseMPG(ui.cbUseMPG->isChecked());
 
 MillMachine->setCorrectSList(getCorrectSList());
 MillMachine->setEnableUseCorrectSOut(ui.gbCorrectSOut->isChecked());
 
 MillMachine->setStrFindDrivePos(ui.leStrFindDrivePos->text());
+MillMachine->setAutoStart(ui.cbAutoStart->isChecked());
+MillMachine->setFeedVProbe(ui.sbFprobe->value());
+
+MillMachine->getMotionDevice()->getModulePlanner()->setKFpause(ui.sbPerFpause->value()/100.0f);
+
+if(!ui.gbSOut->isChecked())
+{
+MillMachine->getMotionDevice()->getModulePlanner()->resetElementSOut();
+}
+else
+if(ui.editOutSPWM->isChecked())
+{
+MillMachine->getMotionDevice()->getModulePlanner()->setElementSOut(typeEOutPWM,ui.editOutSPWM->value());
+}
+else if(ui.editOutSAOUT->isChecked())
+{
+MillMachine->getMotionDevice()->getModulePlanner()->setElementSOut(typeEAOutput,ui.editOutSAOUT->value());
+}
+
+if(ui.cbUseDriveA->isChecked())
+{
+if(MillMachine->getDrive("A")==nullptr)
+    {
+    WLMillDrive *MD = new WLMillDrive;
+    MD->setName("A");
+    MillMachine->addDrive(MD);
+    ret=true;
+    }
+}
+else if(MillMachine->getDrive("A")!=nullptr)
+       {
+       MillMachine->removeDrive(MillMachine->getDrive("A"));
+       ret=true;
+       }
+
+if(ui.cbUseDriveB->isChecked())
+{
+if(MillMachine->getDrive("B")==nullptr)
+    {
+    WLMillDrive *MD = new WLMillDrive;
+    MD->setName("B");
+    MillMachine->addDrive(MD);
+    ret=true;
+    }
+}
+else if(MillMachine->getDrive("B")!=nullptr)
+       {
+       MillMachine->removeDrive(MillMachine->getDrive("B"));
+       ret=true;
+       }
+{
+
+MillMachine->getGCode()->setHTool(0,ui.sbZH0ToolProbe->value());
+MillMachine->setEnableGModel(ui.cbUseGModel->isChecked());
+return ret;
+}
 }

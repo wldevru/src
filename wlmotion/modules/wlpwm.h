@@ -8,28 +8,22 @@
 
 #include "wlmodule.h"
 
-#define comPWM_setOut        1 //set percent outPWM
+//OutPWM
+#define comPWM_setOut        1 //set outPWM
 #define comPWM_setEnableOut  2 //enable outPWM
-#define comPWM_setKOut       3 //set K outPWM
-#define comPWM_setPmaxOut    4 //set max percent outPWM
 #define comPWM_setInvOut     5 //set inverse outPWM
 #define comPWM_setFOut       6 //set frequency outPWM
 #define comPWM_setUnlockOut  7 //unlock outPWM
 
-#define comPWM_getDataOut  100 //call data outPWM
-
-#define comPWM_setValue 128
-#define comPWM_getValue 129
-
-#define sendPWM_dataOut 200 //send data ooutPWM
+#define comPWM_setData 128
+#define comPWM_getData 129
 
 enum typeDataPWM{
-     dataPWM_Pnow
-    ,dataPWM_Ptar
-    ,dataPWM_Kpwm
+     dataPWM_value
     ,dataPWM_Fpwm
     ,dataPWM_enable
     ,dataPWM_inv
+    ,dataPWM_flag
   };
 
 #define PWMF_enable  1<<0
@@ -44,7 +38,6 @@ class WLPWM : public WLElement
 	Q_OBJECT
 
 public:
-    Q_PROPERTY(float kout WRITE setKOut)
 
 public:
 	
@@ -52,17 +45,15 @@ public:
 ~WLPWM();
 
 private:
+
 WLFlags Flags;
 
-float m_Power;
-float m_Kout;
+float m_value;
 float m_Freq;
 
  quint8 error;
 
 public:
-    void setData(quint8 _flag,float P,float F);
-
   float freq() {return m_Freq;}
 
    void setError(quint8 err)  {emit changedError(error=err);}
@@ -71,31 +62,26 @@ public:
    bool isInvalid()           {return Flags.get(PWMF_invalid);}
    bool isUnlock()            {return Flags.get(PWMF_unlock);}
 
-   float power() {return m_Power;}
-   float value() {return power()/100.0f;}
+   float value() {return m_value;}
 
 signals:
  
  void changedError(quint8);
  void changedFreq(float);
- void changedPower(float);
- void changedK(float);
- void changed();
+ void changedValue(float);
+ void changed(int);
 
 public:
 
-	bool setOut(float P);
+    bool setOut(float value);
     bool togInv() {return setInv(!isInv());}
     bool setInv(bool inv);
 	bool setEnable(bool enable);
-	bool setPmax(float Pmax);
-	bool sendGetData();
-	bool setKOut(float k);
+    bool sendGetData(typeDataPWM type);
+    bool sendGetData();
     bool setFreq(float f);
 
-    float getKOut() {return m_Kout;}
-
-     void setData(QDataStream&);
+    void setData(QDataStream&);
 public:
 
 virtual void writeXMLData(QXmlStreamWriter &stream);

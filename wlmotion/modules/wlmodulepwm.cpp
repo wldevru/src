@@ -9,9 +9,7 @@ Init(1);
 
 QTimer *updateTimer = new QTimer;
 connect(updateTimer,SIGNAL(timeout()),SLOT(update()));
-updateTimer->start(100);
-
-
+updateTimer->start(200);
 }
 
 WLModulePWM::~WLModulePWM()
@@ -44,7 +42,7 @@ if(sizeOutPWM>outPWM.size())
   pwm->setIndex(i);
   pwm->setParent(this);
   connect(pwm,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
-  connect(pwm,SIGNAL(changed()),SLOT(updatePWM()));
+  connect(pwm,SIGNAL(changed(int)),SIGNAL(changedOutPWM(int)));
   outPWM+=pwm;
   }
 else
@@ -52,7 +50,7 @@ else
 	  {	  
 	  pwm=outPWM.takeLast();
 	  disconnect(pwm,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-      disconnect(pwm,SIGNAL(changed()),this,SLOT(updatePWM()));
+      disconnect(pwm,SIGNAL(changed(int)),this,SIGNAL(changedOutPWM(int)));
 	  delete pwm;  
       }
 
@@ -72,16 +70,7 @@ void WLModulePWM::update()
 foreach(WLPWM *pwm,outPWM)
   {
   pwm->sendGetData();
-}
-}
-
-void WLModulePWM::updatePWM()
-{
-WLPWM *PWM=static_cast<WLPWM*>(sender());
-
-qDebug()<<"updatePWM()"<<PWM->getIndex();
-
-emit changedOutPWM(PWM->getIndex());
+  }
 }
 
 void  WLModulePWM::readCommand(QByteArray Data)
@@ -100,7 +89,7 @@ Stream>>ui1;
 switch(ui1)
 {
 
-case comPWM_setValue:Stream>>index;//index8
+case comPWM_setData: Stream>>index;//index8
                      if(index<getSizeOutPWM())
                       {
                       outPWM[index]->setData(Stream);
@@ -108,17 +97,8 @@ case comPWM_setValue:Stream>>index;//index8
 
                      break;
 
-case sendPWM_dataOut:Stream>>index;//index8
-   	                 Stream>>ui1;//flag
-					 Stream>>f1;
-					 Stream>>f2;
-                      //   qDebug()<<"ChangedDataOutPWM"<<index<<f1;
-					 if(index<getSizeOutPWM()) outPWM[index]->setData(ui1,f1,f2);	
-					 break;
-
 case  sendModule_prop: Stream>>ui1;
-					                      
-					   Init(ui1);
+                       Init(ui1);
                        break;
 
 case  sendModule_error:

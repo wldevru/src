@@ -7,6 +7,8 @@
 #include "wlmoduleioput.h"
 #include "wlmodulepwm.h"
 #include "wlmoduleencoder.h"
+#include "wlmoduleaioput.h"
+#include "wlenternum.h"
 
 namespace Ui {
 class WLEditIOWidget;
@@ -27,24 +29,14 @@ public:
     void setValue(int val);
     int  value();
 
-    WLIOPut *getIOPut() {if(m_Module->type()==typeMIOPut)
-                               {
-                               WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
-                               return  m_input ? ModuleIOPut->getInput(value()): ModuleIOPut->getOutput(value());
-                               }
-                            else
-                               return nullptr;
-                        }
+    WLIOPut   *getIOPut();
+    WLEncoder *getEncoder();
+    WLPWM     *getPWM();
 
+    bool isChecked();
+    bool isEnable();
 
-    WLEncoder *getEncoder() {if(m_Module->type()==typeMEncoder)
-                               {
-                               WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
-                               return  m_input ? ModuleEncoder->getEncoder(value()): nullptr;
-                               }
-                            else
-                               return nullptr;
-                        }
+    QAbstractButton *getButton();
 
 private:
     Ui::WLEditIOWidget *ui;
@@ -57,15 +49,22 @@ WLModule *m_Module;
 private slots:
    void update();
 
-   void togInvers() {if(m_Module->type()==typeMIOPut) getIOPut()->togInv();}
+   void togInvers();
 
    void onActTogInvers();
    void onActLatchInput();
-   void oActResetEncoder();
+   void onActResetEncoder();
+   void onActSetFreq();
 
    void setLatchInput(int);
 
-   // QWidget interface
+public slots:
+   void setCheckable(bool enable);
+   void setChecked(bool check);
+
+signals:
+   void toggle(bool);
+   // QWidget interface   
 protected:   
    void mousePressEvent(QMouseEvent *event);
 };

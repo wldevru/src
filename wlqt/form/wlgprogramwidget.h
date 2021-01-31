@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QFileInfo>
+#include <QMessageBox>
+#include <QFileDialog>
+
 #include "ui_wlgprogramwidget.h"
 
 
@@ -38,10 +41,15 @@ private:
 
     int iEditElement=0;
 
+    bool m_trackElementF=true;
+
+
 signals:
 
 	void changed(bool);
     void changedEditElement(int index);
+
+    void pressOpenFile();
 
 public slots:
 
@@ -51,12 +59,16 @@ public slots:
 
 private slots:
 
+    void updateTrack();
+    void setTrack(bool en) {m_trackElementF=en;}
+
     void saveTextProgram();
 
 	void onUpdate();
 	void onAccept();
 	void onBackup();
 	void onReload();
+    void onOpenFile() {emit pressOpenFile();}
 
 	void onChangedTextProgram();
 	void onChangedPositionTextProgram();

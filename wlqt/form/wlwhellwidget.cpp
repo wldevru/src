@@ -21,6 +21,7 @@ WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *MIOPut,WLModuleEncod
     ui->editInV->setModule(MIOPut);
     ui->editInV->setLabel("inV");
     ui->editInV->setValue(Whell->getInVmode());
+    ui->editInV->setCheckable(false);
 
     ui->gbInA->setChecked(!(Whell->getFlag()&WHF_manualA));
     ui->gbInX->setChecked(!(Whell->getFlag()&WHF_manualX));
@@ -36,6 +37,11 @@ WLWhellWidget::WLWhellWidget(WLWhell *_Whell,WLModuleIOPut *MIOPut,WLModuleEncod
     ui->encoder->setValue(Whell->getEncoder());
 
     ui->sbPulses->setValue(Whell->getPulses());
+
+    QTimer *timer = new QTimer;
+
+    connect(timer,&QTimer::timeout,this,&WLWhellWidget::updateIndexs);
+    timer->start(100);
 
     setWindowTitle(tr("Edit Whell: ") +QString::number(Whell->getIndex()));
 }
@@ -86,7 +92,8 @@ for(int i=0;i<sizeInAxis;i++)
   EIW= new WLEditIOWidget(this);
   EIW->setModule(MIOPut);
   EIW->setLabel("in"+QString::number(i));
-  EIW->setValue(iInA[i]);  
+  EIW->setValue(iInA[i]);
+
   ListEIWAxis+=EIW;
 
   if(i>2)
@@ -99,7 +106,8 @@ for(int i=0;i<sizeInX;i++)
   EIW->setModule(MIOPut);
   EIW->setLabel("in"+QString::number(i));;
   EIW->setValue(iInX[i]);
-   ListEIWX+=EIW;
+
+  ListEIWX+=EIW;
 
   if(i>1)
       connect(ui->cbInXbianry,SIGNAL(toggled(bool)),EIW,SLOT(setDisabled(bool)));
@@ -116,4 +124,33 @@ for(int i=sizeInX-1;i>=0;i--)
  ui->vLayoutInputX->addWidget(ListEIWX[i]);
  }
 
+}
+
+void WLWhellWidget::updateIndexs()
+{
+quint8 iA=0;
+quint8 iX=0;
+
+ for(quint8 i=0;i<ListEIWAxis.size();i++)
+     if((ListEIWAxis[i]->isChecked())
+      &&(ListEIWAxis[i]->getIOPut()->getNow()))
+         {
+         if(ui->cbInAbianry->isChecked())
+             iA+=1<<i;
+         else
+             iA=i+1;
+         }
+
+ for(quint8 i=0;i<ListEIWX.size();i++)
+     if((ListEIWX[i]->isChecked())
+      &&(ListEIWX[i]->getIOPut()->getNow()))
+         {
+         if(ui->cbInXbianry->isChecked())
+             iX+=1<<i;
+         else
+             iX=i+1;
+         }
+
+ui->labelA->setText(iA==0 ? "off":QString::number(iA));
+ui->labelX->setText(QString("XE%1").arg(iX));
 }

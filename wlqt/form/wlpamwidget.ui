@@ -129,42 +129,54 @@
    <item row="3" column="1" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="labelVst">
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Vst (1/s)</string>
+        <string>Vst</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="labelAac">
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Acc (1/s^2)</string>
+        <string>Acc</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="labelVma">
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Vma(1/s)</string>
+        <string>Vma</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="labelAde">
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Ade (1/s^2)</string>
+        <string>Ade</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>

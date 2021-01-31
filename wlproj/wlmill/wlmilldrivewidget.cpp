@@ -10,9 +10,18 @@ WLMillDriveWidget::WLMillDriveWidget(WLMillDrive *_drive,QWidget *parent) :
     ui->setupUi(this);
 
     ui->sbBacklash->setValue(m_MDrive->getBacklash());
+
+    setUnit("unit");
 }
 
 WLMillDriveWidget::~WLMillDriveWidget()
 {
     delete ui;
+}
+
+void WLMillDriveWidget::setUnit(QString unit)
+{
+    m_unit=unit;
+
+    ui->sbBacklash->setSuffix(" "+m_unit);
 }

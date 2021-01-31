@@ -2,7 +2,10 @@
 
 WLGAxisLabel::WLGAxisLabel(QWidget *parent) : QWidget(parent)
 {
-setMinimumHeight(32);
+//setMaximumSize(300,60);
+setMinimumSize(200,20);
+
+setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
 
 setVisible(false);
 
@@ -25,10 +28,9 @@ void WLGAxisLabel::paintEvent(QPaintEvent *event)
 {
 QPainter painter(this);
 QFont font;
-
+QColor colorF=QColor(Qt::darkGreen);
 painter.setPen(QColor(Qt::black));
 //painter.drawRect(0,0,this->width()-1,this->height()-1);
-
 QString name=m_drive ? m_drive->getName() : "?";
 QString  pos=m_drive ? QString("%1").arg(m_drive->getAxisPosition(),0,'f',2) : "0000.00";
 QString    f=m_drive ? QString("%1").arg(m_drive->Vnow()*60,0,'f',2) : "0000.00";
@@ -56,17 +58,20 @@ if(m_gcode)
       {
       if(m_gcode->isGCode(43))
         {
-        ofst+=" (G43H"+QString::number(m_gcode->getValue('H'))+")";
+        f=" +H"+QString::number(m_gcode->getValue('H'));
+        colorF=QColor(Qt::red);
         }
         else if(m_gcode->isGCode(44))
           {
-          ofst+=" (G44H"+QString::number(m_gcode->getValue('H'))+")";
+          f=" -H"+QString::number(m_gcode->getValue('H'));
+          colorF=QColor(Qt::blue);
           }
       }
-
    }
 else
    ofst=pos;
+
+if(isChecked()) ofst+="*";
 
 rName.setX(0);
 rName.setY(0);
@@ -86,7 +91,7 @@ painter.drawRoundedRect(0,0,this->width()-1,this->height()-1,3,3);
 
 //painter.drawRect(rName);
 
-rPos.setTopLeft(QPoint(this->width()-75,(this->height()-2)/2));
+rPos.setTopLeft(QPoint(this->width()-this->width()/4,(this->height()-2)/2));
 rPos.setBottomRight(QPoint(this->width()-2,this->height()-2));
 
 font.setPixelSize((rName.height())/2);
@@ -98,14 +103,11 @@ painter.drawText(rPos,Qt::AlignVCenter|Qt::AlignRight,pos);
 
 rF.setBottomLeft(rPos.topLeft());
 rF.setTopRight(QPoint(this->width()-2,0));
-painter.setPen(QColor(Qt::blue));
-
 
 rOfst.setBottomLeft(rName.bottomRight());
 rOfst.setTopRight(rF.topLeft());
 
-painter.setPen(QColor(Qt::darkGreen));
-
+painter.setPen(colorF);
 
 painter.drawText(rF,Qt::AlignVCenter|Qt::AlignRight,f);
 
