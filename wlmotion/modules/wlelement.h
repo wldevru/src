@@ -30,7 +30,7 @@ enum typeElement{typeEEmpty=0
                  ,typeEAxis
                  ,typeEDCan
                  ,typeEFreq
-                 ,typeEWhell
+                 ,typeEMPG
                  ,typeEAOutput
                 };
 

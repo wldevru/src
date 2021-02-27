@@ -3,7 +3,7 @@
 WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Program,QWidget *parent)
     : QWidget(parent)
 {
-	MillMachine=_MillMachine;
+    MillMachine=_MillMachine;
     Program=_Program;
 
 	disButton=false;
@@ -22,8 +22,8 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
     connect(timerOnButton,SIGNAL(timeout()),this,SLOT(updateOnButton()));
     timerOnButton->start(500);
 
-    listFper<<0.1<<0.25<<1<<5<<10<<25<<50<<75<<100;
-    listManDist = QString("JOG,5.00,1.00,0.10,0.01").split(",");
+    setFperStr("0.1,0.25,1,5,10,25,50,75,100");
+    setJogDistStr("JOG,5.00,1.00,0.10,0.01");
 
     m_buttonSize=QSize(32,32);
 
@@ -81,11 +81,11 @@ QTimer *timerFS= new QTimer;
 connect(timerFS,SIGNAL(timeout()),SLOT(updateFSLabel()));
 timerFS->start(50);
 
-WLWhell *Whell=MillMachine->getWhell();
+WLMPG *Whell=MillMachine->getMPG();
 
 if(Whell)
  {
- connect(Whell,&WLWhell::changedCurIndexAxis,this,[=](quint8 i){if(gALabelX) gALabelX->setChecked(i==1);
+ connect(Whell,&WLMPG::changedCurIndexAxis,this,[=](quint8 i){if(gALabelX) gALabelX->setChecked(i==1);
                                                                 if(gALabelY) gALabelY->setChecked(i==2);
                                                                 if(gALabelZ) gALabelZ->setChecked(i==3);
                                                                 if(gALabelA) gALabelA->setChecked(i==4);
@@ -113,36 +113,31 @@ WLPositionWidget::~WLPositionWidget()
 
 }
 
+void WLPositionWidget::setJogDistStr(QString str)
+{
+m_listManDist=str.split(",");
+}
+
+void WLPositionWidget::setFperStr(QString str)
+{
+QStringList list=str.split(",");
+
+m_listFper.clear();
+
+foreach(QString vstr,list)
+ {
+ m_listFper+=vstr.toFloat();
+ }
+}
+
 void WLPositionWidget::initElementControls()
 {
 QList <WLMillDrive*> list=MillMachine->getDrives();
 
-//QWidget *widgetEL = new QWidget(this);
-//QWidget *widgetPM = new QWidget(this);
-//ui.gridLayout->addLayout(ui.horLayoutTop0,0,0);
-//ui.gridLayout->addLayout(ui.horLayoutTop1,0,1);
-
 QSizePolicy sizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
-//sizePolicy.setHeightForWidth(true);
-
-//QSplitter *spliter= new QSplitter(this);
-//
-//spliter->setOrientation(Qt::Horizontal);
-//spliter->addWidget(widgetEL);
-//spliter->addWidget(widgetPM);
-
 QHBoxLayout *horLayout;
 
-//QVBoxLayout *verLayoutEL=new QVBoxLayout(this);
-//QVBoxLayout *verLayoutPM=new QVBoxLayout(this);
-//
-//widgetEL->setLayout(verLayoutEL);
-//widgetPM->setLayout(verLayoutPM);
-
 QVBoxLayout *verLayoutEL = ui.verLayoutControl;
-//ui.horLayoutControl->addWidget(spliter);
-//ui.horLayoutControl->addWidget(widgetEL);
-//ui.horLayoutControl->addWidget(widgetPM);
 
 gALabelX=new WLGAxisLabel(this);
 gALabelY=new WLGAxisLabel(this);
@@ -151,9 +146,11 @@ gALabelA=new WLGAxisLabel(this);
 gALabelB=new WLGAxisLabel(this);
 gALabelC=new WLGAxisLabel(this);
 
-bgMinusAxis = new QButtonGroup();
-int row=1;
 QFont font;
+
+font=this->font();
+font.setPointSize(12);
+
 
 foreach(WLMillDrive *mdrive,list)
  {
@@ -173,7 +170,7 @@ foreach(WLMillDrive *mdrive,list)
  AL->setGCode(MillMachine->getGCode());;
 
  connect(AL,SIGNAL(changedPress(QString,int)),this,SLOT(onPushDrive(QString,int)));
- //verLayoutEL->addWidget(AL);
+
  horLayout->addWidget(AL);
 
  QToolButton *TBM = new QToolButton(this);
@@ -181,11 +178,7 @@ foreach(WLMillDrive *mdrive,list)
  TBM->setIconSize(m_buttonSize);
  TBM->setAutoRepeat(false);
  TBM->setSizePolicy(sizePolicy);
- font=TBM->font();
- font.setPointSize(12);
 
- bgMinusAxis->addButton(TBM);
- //connect(TBM,&QToolButton::pressed(),)
  connect(TBM,&QToolButton::pressed,this,[=](){onPBAxis(mdrive->getName(),-1,1);});
  connect(TBM,&QToolButton::released,this,[=](){onPBAxis(mdrive->getName(),-1,0);});
 
@@ -218,8 +211,6 @@ foreach(WLMillDrive *mdrive,list)
  else if(mdrive->getName()=="Z") {pbPlusZ=TBP;pbMinusZ=TBM;}
 
  verLayoutEL->addLayout(horLayout);
-
- row++;
  }
 
 QSizePolicy sizePolicyE = sizePolicy;
@@ -285,7 +276,6 @@ horLayout->addWidget(TBP);
 
 verLayoutEL->addLayout(horLayout);
 
-row++;
 //S
 horLayout=new QHBoxLayout(this);
 
@@ -406,8 +396,6 @@ connect(TBP,&QToolButton::clicked,this,&WLPositionWidget::on_pbPlusFman_pressed)
 horLayout->addWidget(TBP);
 
 verLayoutEL->addLayout(horLayout);
-//ui.laElementControl->addLayout(horLayout);
-row++;
 }
 
 float WLPositionWidget::calcStepMov()
@@ -497,20 +485,27 @@ void WLPositionWidget::focusOutEvent(QFocusEvent *event)
 {
 Q_UNUSED(event);
 
-if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);}
-if(pbPlusX->isEnabled())  {pbPlusX->setDown(false);  onPBAxis("X", 1,0);}
-if(pbMinusY->isEnabled()) {pbMinusY->setDown(false); onPBAxis("Y", 1,0);}
-if(pbPlusY->isEnabled())  {pbPlusY->setDown(false);  onPBAxis("Y", 1,0);}
-if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(false); onPBAxis("Z", 1,0);}
-if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(false);  onPBAxis("Z", 1,0);}
+if(pbMinusX->isEnabled()
+ &&pbMinusX->isDown())    {pbMinusX->setDown(false); onPBAxis("X", 1,0);}
 
- pbFast->setDown(false);
+if(pbPlusX->isEnabled()
+ &&pbPlusX->isDown())     {pbPlusX->setDown(false);  onPBAxis("X", 1,0);}
+
+if(pbMinusY->isEnabled()
+ &&pbMinusY->isDown())    {pbMinusY->setDown(false); onPBAxis("Y", 1,0);}
+
+if(pbPlusY->isEnabled()
+ &&pbPlusY->isDown())     {pbPlusY->setDown(false);  onPBAxis("Y", 1,0);}
+
+if(pbMinusZ->isEnabled()
+ &&pbMinusZ->isDown()) {pbMinusZ->setDown(false); onPBAxis("Z", 1,0);}
+
+if(pbPlusZ->isEnabled()
+  &&pbPlusZ->isDown())  {pbPlusZ->setDown(false);  onPBAxis("Z", 1,0);}
+
+pbFast->setDown(false);
 }
 
-void WLPositionWidget::resizeEvent(QResizeEvent *event)
-{
-    qDebug()<<"resize PositionWidget";
-}
 
 void WLPositionWidget::mousePressEvent(QMouseEvent *event)
 {
@@ -524,12 +519,12 @@ if(labelS->geometry().contains(event->pos())) {
  menu.exec(labelS->mapToGlobal(pos()));
  }else  if (labelTypeManual->geometry().contains(event->pos()))
         {
-        if(++m_curIndexListMan==listManDist.size())
+        if(++m_curIndexListMan==m_listManDist.size())
           {
           m_curIndexListMan=0;
           }
 
-        labelTypeManual->setText(listManDist[m_curIndexListMan]);
+        labelTypeManual->setText(m_listManDist[m_curIndexListMan]);
         }
 
 return;
@@ -657,7 +652,7 @@ if(ret==QMessageBox::Ok)
 }
 
 void WLPositionWidget::on_pbFast_pressed()
-{
+{     
 MillMachine->setPercentManual(100.0);
 }
 
@@ -666,22 +661,21 @@ void WLPositionWidget::on_pbFast_released()
 MillMachine->setPercentManual(sbFman->value());
 }
 
-
 void WLPositionWidget::on_pbPlusFman_pressed()
 {
-int index=listFper.indexOf(sbFman->value());
+int index=m_listFper.indexOf(sbFman->value());
 
 if(index!=-1)
  {
  index++;
- if(index<listFper.size())  sbFman->setValue(listFper[index]);
+ if(index<m_listFper.size())  sbFman->setValue(m_listFper[index]);
  }
 else {
- for(int i=0;i<listFper.size();i++)
+ for(int i=0;i<m_listFper.size();i++)
   {
-  if(sbFman->value()<listFper[i])
+  if(sbFman->value()<m_listFper[i])
       {
-      sbFman->setValue(listFper[i]);
+      sbFman->setValue(m_listFper[i]);
       break;
       }
   }
@@ -692,19 +686,19 @@ else {
 
 void  WLPositionWidget::on_pbMinusFman_pressed()
 {
-int index=listFper.indexOf(sbFman->value());
+int index=m_listFper.indexOf(sbFman->value());
 
 if(index!=-1)
   {
   index--;
-  if(index>=0)  sbFman->setValue(listFper[index]);
+  if(index>=0)  sbFman->setValue(m_listFper[index]);
   }
 else {
- for(int i=listFper.size()-1;i>=0;i--)
+ for(int i=m_listFper.size()-1;i>=0;i--)
   {
-  if(sbFman->value()>listFper[i])
+  if(sbFman->value()>m_listFper[i])
       {
-      sbFman->setValue(listFper[i]);
+      sbFman->setValue(m_listFper[i]);
       break;
       }
   }
@@ -766,7 +760,7 @@ MillMachine->goFindDrivePos();
 }
 
 void WLPositionWidget::onExGCode()
-{
+{    
 MillMachine->runGCode(ui.cbExGCode->currentText());
 }
 
@@ -834,7 +828,7 @@ blckPalette.setColor(QPalette::WindowText, Qt::black);
 
 gALabelX->setGPos(GP.x);
 gALabelY->setGPos(GP.y);
-gALabelZ->setGPos(GP.z-MillMachine->getGCode()->getHcorr());
+gALabelZ->setGPos(GP.z-MillMachine->getGCode()->getHofst());
 gALabelA->setGPos(GP.a);
 gALabelB->setGPos(GP.b);
 
@@ -934,6 +928,13 @@ if(type==WLGAxisLabel::typeName)
  act=menu.addAction(tr("1/2"));
  connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->setCurPositionSC(nameDrive,MillMachine->getCurPositionSC(nameDrive)/2);});
 
+ if(nameDrive=="Z")
+ {
+ act=menu.addAction(tr("set H pause")); 
+ act->setEnabled(MillMachine->isUseHPause());
+ connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->setHPause(MillMachine->getCurPosition(nameDrive));});
+ }
+
  QMenu menuOper(this);
  menuOper.setTitle(tr("action"));
 
@@ -949,6 +950,9 @@ if(type==WLGAxisLabel::typeName)
  menu.addMenu(&menuOper);
  //act=menu.addAction(tr("Set Plus  Limit"));
  //act=menu.addAction(tr("Set Minus Limit"));
+
+ act=menu.addAction(tr("reset alarm"));
+ connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->getDrive(nameDrive)->resetAlarm();});
 
 
       if(nameDrive=="X") menu.exec(gALabelX->mapToGlobal(pos()));

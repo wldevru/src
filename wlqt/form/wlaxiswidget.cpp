@@ -55,14 +55,14 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset,QWidget *par
     ui->editOutRALM->setModule(m_axis->getModuleIOPut(),false);
     ui->editOutENB ->setModule(m_axis->getModuleIOPut(),false);
 
+    ui->editOutRALM->setValue(m_axis->getOutput(AXIS_outRALM)->getIndex());
+    ui->editOutENB ->setValue(m_axis->getOutput(AXIS_outENB)->getIndex());
+
     ui->editOutRALM->setCheckable(true);
     ui->editOutENB->setCheckable(true);
 
-    ui->editOutRALM->setChecked(ui->editInPEL->value()!=0);
-    ui->editOutENB->setChecked(ui->editInMEL->value()!=0);
-
-    ui->editOutRALM->setValue(m_axis->getOutput(AXIS_outRALM)->getIndex());
-    ui->editOutENB ->setValue(m_axis->getOutput(AXIS_outENB)->getIndex());
+    ui->editOutRALM->setChecked(ui->editOutRALM->value()!=0);
+    ui->editOutENB->setChecked(ui->editOutENB->value()!=0);
 
     ui->editOutRALM->setLabel("outRALM");
     ui->editOutENB ->setLabel("outENB");

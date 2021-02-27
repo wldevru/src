@@ -313,7 +313,7 @@ public:
 	bool addSyhData(qint32 pos);
 	bool setPos(qint32 pos);
 	bool setMinMaxPos(qint32 minpos,qint32 maxpos);
-	bool setKF(float _KFA);
+    bool setKF(float _KFA=1.0f);
 	void reset();	
 	bool setDisableLimit(bool dis);
     bool setDisableManual(bool dis);
@@ -321,8 +321,9 @@ public:
 	bool setActIn(typeInputAxis type,typeActIOPutAxis typeAct);
 	bool setTypePulse(typePulseAxis type,quint8 SDinv);
 	bool setKSTCurve(float kSTcurve);
-	bool setDelaySCurve(float delayScurve);
-	bool setKGear(float kGear);
+    bool setDelaySCurve(float delayScurve=0,bool save=true);
+    bool restoreDelaySCurve() {return setDelaySCurve(delaySCurve);}
+    bool setKGear(float kGear);
 	bool setEnable(bool enable);
     bool setModeSub(quint8 imasterAxis);
 

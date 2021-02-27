@@ -11,6 +11,15 @@ WLDialog::~WLDialog()
 
 }
 
+void WLDialog::showQuestion(QString txt)
+{
+if(QMessageBox::question(this, tr("Question:"),txt,QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
+    emit enterOk();
+else
+    emit enterCancel();
+
+}
+
 void WLDialog::showEnterNum(QString txt)
 {
 WLEnterNum EnterNum(this);
@@ -28,7 +37,6 @@ else
 
 void WLDialog::showEnterString(QString txt)
 {
-
 WLEnterString EnterString(this);
 
 EnterString.setLabel(txt);
@@ -57,3 +65,5 @@ void WLDialog::showMessage(QString txt)
 QMessageBox::information(this, tr("Message: "),txt,QMessageBox::Ok);
 emit enterCancel();
 }
+
+

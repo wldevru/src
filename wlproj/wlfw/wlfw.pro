@@ -6,9 +6,9 @@ TEMPLATE = app
 TARGET = wlfw
 
 QMAKE_LFLAGS = -no-pie
-#DEFINES += QT_NO_DEBUG_OUTPUT\
-#           QT_NO_INFO_OUTPUT\
-#           QT_NO_WARNING_OUTPUT\
+DEFINES += QT_NO_DEBUG_OUTPUT\
+           QT_NO_INFO_OUTPUT\
+           QT_NO_WARNING_OUTPUT\
 
 QT += core widgets serialport gui network xml
 
@@ -52,9 +52,9 @@ HEADERS +=\
     ../../wlmotion/modules/wlmoduleioput.h \
     ../../wlmotion/modules/wlmoduleplanner.h \
     ../../wlmotion/modules/wlmodulepwm.h \
-    ../../wlmotion/modules/wlmodulewhell.h \
+    ../../wlmotion/modules/wlmodulempg.h \
     ../../wlmotion/modules/wlpwm.h \
-    ../../wlmotion/modules/wlwhell.h \
+    ../../wlmotion/modules/wlmpg.h \
     ../../wlmotion/wldevice.h \
     ../../wlmotion/wlmotion.h \
     ./wldevfw.h \
@@ -80,9 +80,9 @@ SOURCES +=\
     ../../wlmotion/modules/wlmoduleioput.cpp \
     ../../wlmotion/modules/wlmoduleplanner.cpp \
     ../../wlmotion/modules/wlmodulepwm.cpp \
-    ../../wlmotion/modules/wlmodulewhell.cpp \
+    ../../wlmotion/modules/wlmodulempg.cpp \
     ../../wlmotion/modules/wlpwm.cpp \
-    ../../wlmotion/modules/wlwhell.cpp \
+    ../../wlmotion/modules/wlmpg.cpp \
     ../../wlmotion/wldevice.cpp \
     ../../wlmotion/wlmotion.cpp \
      ./wldevfw.cpp \

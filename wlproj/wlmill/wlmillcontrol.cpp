@@ -80,14 +80,14 @@ WLMillControl::WLMillControl(WLMillMachine *_MillMachine,WLGProgram *_Program,QW
 	connect(ui.rbWhellVMode,SIGNAL(toggled(bool)),SLOT(updateWhellAxis()));
     connect(MillMachine,SIGNAL(changedOn(bool)),SLOT(updateWhellAxis()));
 
-    WLWhell *Whell=MillMachine->getWhell();
+    WLMPG *Whell=MillMachine->getMPG();
 
     if(Whell)
      {
      qDebug()<<"Whell connect";
-     connect(Whell,&WLWhell::changedCurIndexAxis,ui.comboBoxWhellAxis,&QComboBox::setCurrentIndex);
-     connect(Whell,&WLWhell::changedCurIndexX,this,&WLMillControl::updateWhellXButton);
-     connect(Whell,&WLWhell::changedCurVmode,ui.rbWhellVMode,&QRadioButton::setChecked);
+     connect(Whell,&WLMPG::changedCurIndexAxis,ui.comboBoxWhellAxis,&QComboBox::setCurrentIndex);
+     connect(Whell,&WLMPG::changedCurIndexX,this,&WLMillControl::updateWhellXButton);
+     connect(Whell,&WLMPG::changedCurVmode,ui.rbWhellVMode,&QRadioButton::setChecked);
      }
 	
 
@@ -426,7 +426,7 @@ if(name=="pbMinusProbeA") MillMachine->goDriveProbe("A",0,calcFtouch(),ui.rbProb
 else	
 if(name=="pbMinusProbeH") MillMachine->goHProbe(calcFtouch(),ui.rbProbeSD->isChecked());
 else
-if(name=="pbMinusProbeHTool") MillMachine->goHTool(calcFtouch(),ui.rbProbeSD->isChecked());
+if(name=="pbMinusProbeHTool") MillMachine->goHToolProbe(calcFtouch(),ui.rbProbeSD->isChecked());
 }
 
 }
@@ -467,13 +467,13 @@ if((ui.tabWidget->currentIndex()==1)
 {
 MillMachine->setDriveManualWhell(ui.comboBoxWhellAxis->currentText(),ui.buttonGroupWhellX->checkedId(),ui.rbWhellVMode->isChecked());
 
-  WLWhell *Whell=MillMachine->getWhell();
+  WLMPG *Whell=MillMachine->getMPG();
 
   if(Whell)
       {
-      ui.gbAxisWhell->setEnabled(Whell->getFlag()&WHF_manualA);
-      ui.gbXWhell->setEnabled(Whell->getFlag()&WHF_manualX);
-      ui.gbVmodeWhell->setEnabled(Whell->getFlag()&WHF_manualV);
+      ui.gbAxisWhell->setEnabled(Whell->getFlag()&MPGF_manualA);
+      ui.gbXWhell->setEnabled(Whell->getFlag()&MPGF_manualX);
+      ui.gbVmodeWhell->setEnabled(Whell->getFlag()&MPGF_manualV);
       }
       else {
       ui.gbAxisWhell->setDisabled(true);

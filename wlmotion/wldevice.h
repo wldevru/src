@@ -2,7 +2,9 @@
 #define WLDevice_H
 
 #include <QObject>
+#include <QCoreApplication>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QMutex>
 #include <QString>
 #include <QtSerialPort/QSerialPort>
@@ -42,7 +44,8 @@
 
 #define errorDevice_nomodule 20
 
-#define DEFINE_TIMERWAITUSB  1
+#define DEFINE_TIMERWAITUSB  2
+#define DEFINE_TIMERWAITETH  1
 
 #ifndef UDPPORT
  #define UDPPORT 2020
@@ -126,7 +129,7 @@ private:
     quint8    m_countTxPacket;
     quint8    m_countRxPacket;
 
-    QTimer *m_timerUSB;
+    QTimer *m_timerSend;
 
 public:
 
@@ -163,7 +166,7 @@ quint32 getVersion() {return m_version;}
 void    setVersion(quint32 _ver) {m_version=_ver; emit changedVersion(m_version);}
 void    setVersionProtocol(quint16 _ver);
 
-void readData(int wait);
+void clearBuf();
 
 protected:
 virtual WLModule *createModule(QString name);
@@ -177,17 +180,9 @@ virtual void reset();
 public:
 
 private slots:	
-void updateModules() {qDebug()<<"update Modules";
 
-                      callStatus();
-
-                      foreach(WLModule *Module,m_modules)
-                           {
-                           qDebug()<<Module->metaObject()->className();
-                           Module->update();
-                           }
-                     }
 void sendEthData();
+
 virtual	void readSlot();
 
     void onErrorSerialPort(QSerialPort::SerialPortError serialPortError);
@@ -203,6 +198,8 @@ public slots:
 	void reconnectSerialPort();
 
     void closeConnect();
+
+    void update();
 
 public slots:
  virtual void callStatus();

@@ -34,6 +34,7 @@
 #include "wllog.h"
 #include "wltoolswidget.h"
 #include "wlmpgwidget.h"
+#include "wleditmpgwidget.h"
 
 #define FileState    QCoreApplication::applicationDirPath()+"//state.dat"
 #define configWLMill QCoreApplication::applicationDirPath()+"//wlmillconfig//config.xml"
@@ -306,7 +307,7 @@ private slots:
 
     void onEditDevice();
     void onEditGModel();
-    void onEditWhell();
+    void onEditMPG();
     void onSetColors();
 
     void onEditDrive(QString nameDrive);

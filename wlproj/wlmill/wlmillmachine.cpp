@@ -6,7 +6,7 @@
 #include <QXmlStreamWriter>
 
 WLMillMachine::WLMillMachine(WLGProgram *_Program,WLEVScript *_EVMScript,QObject *parent)
-	: QThread(parent)
+    :WLMachine(parent)
 {
 m_Program=_Program;
 
@@ -27,11 +27,9 @@ m_mainDim=0.01;
 //m_simpliDist=0;
 //m_smoothDist=0;
 //VG1=0;
-m_VBacklash=100;
+m_Fbacklash=100;
 //VManual=100;
-m_VProbe=10;
-
-m_hPause=0;
+m_Fprobe=10;
 
 tarSOut=0;
 
@@ -125,14 +123,14 @@ Flag.set(ma_pause,false);
 
 WLMillMachine::~WLMillMachine()
 {
-qDebug()<<"~WLMillMachine()"<<thread()<<this->currentThread();
+//qDebug()<<"~WLMillMachine()"<<thread()<<this->currentThread();
 
 saveConfig();
 
 m_motDevice->deleteLater();
 
-quit();
-wait();
+//quit();
+//wait();
 
 qDebug()<<"end MillMachine";
 }
@@ -199,12 +197,12 @@ if((m_correctSList.isEmpty())||(m_correctSList.last().Sadj!=m_maxS))
 
 }
 
-WLWhell *WLMillMachine::getWhell()
+WLMPG *WLMillMachine::getMPG()
 {
-WLModuleWhell *MWhell=m_motDevice->getModuleWhell();
+WLModuleMPG *MMPG=m_motDevice->getModuleMPG();
 
-if(MWhell)
-  return MWhell->getWhell(0);
+if(MMPG)
+  return MMPG->getMPG(0);
 else
   return nullptr;
 }
@@ -239,21 +237,29 @@ setOn(!off);
 
 WLMillDrive *WLMillMachine::getDrive(QString nameDrive,bool send)
 {
-WLMillDrive *MDrive=static_cast<WLMillDrive*>(WLDrive::getDrive(nameDrive));
+WLDrive *drive=WLDrive::getDrive(nameDrive);
 
-if(!MDrive&&send)
+if(drive!=nullptr)
+{
+if(strcmp(drive->metaObject()->className(),"WLMillDrive")==0)
+             return static_cast<WLMillDrive*>(drive);
+}
+
+if(!drive&&send)
     setMessage(nameClass(),tr("error name drive"),-1);
 
-return MDrive;
+return nullptr;
 }
 
 QList<WLMillDrive *> WLMillMachine::getDrives()
 {
 QList <WLMillDrive *> retList;
+QList <WLDrive *> driveList=WLDrive::getDriveList();
 
-foreach(WLDrive *drive,WLDrive::driveList)
+foreach(WLDrive *drive,driveList)
  {
- retList+=static_cast<WLMillDrive*>(drive);
+ if(strcmp(drive->metaObject()->className(),"WLMillDrive")==0)
+                     retList+=static_cast<WLMillDrive*>(drive);
  }
 
 return retList;
@@ -261,7 +267,7 @@ return retList;
 
 void WLMillMachine::setOn(bool on)   
 {
-WLWhell *Whell=getWhell();
+WLMPG *Whell=getMPG();
 
 if(!on) runScript("OFF()");
 
@@ -295,21 +301,16 @@ if(on)
           Whell->setDataAxis(i,millDrives[i]->getAxis()->getIndex(),1.0f/Whell->getPulses()/millDrives[i]->dimension());
       }
 
-   getWhell()->setEnable(true);
+   getMPG()->setEnable(true);
    }
   }
 else
   {
-  if(Whell) getWhell()->setEnable(false);
+  if(Whell) getMPG()->setEnable(false);
   }
 
 }
 
-void WLMillMachine::run(void)
-{
-init();
-exec();
-}
 
 bool WLMillMachine::isPossiblyManual()
 {
@@ -468,28 +469,6 @@ if(isUseCorrectSOut()&&m_correctSList.size()>2)
 emit changedSValue(curSOut=S);
 }
 
-void WLMillMachine::goFindDrivePos()
-{
-if(!verifyReadyMotion()) return;
-
-qDebug()<<"goFindDrivePos"<<isAuto();
-
-if(isAuto())
-   {
-   Stop();
-   }
-else
- {
- WLDrive::resets();
-
- m_listFindDrivePos=m_strFindDrivePos.split(",");
-
- typeAuto=AUTO_FindDrivePos;
-
- setAuto();
- updateAuto();
- }
-}
 
 void WLMillMachine::Stop() //полная остановка
 {
@@ -503,7 +482,7 @@ MutexShowTraj.unlock();
 
 emit changedTrajSize(MillTraj.size());
 
-setAuto(false);
+resetAuto();
 
 Flag.reset(ma_runlist
           |ma_runprogram);
@@ -517,9 +496,7 @@ WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
 if(ModuleAxis)
    ModuleAxis->setActInProbe(AXIS_actNo);
 
-//setEnableManualWhell(false);
-
-WLDrive::startStops(true);
+SDStop();
 
 if(Flag.get(ma_runprogram)
  &&!Flag.get(ma_stop)
@@ -587,7 +564,8 @@ if(!verifyReadyMotion()) {reset();return;}
 
 saveConfig();
 
-if((ModulePlanner->getStatus()==MPLANNER_pause||ModulePlanner->getStatus()==MPLANNER_stop)
+if((ModulePlanner->getStatus()==MPLANNER_pause
+  ||ModulePlanner->getStatus()==MPLANNER_stop)
  &&!Flag.get(ma_runlist))
 {
 if(Flag.get(ma_pause))
@@ -716,10 +694,12 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
  stream.writeEndElement();
 
  stream.writeStartElement("Drive");
-  for (int i=0;i<WLDrive::driveList.size();i++)
+ QList <WLDrive*> driveList=WLDrive::getDriveList();
+
+  for (int i=0;i<driveList.size();i++)
   {
-  stream.writeStartElement(WLDrive::driveList[i]->metaObject()->className());
-    WLDrive::driveList[i]->writeXMLData(stream);
+  stream.writeStartElement(driveList[i]->metaObject()->className());
+    driveList[i]->writeXMLData(stream);
   stream.writeEndElement();
   }
  stream.writeEndElement();
@@ -727,6 +707,7 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
  stream.writeStartElement("Position");
  stream.writeAttribute("G28",m_GCode.getG28Position().toString());
  stream.writeAttribute("G43",m_GCode.getG43Position().toString());
+ stream.writeAttribute("offsetHTool",QString::number(m_GCode.getOffsetHTool()));
  stream.writeEndElement();
 
  stream.writeStartElement("GModel");
@@ -742,7 +723,7 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
  stream.writeAttribute("refPoint0",m_GCode.getRefPoint0SC(i).toString());
  stream.writeAttribute("refPoint1",m_GCode.getRefPoint1SC(i).toString());
  stream.writeEndElement();
- }
+ } 
 
  for(int i=1;i<sizeTools;i++)
  {
@@ -925,9 +906,14 @@ if(FileXML.isOpen())
 
        if(!stream.attributes().value("WLMotion").isEmpty())
             {
-            if(!m_motDevice->initFromFile(configMMDir+stream.attributes().value("WLMotion").toString()+".xml"))
+            QString initFile=configMMDir+stream.attributes().value("WLMotion").toString()+".xml";
+
+            WLMotion WLMDev;
+
+            if(!WLMDev.initFromFile(initFile))
               {
-              m_motDevice->initFromFile(":/data/wlmillconfig/WLM35A.xml");
+              initFile=":/data/wlmillconfig/WLM35A.xml";
+              WLMDev.initFromFile(initFile);
               }
 
             auto infoList=WLDevice::availableDevices();
@@ -937,17 +923,21 @@ if(FileXML.isOpen())
             foreach(WLDeviceInfo info,infoList)
             {
             qDebug()<<"info"<<info.comPort<<info.UID96;
-            if(info.isValid(m_motDevice->getInfo()))
+            if(info.isValid(WLMDev.getInfo()))
                {
                findOk=true;
 
                m_motDevice->setInfo(info);
                m_motDevice->openConnect();
-
-               if(m_motDevice->getModuleConnect())
-                                m_motDevice->getModuleConnect()->setEnableHeart(true);
+               break;
                }
+
             }
+
+            m_motDevice->initFromFile(initFile);
+
+            if(m_motDevice->getModuleConnect())
+                             m_motDevice->getModuleConnect()->setEnableHeart(true);
 
             if(!findOk
              &&!m_motDevice->getUID96().isEmpty())
@@ -997,8 +987,7 @@ if(FileXML.isOpen())
       }
 
 //--old Style
-    if(stream.name()=="HomePos")
-		 {
+    if(stream.name()=="HomePos"){
          WLGPoint GP;
          GP.fromString(stream.attributes().value("GPoint").toString());
          m_GCode.setG28Position(GP);
@@ -1009,29 +998,29 @@ if(FileXML.isOpen())
          {
          WLGPoint GP;
 
-         if(!stream.attributes().value("G28").isEmpty())
-           {
+         if(!stream.attributes().value("G28").isEmpty()){
            GP.fromString(stream.attributes().value("G28").toString());
            m_GCode.setG28Position(GP);
            }
 
-         if(!stream.attributes().value("G43").isEmpty())
-           {
+         if(!stream.attributes().value("G43").isEmpty()){
            GP.fromString(stream.attributes().value("G43").toString());
            m_GCode.setG43Position(GP);
+           }
+
+         if(!stream.attributes().value("offsetHTool").isEmpty()){
+           getGCode()->setOffsetHTool(stream.attributes().value("offsetHTool").toDouble());
            }
 
          continue;
          }
 
-    if(stream.name()=="GModel")
-         {
+    if(stream.name()=="GModel"){
          m_GModel.readXMLData(stream);
          continue;
          }
 
-    if(stream.name()=="SC")
-		 {
+    if(stream.name()=="SC"){
 		 qDebug()<<"loadSC";
 		 WL3DPoint SC;
 
@@ -1150,6 +1139,8 @@ return false;
 
 void WLMillMachine::setFinished()
 {
+qDebug()<<"setFinished?";
+
 if(!isReady()) return;
 
 QMutexLocker locker(&Mutex);
@@ -1191,29 +1182,36 @@ if(isEmptyMotion()
    }
 }
 }
-
-
-bool WLMillMachine::updateAuto()
+void WLMillMachine::updateAuto()
 {
-qDebug()<<"update Auto";
+if(isAuto()&&(m_typeAutoMMachine!=AUTO_no))
+ {
+ updateMillMachineAuto();
+ }
+else
+ {
+ WLMachine::updateAuto();
+ }
+}
 
-QMutexLocker locker1(&MutexAuto);
+void WLMillMachine::updateMillMachineAuto()
+{    
+qDebug()<<"update Auto MillMachine";
 
+QMutexLocker locker(&MutexAuto);
 
 if(isAuto()) 
-switch(typeAuto)
+switch(m_typeAutoMMachine)
  {
  case AUTO_ProbeEMG:
- case AUTO_ProbeSD:       return updateProbe();
+ case AUTO_ProbeSD:      updateProbe();
  case AUTO_HProbeEMG:
- case AUTO_HProbeSD:      return updateHProbe();
- case AUTO_FindDrivePos:  return updateFindDrivePos();
+ case AUTO_HProbeSD:     updateHProbe();
  case AUTO_HToolEMG:
- case AUTO_HToolSD:       return updateHTool();
+ case AUTO_HToolSD:      updateHToolProbe();
  //case AUTO_Program: return updateProgram();
  }
 
-return 0;
 }
 
 bool WLMillMachine::updateProbe()
@@ -1236,10 +1234,10 @@ switch(iOperation)
                  else
                     iOperation=3;
 
-         ModuleAxis->setActInProbe(typeAuto==AUTO_ProbeSD ? AXIS_actSdStop:AXIS_actEmgStop);
+         ModuleAxis->setActInProbe(m_typeAutoMMachine==AUTO_ProbeSD ? AXIS_actSdStop:AXIS_actEmgStop);
 
 
-         driveProbe->startMovPos(iDriveDir ? driveProbe->maxPosition():driveProbe->minPosition(),m_VProbe/60);
+         driveProbe->startMovPos(iDriveDir ? driveProbe->maxPosition():driveProbe->minPosition(),m_Fprobe/60);
 		 break;
 
  case 2: if(ModuleAxis->isLatchProbe2())
@@ -1248,7 +1246,7 @@ switch(iOperation)
 
           if(driveProbe->startMovPos(ModuleAxis->getLatchProbe2(driveProbe->getAxis()->getIndex())*driveProbe->dimension()
                                  +(driveProbe->rot()? -getDrive(driveProbe->getName())->getHalfBacklash():getDrive(driveProbe->getName())->getHalfBacklash())
-                                  ,m_VProbe/60))
+                                  ,m_Fprobe/60))
              break;
 
 		  }
@@ -1257,7 +1255,7 @@ switch(iOperation)
 		  sendMessage(tr("no sensor signal"),"inProbe",0);
           }
 
-         setAuto(false);
+         resetAuto();
          QTimer::singleShot(10,this,SLOT(setFinished()));
          qDebug()<<"Complete probeR";
 		 break;	
@@ -1268,7 +1266,7 @@ switch(iOperation)
 
           if(driveProbe->startMovPos(ModuleAxis->getLatchProbe3(driveProbe->getAxis()->getIndex())*driveProbe->dimension()
                                  +(driveProbe->rot()? -getDrive(driveProbe->getName())->getHalfBacklash():getDrive(driveProbe->getName())->getHalfBacklash())
-                                  ,m_VProbe/60))
+                                  ,m_Fprobe/60))
               break;
 
           }
@@ -1277,12 +1275,12 @@ switch(iOperation)
 		  sendMessage(tr("no sensor signal"),"inProbe",0);		 
 		  }
 
-         setAuto(false);
+         resetAuto();
          QTimer::singleShot(10,this,SLOT(setFinished()));
          qDebug()<<"Complete probeF";
 		 break;	
 
- case 4: setAuto(false);
+ case 4: resetAuto();
 	     QTimer::singleShot(10,this,SLOT(setFinished()));
          qDebug()<<"Complete probe+";
 	     break;
@@ -1351,38 +1349,13 @@ return 0;
 }
  
 
-bool WLMillMachine::updateFindDrivePos()
+bool WLMillMachine::updateHToolProbe()
 {
-if(!isActivDrives())
-{
- if(m_listFindDrivePos.isEmpty())
- {
- setAuto(false);
- QTimer::singleShot(10,this,SLOT(setFinished()));
- return 0;
- }
- else
- {
- QString curAxisFind=(m_listFindDrivePos.takeFirst()).toUpper();
-
- for(int i=0;i<curAxisFind.size();i++)
-   {
-   goDriveFind(curAxisFind.at(i));
-   }
- }
-}
-
-return 1;
-}
-
-bool WLMillMachine::updateHTool()
-{
-qDebug("update Auto HTool %d",iOperation);
+qDebug()<<"update Auto HTool %d"<<iOperation<<!WLDrive::isMotionDrives()<<!Flag.get(ma_runlist);
 
 WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
 
-if(!WLDrive::isMotionDrives()
- &&!Flag.get(ma_runlist))
+if(!WLDrive::isMotionDrives())
 switch(iOperation)
 {
 case 0: /*runGCode("G0 G53 X"+QString::number(getGCode()->getG43Position().x)
@@ -1398,7 +1371,7 @@ case 1:  driveProbe->setMainPad();
 
           ModuleAxis->resetLatchProbe();
 
-         if(typeAuto==AUTO_HToolSD)
+         if(m_typeAutoMMachine==AUTO_HToolSD)
             ModuleAxis->setActInProbe(AXIS_actSdStop);
          else
             ModuleAxis->setActInProbe(AXIS_actEmgStop);
@@ -1410,14 +1383,17 @@ case 1:  driveProbe->setMainPad();
 
         m_backProbePosition=driveProbe->position();
 
-        driveProbe->startMovPos(driveProbe->minPosition(),m_VProbe/60);
+        driveProbe->startMovPos(driveProbe->minPosition(),m_Fprobe/60);
         break;
 
 case 2: if(ModuleAxis->isLatchProbe2())
          {
          double H=ModuleAxis->getLatchProbe2(driveProbe->getAxis()->getIndex())*driveProbe->dimension();
 
-         getGCode()->setHTool(getGCode()->getValue('H'),H);
+         if(getGCode()->getValue('H')==0)
+            getGCode()->setOffsetHTool(H);
+         else
+            getGCode()->setHTool(getGCode()->getValue('H'),H-getGCode()->getOffsetHTool());
 
          driveProbe->startMovPos(m_backProbePosition,0);
          iOperation=4;
@@ -1425,7 +1401,7 @@ case 2: if(ModuleAxis->isLatchProbe2())
         else
          {
          sendMessage(tr("no sensor signal"),"inProbe",0);
-         setAuto(false);
+         reset();
          QTimer::singleShot(10,this,SLOT(setFinished()));
          }
 
@@ -1433,9 +1409,12 @@ case 2: if(ModuleAxis->isLatchProbe2())
 
 case 3: if(ModuleAxis->isLatchProbe3())
          {
-         double H=ModuleAxis->getLatchProbe2(driveProbe->getAxis()->getIndex())*driveProbe->dimension();
+         double H=ModuleAxis->getLatchProbe3(driveProbe->getAxis()->getIndex())*driveProbe->dimension();
 
-         getGCode()->setHTool(getGCode()->getValue('H'),H);
+         if(getGCode()->getValue('H')==0)
+            getGCode()->setOffsetHTool(H);
+         else
+            getGCode()->setHTool(getGCode()->getValue('H'),H-getGCode()->getOffsetHTool());
 
          driveProbe->startMovPos(m_backProbePosition,0);
          iOperation=4;
@@ -1443,14 +1422,12 @@ case 3: if(ModuleAxis->isLatchProbe3())
         else
          {
          sendMessage(tr("no sensor signal"),"inProbe",0);
-         setAuto(false);
+         reset();
          QTimer::singleShot(10,this,SLOT(setFinished()));
          }
         break;
 
-case 4: setAuto(false);
-
-
+case 4: resetAuto();
         QTimer::singleShot(10,this,SLOT(setFinished()));
         break;
 
@@ -1475,7 +1452,7 @@ switch(iOperation)
 
 		 ModuleAxis->resetLatchProbe();
 
-		 if(typeAuto==AUTO_HProbeSD)
+         if(m_typeAutoMMachine==AUTO_HProbeSD)
 			ModuleAxis->setActInProbe(AXIS_actSdStop);
 		 else
             ModuleAxis->setActInProbe(AXIS_actEmgStop);
@@ -1486,7 +1463,7 @@ switch(iOperation)
 		 	  iOperation=3;
 		  
 
-         driveProbe->startMovPos(driveProbe->minPosition(),m_VProbe/60);
+         driveProbe->startMovPos(driveProbe->minPosition(),m_Fprobe/60);
 		 break;
 
  case 2: if(ModuleAxis->isLatchProbe2())
@@ -1502,7 +1479,7 @@ switch(iOperation)
 		 else
 		  {
 		  sendMessage(tr("no sensor signal"),"inProbe",0);
-		  setAuto(false);
+          resetAuto();
 	      QTimer::singleShot(10,this,SLOT(setFinished()));
 		  }
 
@@ -1521,12 +1498,12 @@ switch(iOperation)
          else
 		  {
 		  sendMessage(tr("no sensor signal"),"inProbe",0);
-		  setAuto(false);
+          resetAuto();
 	      QTimer::singleShot(10,this,SLOT(setFinished()));
 		  }
 		 break;	
 
- case 4: setAuto(false);
+ case 4: resetAuto();
          setCurPositionSC(driveProbe->getName(),hProbeData.zPos);
 
          QTimer::singleShot(10,this,SLOT(setFinished()));
@@ -1552,7 +1529,7 @@ if(nameCoord=="X") newPos.x=pos;
 else
 if(nameCoord=="Y") newPos.y=pos;
 else
-if(nameCoord=="Z") newPos.z=pos+getGCode()->getHcorr();
+if(nameCoord=="Z") newPos.z=pos+getGCode()->getHofst();
 else
 if(nameCoord=="A") newPos.a=pos;
 else
@@ -1598,6 +1575,46 @@ newSCG.z=newOffsetSC.z;
 m_GCode.setOffsetSC(iSC,newSCG);
 }
 
+double WLMillMachine::getCurPosition(QString name)
+{
+WLGPoint GP=getCurrentPosition();
+
+name=name.toUpper();
+
+if(name=="X") return GP.x; else
+if(name=="Y") return GP.y; else
+if(name=="Z") return GP.z; else
+if(name=="A") return GP.a; else
+if(name=="B") return GP.b; else
+if(name=="C") return GP.c; else
+if(name=="U") return GP.u; else
+if(name=="V") return GP.v; else
+if(name=="W") return GP.w; else
+
+    return 0;
+}
+
+QString WLMillMachine::getCurPosition()
+{
+QString ret;
+
+WLGPoint GP=getCurrentPosition();
+
+ret+="G53 ";
+
+if(getDrive("X")) ret+="X"+QString::number(GP.x);
+if(getDrive("Y")) ret+="Y"+QString::number(GP.y);
+if(getDrive("Z")) ret+="Z"+QString::number(GP.z);
+if(getDrive("A")) ret+="A"+QString::number(GP.a);
+if(getDrive("B")) ret+="B"+QString::number(GP.b);
+if(getDrive("C")) ret+="C"+QString::number(GP.c);
+if(getDrive("U")) ret+="U"+QString::number(GP.u);
+if(getDrive("V")) ret+="V"+QString::number(GP.v);
+if(getDrive("W")) ret+="W"+QString::number(GP.w);
+
+return ret;
+}
+
 void  WLMillMachine::rotAboutRotPointSC(int i,float a)
 {
 m_GCode.rotAboutRotPointSC(i,a);
@@ -1606,17 +1623,17 @@ m_GCode.rotAboutRotPointSC(i,a);
 
 void WLMillMachine::setDriveManualWhell(QString nameDrive,quint8 X1,bool vmode)
 {
-WLModuleWhell *ModuleWhell=m_motDevice->getModuleWhell();
+WLModuleMPG *ModuleMPG=m_motDevice->getModuleMPG();
 
 WLMillDrive *Drive=getDrive(nameDrive,false);
 
-if(ModuleWhell)
+if(ModuleMPG)
 {
  if(nameDrive.isEmpty()
   ||Drive==nullptr
   ||Drive->getName().isEmpty())
  {
- ModuleWhell->getWhell(0)->setIndexAxis(0);
+ ModuleMPG->getMPG(0)->setIndexAxis(0);
  }
  else
   if(isOn())
@@ -1626,9 +1643,9 @@ if(ModuleWhell)
    Drive->setKSpeed(1);
    Drive->setVmov(0);
 
-   ModuleWhell->getWhell(0)->setVmode(vmode);
-   ModuleWhell->getWhell(0)->setIndexAxis(Drive->getAxis()->getIndex()+1);
-   ModuleWhell->getWhell(0)->setIndexX(X1);
+   ModuleMPG->getMPG(0)->setVmode(vmode);
+   ModuleMPG->getMPG(0)->setIndexAxis(Drive->getAxis()->getIndex()+1);
+   ModuleMPG->getMPG(0)->setIndexX(X1);
   }
 
 }
@@ -1653,12 +1670,12 @@ else if(driveProbe
      {
      iDriveDir=dir;
      iOperation=0;
-     m_VProbe=F;
+     m_Fprobe=F;
 
       switch(type)
       {
-      case 1:  typeAuto=AUTO_ProbeSD;     break;
-      default: typeAuto=AUTO_ProbeEMG;    break;
+      case 1:  m_typeAutoMMachine=AUTO_ProbeSD;     break;
+      default: m_typeAutoMMachine=AUTO_ProbeEMG;    break;
       }
 
      driveProbe->reset();
@@ -1685,12 +1702,12 @@ if(driveProbe)
 {
 iDriveDir=0;
 iOperation=0;
-m_VProbe=F;
+m_Fprobe=F;
 
 if(sd)
-  typeAuto=AUTO_HProbeSD;
+  m_typeAutoMMachine=AUTO_HProbeSD;
 else
-  typeAuto=AUTO_HProbeEMG;
+  m_typeAutoMMachine=AUTO_HProbeEMG;
 
 setAuto();
 updateAuto();
@@ -1698,7 +1715,7 @@ updateAuto();
 
 }
 
-void WLMillMachine::goHTool(float F, bool sd)
+void WLMillMachine::goHToolProbe(float F, bool sd)
 {
 if(!verifyReadyMotion()) {return;}
 
@@ -1708,26 +1725,18 @@ if(driveProbe)
 {
 iDriveDir=0;
 iOperation=0;
-m_VProbe=F;
+m_Fprobe=F;
 
 if(sd)
-  typeAuto=AUTO_HToolSD;
+  m_typeAutoMMachine=AUTO_HToolSD;
 else
-  typeAuto=AUTO_HToolEMG;
+  m_typeAutoMMachine=AUTO_HToolEMG;
 
 setAuto();
 updateAuto();
 }
 }
-
-void WLMillMachine::setPercentManual(float per)
-{
-m_percentManual=per;
-
-foreach(WLMillDrive *Drive,millDrives)
-    Drive->setManualPercent(m_percentManual);
-}
-
+/*
 void WLMillMachine::goDriveFind(QString nameDrive)
 {
 qDebug()<<"goDriveFind"<<nameDrive;
@@ -1769,6 +1778,7 @@ if(Drive)
  Drive->startTask();
  }
 }
+*/
 
 void WLMillMachine::goDriveTouch(QString nameDrive,int dir,float F)
 {
@@ -1785,14 +1795,13 @@ Drive->reset();
 Drive->setMovTouch(dir,F);
 Drive->startTask();
 }
-}
+}/*
 
 void WLMillMachine::goDriveManual(QString nameDrive,int IncDec,float step)
 {
 qDebug()<<"go drive Manual "<<IncDec<<step;
 
 if(IncDec!=0&&!verifyReadyMotion()) return;
-
 
 WLMillDrive *Drive=static_cast<WLMillDrive*> (getDrive(nameDrive));
 
@@ -1813,7 +1822,7 @@ if(IncDec==0)
  }
 }
 }
-
+*/
 void WLMillMachine::Pause(bool pause) //остановка в любой момент
 {
 QMutexLocker locker(&Mutex);
@@ -1952,10 +1961,26 @@ WLGPoint WLMillMachine::getCurrentPositionActivSC()
 return m_GCode.getPointActivSC(getCurrentPosition(),true);
 }
 
+void WLMillMachine::setAuto()
+{
+if(getMPG()&&isUseMPG())
+   getMPG()->setEnable(false);
+
+WLMachine::setAuto();
+}
+
+void WLMillMachine::resetAuto()
+{
+if(getMPG()&&isUseMPG())
+   getMPG()->setEnable(true);
+
+WLMachine::resetAuto();
+}
+
 void WLMillMachine::setSOut(float S)
 {
-tarSOut=S;
-m_motDevice->getModulePlanner()->setSOut(calcSOut(tarSOut)/100);
+    tarSOut=S;
+    m_motDevice->getModulePlanner()->setSOut(calcSOut(tarSOut)/100);
 }
 
 
@@ -2089,7 +2114,7 @@ updateMovProgram();
 emit changedTrajSize(MillTraj.size());
 emit changedReadyRunList(Flag.set(ma_readyRunList,!MillTraj.isEmpty()));
 
-//if(Flag.get(ma_autostart)) startMovList();
+if(Flag.get(ma_autostart)) startMovList();
 
 return true;
 }
@@ -2103,10 +2128,7 @@ QList <WLElementTraj> curListTraj;
 QList <WLElementTraj>    ListTraj;
 
 qDebug()<<"GCode"<<gtxt;
-/*
-if(Flag.get(ma_runprogram)
- ||MillTraj.size()>=50) return false;
-*/
+
 const float simpliD=m_mainDim*(1<<xPD);
 
 WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
@@ -2123,7 +2145,6 @@ if(WLGProgram::translate(gtxt,curListTraj,lastGPoint,&m_GCode,0))
     {		
     WLElementTraj::simpliTrajectory(ListTraj,curListTraj,simpliD);
 
-    qDebug()<<"add runGCode";
 	addElementTraj(curListTraj);
 	
 	if(!curListTraj.isEmpty())
@@ -2149,12 +2170,15 @@ if(WLGProgram::translate(gtxt,curListTraj,lastGPoint,&m_GCode,0))
 	  
       //Flag.set(ma_runscript,m_EVMScript->isBusy());
 
-      if(isRunList())
-        {
-        updateMovBuf();
-        }
-      else  if(Flag.get(ma_autostart)
-             ||Flag.get(ma_runscript)) Start();
+      if(!isPause())
+       {
+       if(isRunList())
+         {
+         updateMovBuf();
+         }
+       else  if(Flag.get(ma_autostart)
+              ||Flag.get(ma_runscript)) Start();
+       }
 	  }
 	return true;
     }
@@ -2577,7 +2601,7 @@ else  if(!deltaBL.isNull())
         ETraj.setBckl();
         ETraj.setLineXYZ(Traj[i].startPoint+m_nowBL,Traj[i].startPoint+nextBL);
 
-        if(m_VBacklash!=0.0f)    ETraj.setF(m_VBacklash);
+        if(m_Fbacklash!=0.0f)    ETraj.setF(m_Fbacklash);
 
         ETraj.calcPoints(&ok,getGModel());
 

@@ -120,7 +120,7 @@ WLFlags Flags;
 int m_sizeBuf;
 int m_free;
 
-float m_KFpause=0;
+float m_KFpause=0.25f;
 
 quint8  m_lastIndexElementBuf;
 quint32 m_curIdElementBuf;

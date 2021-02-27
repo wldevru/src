@@ -24,7 +24,8 @@ if(name=="WLModuleAIOPut")  Module=new WLModuleAIOPut;
 else
 if(name=="WLModuleEncoder") Module=new WLModuleEncoder;
 else
-if(name=="WLModuleWhell")   Module=new WLModuleWhell;
+if(name=="WLModuleWhell"
+ ||name=="WLModuleMPG")     Module=new WLModuleMPG;
 else								 
 if(name=="WLModulePlanner") Module=new WLModulePlanner;
 else								 
@@ -52,7 +53,7 @@ case typeMIOPut:  Module=new WLModuleIOPut;
 	              break;
 case typeMAIOPut:  Module=new WLModuleAIOPut;
                   break;
-case typeMWhell:  Module=new WLModuleWhell;
+case typeMMPG:    Module=new WLModuleMPG;
 	              break;
 case typeMEncoder:Module=new WLModuleEncoder;
 	              break;

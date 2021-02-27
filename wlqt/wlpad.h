@@ -7,15 +7,15 @@
 #include <QList>
 #include <QMutex>
 
-struct dataSA
+struct dataSS
 {
 double speed;
-double acc;
+double scur;
 
-dataSA() {reset();}
-void reset() {speed=acc=0;}
+dataSS() {reset();}
+void reset() {speed=scur=0;}
 
-bool isEmpty() {return ((speed==0.0)&&(acc==0.0));}
+bool isEmpty() {return ((speed==0.0)&&(scur==0.0));}
 };
 
 struct dataPad
@@ -145,7 +145,7 @@ bool Load(QString);
 bool Reload();
 
 bool setSpeed(float spe);
-bool setSA(dataSA data);
+//bool setSS(dataSS data);
 bool setSpePer(float  per);
 bool addSpeK(float  k);
 bool setAccPer(float  per);

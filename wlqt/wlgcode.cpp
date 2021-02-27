@@ -93,25 +93,18 @@ if(number<sizeTools
     }
 }
 
-float WLGCode::getHvalue(int index)
+
+double WLGCode::getHofst()
 {
-float ret=0;
+double ret=0;
 
-if(index<sizeTools)
- {
- ret=getDataTool(index==0 ? getValue('H') : index).h;
- }
+quint16 H=(quint16)getValue('H');
 
-return ret;
+if(H!=0)
+{
+ if(isGCode(43)) ret=getDataTool(H).h;
+   else if(isGCode(44)) ret=-getDataTool(H).h;
 }
-
-float WLGCode::getHcorr()
-{
-float ret=0;
-
-if(isGCode(43)) ret=getHvalue();
-  else if(isGCode(44)) ret=-getHvalue();
-
 return ret;
 }
 
@@ -148,21 +141,39 @@ void WLGCode::setHTool(int i, float h)
 {
 WLGTool Tool=getDataTool(i);
 
-if(i==0)
- {
- Tool.h=h;
- }
-else
- {
- Tool.h=h-getDataTool(0).h;
- }
+Tool.h=h;
 
 qDebug()<<"setHTool"<<i<<h<<Tool.h;
 
 setDataTool(i,Tool);
 }
 
+double WLGCode::getValue(QString name)
+{
+double ret=0;
 
+
+if(!name.isEmpty())
+{
+const char *str=name.toStdString().c_str();
+
+ret=getValue(*str);
+}
+
+return ret;
+}
+
+double WLGCode::getHTool(int index)
+{
+if(index<0) index=getValue('H');
+
+return getDataTool(index).h;
+}
+
+double WLGCode::getDTool(int index)
+{
+return index<0 ? getDataTool(getT()).d : getDataTool(index).d;
+}
 
 
 
@@ -344,15 +355,21 @@ switch(code)
            m_data.GCode[81]=0; //"Off Drill";
            m_data.GCode[83]=0;
 		   break;
-   case 81:m_data.GCode[81]=1; //"Drill";
+
+   case 81:if((m_data.GCode[83]==0)
+            &&(m_data.GCode[81]==0)) m_data.initDrillPlane=true;
+
+           m_data.GCode[81]=1; //"Drill";
            m_data.GCode[83]=0;
            m_data.GCode[80]=0;
-           m_data.initDrillPlane=true;
            break;
-   case 83:m_data.GCode[83]=1; //"Long drill";
+
+   case 83:if((m_data.GCode[83]==0)
+            &&(m_data.GCode[81]==0)) m_data.initDrillPlane=true;
+
+           m_data.GCode[83]=1; //"Long drill";
            m_data.GCode[81]=0;
-           m_data.GCode[80]=0;
-           m_data.initDrillPlane=true;
+           m_data.GCode[80]=0;    
            break;
    //**14
    case 90:if(List.size()==1)		    
@@ -448,11 +465,11 @@ switch(name)
   case 'F': m_data.gF.set(data); break;
 
   case 'S': m_data.gS.set(data); break;
-  case 'T': m_data.gT.set(data); break;
+  case 'T': m_data.gT.set(ceil(fabs(data))); break;
 
   case 'H': if(data>=0
                &&data<sizeTools)   {                
-                m_data.gH.set(data);
+                m_data.gH.set(ceil(fabs(data)));
                 }
            else {              
                 return false;
@@ -529,8 +546,8 @@ double WLGCode::getValue(char name)
   case 'F': return m_data.gF.value;
 
   case 'S': return m_data.gS.value;
-  case 'T': return m_data.gT.value;
 
+  case 'T': return m_data.gT.value;
   case 'H': return m_data.gH.value;
 
   default : return 0;
@@ -613,7 +630,7 @@ else
     if(isValid('Z'))
      {
      newPoint.z=getValue('Z')*(scale ? m_data.G51Scale.z:1.0);
-     newPoint.z+=getHcorr();
+     newPoint.z+=getHofst();
      }
 
 	if(isValid('A')) newPoint.a=getValue('A'); 
@@ -722,10 +739,10 @@ WLGPoint WLGCode::getPointG53(WLGPoint lastGPoint)
 WLGPoint newPoint=getPointActivSC(lastGPoint);
 
 newPoint=getPointGCode(newPoint,false);
-/*
-if(isGCode(90))
-    newPoint.z-=getHcorr();
-*/
+
+if(isGCode(90)
+ &&isValid('Z')) newPoint.z-=getHofst();
+
 return getPointActivSC(newPoint,true);
 }
 
@@ -911,6 +928,8 @@ G51Scale.y=1;
 G51Scale.z=1;
 
 absIJK=false;
+
+offsetHTool=0;
 
 iCurTool=1;
 

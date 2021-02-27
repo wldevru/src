@@ -10,12 +10,14 @@ class WLLabel : public QLabel
 
 public:
 	WLLabel(QWidget *parent);
-    WLLabel(QString Prefix,QString Suffix="",double m_data=0,int m_n=0);
+    WLLabel(QString m_prefix,QString m_suffix="",double m_data=0,int m_n=0);
 	
 	~WLLabel();
 
-void setPrefix(QString str) {Prefix=str;}
-void setSuffix(QString str) {Suffix=str;}
+void setPrefix(QString str) {m_prefix=str;}
+void setSuffix(QString str) {m_suffix=str;}
+
+QString getPrefix() {return m_prefix;}
 
 void setPSfix(QString Pstr,QString Sstr) {setPrefix(Pstr);setSuffix(Sstr);}
 
@@ -23,13 +25,13 @@ void setData(double d,int m_n=0);
 void setData(QString txt);
 void setDataN(int _n) {m_n=_n;}
 
-void setPS(QString pr,QString su) {Prefix=pr;Suffix=su;}
+void setPS(QString pr,QString su) {m_prefix=pr;m_suffix=su;}
 
 double getData();
 
 private:
-	QString Prefix;
-	QString Suffix;
+    QString m_prefix;
+    QString m_suffix;
     double m_data;
     int m_n;
 
@@ -43,9 +45,15 @@ public slots:
 
 protected:
 	virtual	void mouseDoubleClickEvent ( QMouseEvent * event ) {emit dclicked(); QLabel::mouseDoubleClickEvent(event);}
+    void mousePressEvent(QMouseEvent *event)                   {emit  clicked(); QLabel::mousePressEvent(event);}
 
 signals:
 	void dclicked();
+    void  clicked();
+
+    // QWidget interface
+protected:
+
 };
 
 #endif // WLLABEL_H

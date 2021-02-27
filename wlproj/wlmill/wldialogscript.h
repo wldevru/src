@@ -22,10 +22,12 @@ private:
 signals:	
  void enterNum(double);	
  void enterString(QString);	
+ void enterOk();
  void enterCancel();	
 
 public slots:
 
+ void showQuestion(QString txt);
  void showMessage(QString txt);
  void showEnterNum(QString txt);
  void showEnterString(QString txt);

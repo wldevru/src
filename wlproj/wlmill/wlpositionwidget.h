@@ -27,6 +27,8 @@ public:
 	~WLPositionWidget();
 
 	// WLFrame getViewSC() {return MillMachine->GCode.getSC(iSC-1);};
+ void setJogDistStr(QString);
+ void setFperStr(QString);
 
 private:
 	Ui::WLPositionWidget ui;
@@ -71,8 +73,6 @@ private:
    QDoubleSpinBox *sbFman;
    QDoubleSpinBox *sbSper;
 
-   QButtonGroup *bgMinusAxis;
-
    QToolButton *pbFast;
 
    QLabel *labelTypeManual;
@@ -80,8 +80,8 @@ private:
    float m_stepSper=2.5;
    float m_stepFper=2.5;
 
-   QList <float> listFper;
-   QStringList listManDist;
+   QList <float> m_listFper;
+   QStringList m_listManDist;
    int m_curIndexListMan=0;
 
    QSize m_buttonSize;
@@ -100,9 +100,7 @@ protected:
 
   void keyPressEvent ( QKeyEvent * event );
   void keyReleaseEvent ( QKeyEvent * event );
- // void focusInEvent ( QFocusEvent * event );
   void focusOutEvent ( QFocusEvent * event );
-  void resizeEvent(QResizeEvent *event);
   void mousePressEvent(QMouseEvent *event);
 
 private slots: 

@@ -20,7 +20,9 @@ return InitInputs(_sizeInputs)&&InitOutputs(_sizeOutputs);
 
 bool WLModuleAIOPut::InitInputs(int sizeInputs)
 {
-if((sizeInputs<1)||(Inputs.size()== sizeInputs)) return false;
+if(sizeInputs<2) sizeInputs=2;
+
+if((Inputs.size()== sizeInputs)) return false;
 
 WLAIOPut *ainput;
 
@@ -48,7 +50,9 @@ return true;
 
 bool WLModuleAIOPut::InitOutputs(int sizeOutputs)
 {
-if((sizeOutputs<1)||(Inputs.size()== sizeOutputs)) return false;
+if(sizeOutputs<1) sizeOutputs=1;
+
+if(Outputs.size()== sizeOutputs) return false;
 
 WLAIOPut *aoutput;
 

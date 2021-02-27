@@ -182,7 +182,7 @@ connect(m_tbZoomOut,&QToolButton::clicked,this,&WLVisualWidget::on_tbZoomOut);
 m_tbUpdate = new QToolButton(this);
 m_tbUpdate -> setIcon(QPixmap(":/data/icons/update.png"));
 m_tbUpdate -> setIconSize(QSize(32,32));
-m_tbUpdate -> setToolTip(tr("zoom out"));
+m_tbUpdate -> setToolTip(tr("update"));
 connect(m_tbUpdate,&QToolButton::clicked,m_Program,&WLGProgram::updateShowTraj,Qt::DirectConnection);
 
 m_timerView=new QTimer;
@@ -708,8 +708,14 @@ if(!m_MillMachine->isReady()) return;
 //#ifdef MILL3D
 bool ok;
 
-qint32 curId=m_MillMachine->getMotionDevice()->getModulePlanner()->getCurIdElement();
-qint32 indexMPlanner=curId+m_MillMachine->getMotionDevice()->getModulePlanner()->getCountBuf();
+qint32 curId=0;
+qint32 indexMPlanner=0;
+
+if(m_MillMachine->getMotionDevice()->getModulePlanner())
+    {
+    curId=m_MillMachine->getMotionDevice()->getModulePlanner()->getCurIdElement();
+    indexMPlanner=curId+m_MillMachine->getMotionDevice()->getModulePlanner()->getCountBuf();
+    }
 
 int pointsCountBuf=0;
 

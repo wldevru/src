@@ -106,6 +106,9 @@
         <property name="singleStep">
          <number>1</number>
         </property>
+        <property name="value">
+         <number>25</number>
+        </property>
        </widget>
       </item>
      </layout>
@@ -515,12 +518,12 @@
          <string>height from bottom of sensor</string>
         </property>
         <property name="text">
-         <string>G53 Tool Z (H0)</string>
+         <string>offset Tool (G53 Z)</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="sbZH0ToolProbe">
+       <widget class="QDoubleSpinBox" name="sbOffsetHToolProbe">
         <property name="decimals">
          <number>2</number>
         </property>

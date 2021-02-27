@@ -37,7 +37,7 @@ quint32 WLModulePlanner::getCountAddElement() const
 
 void WLModulePlanner::setSizeBuf(int value)
 {
-    m_sizeBuf = value;
+m_sizeBuf = value;
 }
 
 void WLModulePlanner::sendGetDataBuf()
@@ -465,8 +465,6 @@ switch(ui1)
 						 Stream>>ui32;									
                          Stream>>f1;//k element complete
                          Stream>>f2;//Star
-
-                        qDebug()<<"sendMBSize"<<m_lastIndexElementBuf<<ui32<<ui1<<ui2;
 
                         emit changedSOut(f2);
 

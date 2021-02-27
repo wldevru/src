@@ -53,9 +53,9 @@ SOURCES += \
     ../../wlmotion/modules/wlmoduleioput.cpp \
     ../../wlmotion/modules/wlmoduleplanner.cpp \
     ../../wlmotion/modules/wlmodulepwm.cpp \
-    ../../wlmotion/modules/wlmodulewhell.cpp \
+    ../../wlmotion/modules/wlmodulempg.cpp \
     ../../wlmotion/modules/wlpwm.cpp \
-    ../../wlmotion/modules/wlwhell.cpp \
+    ../../wlmotion/modules/wlmpg.cpp \
     ../../wlmotion/wldevice.cpp \
     ../../wlmotion/wlmotion.cpp \
     ../../wlqt/form/wldevicewidget.cpp \
@@ -69,7 +69,6 @@ SOURCES += \
     ../../wlqt/form/wlmessmanager.cpp \
     ../../wlqt/form/wlpamlistwidget.cpp \
     ../../wlqt/form/wlpamwidget.cpp \
-    ../../wlqt/form/wlwhellwidget.cpp \
     ../../wlqt/wl3dpoint.cpp \
     ../../wlqt/wlcalc.cpp \
     ../../wlqt/wldrive.cpp \
@@ -104,7 +103,9 @@ SOURCES += \
     wlelementcontrol.cpp \
     wltoolswidget.cpp \
     ../../wlqt/form/wlaxiswidget.cpp \
-    ../../wlqt/form/wlmpgwidget.cpp
+    ../../wlqt/form/wlmpgwidget.cpp \
+    ../../wlqt/form/wleditmpgwidget.cpp \
+    ../../wlqt/wlmachine.cpp
 
 
 HEADERS += \
@@ -126,9 +127,9 @@ HEADERS += \
     ../../wlmotion/modules/wlmoduleioput.h \
     ../../wlmotion/modules/wlmoduleplanner.h \
     ../../wlmotion/modules/wlmodulepwm.h \
-    ../../wlmotion/modules/wlmodulewhell.h \
+    ../../wlmotion/modules/wlmodulempg.h \
     ../../wlmotion/modules/wlpwm.h \
-    ../../wlmotion/modules/wlwhell.h \
+    ../../wlmotion/modules/wlmpg.h \
     ../../wlmotion/wldevice.h \
     ../../wlqt/form/WLMillDriveWidget.h \
     ../../wlqt/form/wldevicewidget.h \
@@ -142,7 +143,6 @@ HEADERS += \
     ../../wlqt/form/wlmessmanager.h \
     ../../wlqt/form/wlpamlistwidget.h \
     ../../wlqt/form/wlpamwidget.h \
-    ../../wlqt/form/wlwhellwidget.h \
     ../../wlqt/wl3dpoint.h \
     ../../wlqt/wlcalc.h \
     ../../wlqt/wldrive.h \
@@ -179,7 +179,9 @@ HEADERS += \
     wlelementcontrol.h \
     wltoolswidget.h \
     ../../wlqt/form/wlaxiswidget.h \
-    ../../wlqt/form/wlmpgwidget.h
+    ../../wlqt/form/wlmpgwidget.h \
+    ../../wlqt/form/wleditmpgwidget.h \
+    ../../wlqt/wlmachine.h
 
 
 FORMS += \
@@ -194,7 +196,6 @@ FORMS += \
     ../../wlqt/form/wlmessmanager.ui \
     ../../wlqt/form/wlpamlistwidget.ui \
     ../../wlqt/form/wlpamwidget.ui \
-    ../../wlqt/form/wlwhellwidget.ui \
     wleditmillwidget.ui \
     wleditpoint.ui \
     wlmillcontrol.ui \
@@ -205,7 +206,8 @@ FORMS += \
     wlelementcontrol.ui \
     wltoolswidget.ui \
     ../../wlqt/form/wlaxiswidget.ui \
-    ../../wlqt/form/wlmpgwidget.ui
+    ../../wlqt/form/wlmpgwidget.ui \
+    ../../wlqt/form/wleditmpgwidget.ui
 
 
 RESOURCES += \

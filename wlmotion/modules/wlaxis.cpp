@@ -203,11 +203,12 @@ else
 return false;
 }
 
-bool WLAxis::setDelaySCurve(float _delaySCurve)
+bool WLAxis::setDelaySCurve(float _delaySCurve,bool save)
 {
 if(_delaySCurve>=0) 
 {
-delaySCurve=_delaySCurve;
+if(save)
+    delaySCurve=_delaySCurve;
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -215,7 +216,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_setDelaySCurve<<getIndex()<<delaySCurve;
+Stream<<(quint8)comAxis_setDelaySCurve<<getIndex()<<_delaySCurve;
 
 emit sendCommand(data);
 return true;
@@ -599,7 +600,6 @@ if(status!=nstatus)
                       if((lstatus!=statusAxis::AXIS_stop)
                         &&(nstatus==statusAxis::AXIS_stop)
                         &&(mode!=modeAxis::AXIS_slave))  emit finished();
-
 
                        if((lstatus==statusAxis::AXIS_stop)
                         &&(nstatus!=statusAxis::AXIS_stop)

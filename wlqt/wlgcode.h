@@ -344,18 +344,19 @@ struct WLGCodeData
  WLGPoint G43Position;
  WLGPoint G28Position;
 
+ double offsetHTool=0;
+
  WLGTool Tools[sizeTools];
 
  WLGPoint G51Scale;
 
- int iCurTool;
+ int iCurTool=0;
 
-int iSC;
-int iSCBuf;
+int iSC=0;
 
-double drillPlane;
-double G64P;
-double G64Q;
+double drillPlane=0;
+double G64P=0;
+double G64Q=0;
 
 bool GCode[GCodeSize];
 
@@ -435,18 +436,19 @@ public:
 
     void setG64PQ(float smooth,float simply) {if(smooth>=0&&simply>=0) {m_data.G64P=smooth;m_data.G64Q=simply;}}
 
-    bool isGCode(int i) {return m_data.GCode[i];}
+Q_INVOKABLE  bool isGCode(int i) {return m_data.GCode[i];}
+
     bool isMCode(int i) {return m_data.MCode[i];}
 
     bool isInitDrillPlane() {return  m_data.initDrillPlane;}
-    void setDrillPlane(double pos) {qDebug()<<"setDrillPlane"<<pos; m_data.drillPlane;}
+    void setDrillPlane(double pos) {qDebug()<<"setDrillPlane"<<pos; m_data.drillPlane=pos;}
     double getDrillPlane() {return m_data.drillPlane;}
 
    double getValue(char);
    bool isValid(char);
    bool setValue(char name,double data);
 
-	void resetGValue();
+  void resetGValue();
 
    WLGPoint getPointGCode(WLGPoint lastGPoint,bool scale=true);
 
@@ -508,6 +510,9 @@ public:
     WLGPoint getG43Position()        {return m_data.G43Position;}
     void setG43Position(WLGPoint hp) {m_data.G43Position=hp;}
 
+    double getOffsetHTool() {return m_data.offsetHTool; }
+    void   setOffsetHTool(double ofst) {m_data.offsetHTool=ofst;}
+
 	int getPlaneCirc();
 
 	QString getActivGCodeString();
@@ -515,11 +520,12 @@ public:
        void setDataTool(int index,WLGTool tool,bool send=true);
     WLGTool getDataTool(int index) {return index<sizeTools ? m_data.Tools[index] : WLGTool();}
 
-    float getHvalue(int index=0);
-    float getHcorr();
+    double getHofst();
 
     void verifyG51();
     void verifyG43();
+
+
 
     void setData(const WLGCodeData &data);
 
@@ -527,7 +533,10 @@ public:
 public:
 
     Q_INVOKABLE void setHTool(int i,float h);
-    Q_INVOKABLE  int getT(){return getValue('T');}
+    Q_INVOKABLE  int getT()    {return getValue('T');}
+    Q_INVOKABLE double getValue(QString name);
+    Q_INVOKABLE double getHTool(int index);
+    Q_INVOKABLE double getDTool(int index);
 
 private:
     WLGCodeData m_data;

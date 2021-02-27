@@ -20,7 +20,7 @@
 
 enum typeModule {typeDevice=0
                 ,typeMAxis//1
-                ,typeMWhell//2
+                ,typeMMPG//2
                 ,typeMPWM//3
                 ,typeMFreq//4
                 ,typeMIOPut	 //5

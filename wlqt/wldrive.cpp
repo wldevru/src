@@ -1,7 +1,7 @@
 #include "wldrive.h"
 #include <math.h>
 
-QList<WLDrive*> WLDrive::driveList;
+QList<WLDrive*> WLDrive::m_driveList;
 
 WLDrive::WLDrive(QString _nameDrive)
 {
@@ -23,7 +23,9 @@ setDimension(WLDriveDim::oneStepSize,0.01);
 setManualPercent(100);
 
 m_feedVFind=10;
+
 m_Vnow=0;
+m_Vmov=0;
 
 pad()->SaveAD(0,100,100,-100,"main");
 
@@ -31,14 +33,14 @@ m_type=Linear;
 
 setObjectName("Drive");
 
-driveList+=this;
+m_driveList+=this;
 }
 
 
 WLDrive::~WLDrive()
 {
 qDebug()<<"~WLDrive()";
-driveList.removeOne(this);
+m_driveList.removeOne(this);
 }
 
 
@@ -157,7 +159,7 @@ if(!isDone())
 
  if(getAxis()->movPos(MASK_abs,nextPositionDrive().step,m_Vmov/dim.value))
    { 
-   qDebug()<<"+"<<positionDrive().step<<">>"<<nextPositionDrive().step;
+   qDebug()<<"+"<<positionDrive().step<<">>"<<nextPositionDrive().step<<" F="<<m_Vmov/dim.value;
    m_nowPosition.offset=m_nextPosition.offset;
    //setMotion();
    waitAfterStartMotion();
@@ -179,6 +181,8 @@ else
  emit finished();
  }
 
+if(isManual())
+    qDebug()<<"start manual";
 return true;
 }
 
@@ -208,6 +212,7 @@ m_nextPosition=m_nowPosition;
 if(getAxis())
   {
   getAxis()->reset();
+  getAxis()->restoreDelaySCurve();//set default
   getAxis()->setKF(1.0);
   }
 
@@ -221,7 +226,7 @@ return Mot(m_nowPosition.get(dim)+dist);
 }
 
 int WLDrive::Mot(double pos)
-{
+{    
 if(isMotion())
  { 
  emit sendMessage(getFullName(),tr("unfinished previous move"),-1);
@@ -381,8 +386,9 @@ return false;
 
 void WLDrive::setFinished()
 {
-qDebug()<<"Drive setFinished";
+qDebug()<<"Drive setFinished"<<getName();
 
+QMutexLocker locker(&MutexDrive);
 //MutexDrive.lock();
 //if(!isMotion()) 	return;
 
@@ -433,9 +439,8 @@ if(isMotion())
    return;
    }
 
-reset();
-
 pad()->Load("main");
+
 if(!_rot) pad()->Load("mainMinus");
 
 pad()->Load("manual");
@@ -525,6 +530,21 @@ else
     return false;
 }
 
+bool WLDrive::setScurve(double Scur)
+{
+if(getAxis())
+ {
+ if(Scur<getAxis()->getDelaySCurve())
+       Scur=getAxis()->getDelaySCurve();
+
+ getAxis()->setDelaySCurve(Scur,false);
+
+ return true;
+ }
+
+return false;
+}
+
 
 bool WLDrive::setKGear(float k)
 {
@@ -554,7 +574,7 @@ void WLDrive::setInterp(bool set)
 {
 Flag.set(fl_interp,set);
 interPad=pad()->getData();
-//interPad.Vma=Vtar;
+
 }
 
 
@@ -562,7 +582,7 @@ void WLDrive::addInResolutionMov(WLIOPut *_inEnableMov,bool state)
 {
 resolutMovIOData+=WLIOData(_inEnableMov,state);
 
-connect(_inEnableMov,SIGNAL(changed()),SLOT(updateInResolutionMov()),Qt::QueuedConnection);
+connect(_inEnableMov,SIGNAL(changed(int)),SLOT(updateInResolutionMov()),Qt::QueuedConnection);
 }
 
 void WLDrive::removeInResolutionMov(WLIOPut *_inEnableMov)
@@ -740,18 +760,22 @@ QList <WLDrive*> Drives;
 
 qDebug()<<"startInterp";
 
-for(int i=0;i<driveList.size();i++)
+for(int i=0;i<m_driveList.size();i++)
     {
-	if(driveList[i]->isInterp())  
+    if(m_driveList[i]->isInterp())
 		{
-        if(driveList[i]->isWait()) return false; //ждем когда все могут двигаться
-		Drives+=driveList[i];
+        if(m_driveList[i]->isWait())
+          {
+          qDebug()<<"waitDrive for interp"<<m_driveList[i]->getName();
+          return false; //ждем когда все могут двигаться
+          }
+        Drives+=m_driveList[i];
 	    }
     }
 
-if(Drives.size()<=1) return true;
+qDebug()<<"size interp"<<Drives.size();
 
-qDebug()<<"size"<<Drives.size();
+if(Drives.isEmpty()) return true;
 
 int const n=Drives.size();
 
@@ -761,11 +785,16 @@ dataPad  mainPad,Pad;
 
 //находим самое длинное перемещение
 int iDistMax=0;
+float maxScur=0;
 
-for(int i=1;i<n;i++)
+for(int i=1;i<n;i++) {
   if(qAbs((float)Drives[i]->distance())
     >qAbs((float)Drives[iDistMax]->distance()))
 	iDistMax=i;
+
+  if(maxScur<Drives[i]->getAxis()->getDelaySCurve())
+       maxScur=Drives[i]->getAxis()->getDelaySCurve();
+  }
 
 mainPad=Drives[iDistMax]->pad()->getData(); //у кого самый большой путь
 //находим коэффицинеты
@@ -789,6 +818,10 @@ for(int i=0;i<n;i++)
  if(Drives[i]->interPad.Vst<(kDist[i]*mainPad.Vst)) //если скорость превышает возможное
     mainPad.Vst*=Drives[i]->interPad.Vst/(kDist[i]*mainPad.Vst);
  
+ if(Drives[i]->getVmov()!=0.0
+  &&Drives[i]->getVmov()<Drives[i]->interPad.Vma)
+     Drives[i]->interPad.Vma=Drives[i]->getVmov();
+
  if(Drives[i]->interPad.Vma<(kDist[i]*mainPad.Vma)) //если скорость превышает возможное
     mainPad.Vma*=Drives[i]->interPad.Vma/(kDist[i]*mainPad.Vma);
  }
@@ -805,8 +838,8 @@ for(int i=0;i<n;i++)
  Drives[i]->interPad.Vma=kDist[i]*mainPad.Vma;
 
  Drives[i]->setPad(Drives[i]->interPad);
- Drives[i]->setVmov();
- Drives[i]->startMotion();
+ Drives[i]->getAxis()->setDelaySCurve(maxScur,false);
+ Drives[i]->startMotion(0);
  }
 
 return true;
@@ -823,10 +856,10 @@ if(k>0&&k<=1)
  { 
  if(isInterp())
       {
-      for(int i=0;i<driveList.size();i++)
-		  if(driveList[i]->isInterp())  
+      for(int i=0;i<m_driveList.size();i++)
+          if(m_driveList[i]->isInterp())
 			  {
-			  driveList[i]->toSetKSpeed(k);
+              m_driveList[i]->toSetKSpeed(k);
 		      }
 	  }
  else
@@ -838,8 +871,12 @@ void WLDrive::setManualPercent(float per)
 {
 if((0.0f<per)&&(per<=100.0f))
  {
- manualPercent=per; qDebug()<<"manualPercent"<<manualPercent;
- if(isMotion()) setKSpeed(manualPercent/100.0f);
+ manualPercent=per;
+
+ qDebug()<<"setManualPercent"<<per<<isManual();
+ if(isMotion()
+  //&&isManual()
+         ) setKSpeed(manualPercent/100.0f);
  }
 
 };
@@ -867,8 +904,8 @@ void WLDrive::startAccel()
 {
 if(isInterp())
    {
-   for(int i=0;i<driveList.size();i++)
-       if(driveList[i]->isInterp())  driveList[i]->toStartAccel();
+   for(int i=0;i<m_driveList.size();i++)
+       if(m_driveList[i]->isInterp())  m_driveList[i]->toStartAccel();
    }
 else
  toStartAccel();
@@ -878,8 +915,8 @@ void WLDrive::startDecel()
 {
 if(isInterp())
    {
-   for(int i=0;i<driveList.size();i++)
-       if(driveList[i]->isInterp())  driveList[i]->toStartDecel();
+   for(int i=0;i<m_driveList.size();i++)
+       if(m_driveList[i]->isInterp())  m_driveList[i]->toStartDecel();
    }
 else
  toStartDecel();
@@ -891,8 +928,8 @@ if(reset) resetAuto();
 
 if(isInterp())
    {
-   for(int i=0;i<driveList.size();i++)
-       if(driveList[i]->isInterp())  driveList[i]->toStartStop();
+   for(int i=0;i<m_driveList.size();i++)
+       if(m_driveList[i]->isInterp())  m_driveList[i]->toStartStop();
    }
 else
  toStartStop();
@@ -904,11 +941,11 @@ resetAuto();
 
 if(isInterp())
    {
-   for(int i=0;i<driveList.size();i++)
-       if(driveList[i]->isInterp())  
+   for(int i=0;i<m_driveList.size();i++)
+       if(m_driveList[i]->isInterp())
 		   {
-		   driveList[i]->resetAuto();
-		   driveList[i]->toStartStop();///!!!
+           m_driveList[i]->resetAuto();
+           m_driveList[i]->toStartStop();///!!!
 	       }
    }
 else
@@ -928,16 +965,16 @@ void WLDrive::updateInputs()
 
 void WLDrive::resets()
 {
-for(int i=0;i<driveList.size();i++)
-        driveList[i]->reset();
+for(int i=0;i<m_driveList.size();i++)
+        m_driveList[i]->reset();
 }
 
 bool WLDrive::isActivs()
 {
 bool ret=false;
 
-for(int i=0;i<driveList.size();i++)
-    if(driveList[i]->isActiv()) ret=true;
+for(int i=0;i<m_driveList.size();i++)
+    if(m_driveList[i]->isActiv()) ret=true;
 
 return ret;
 }
@@ -946,8 +983,8 @@ bool WLDrive::isMotionDrives()
 {
 bool ret=false;
 
-for(int i=0;i<driveList.size();i++)
-    if(driveList[i]->isMotion()) ret=true;
+for(int i=0;i<m_driveList.size();i++)
+    if(m_driveList[i]->isMotion()) ret=true;
 
 return ret;
 }
@@ -959,25 +996,30 @@ WLDrive *ret=nullptr;
 
 name=name.toLower();
 
-for(int i=0;i<driveList.size();i++)
- if(driveList[i]->getName().toLower()==name)
+for(int i=0;i<m_driveList.size();i++)
+ if(m_driveList[i]->getName().toLower()==name)
   {
-  ret=driveList[i];
+  ret=m_driveList[i];
   break;
   }
 
 return ret;
 }
 
+QList<WLDrive *> WLDrive::getDriveList()
+{
+return m_driveList;
+}
+
 void WLDrive::startStops(bool reset)
 {
-foreach(WLDrive *drive,driveList)
+foreach(WLDrive *drive,m_driveList)
           drive->startStop(reset);
 }
 
 void WLDrive::setMainPads()
 {
-foreach(WLDrive *drive,driveList)
+foreach(WLDrive *drive,m_driveList)
            drive->setMainPad();
 }
 
@@ -1042,12 +1084,12 @@ foreach(QString num,List)
 
             if(m_AxisList.isEmpty())
                 {
+                connect(axis,&WLAxis::changedFreq,this,&WLDrive::updateFreq);
                 connect(axis,&WLAxis::changedLatch2,this,&WLDrive::updateAuto);
                 connect(axis,&WLAxis::changedLatch3,this,&WLDrive::updateAuto);
                 connect(axis,&WLAxis::changedError,this,&WLDrive::setError);
                 connect(axis,&WLAxis::changedPosition,this,&WLDrive::updatePos,Qt::DirectConnection);
                 connect(axis,&WLAxis::finished,this,&WLDrive::setFinished,Qt::QueuedConnection);
-                connect(axis,&WLAxis::changedFreq,this,&WLDrive::updateFreq);
                 }
             else
                 {
@@ -1100,7 +1142,8 @@ foreach(WLAxis *Axis,getAxisList())
 
 void WLDrive::updatePos(qint32 Pos)
 {
-QMutexLocker locker1(&MutexDrivePosition);                      
+QMutexLocker locker0(&MutexDrive);
+QMutexLocker locker1(&MutexDrivePosition);
 
 if(Flag.get(fl_setpos))
   {
@@ -1217,7 +1260,7 @@ return 1;
 
 void WLDrive::updateAuto()
 {
-qDebug("updateAuto Drive");
+qDebug()<<"updateAuto Drive"<<isAutoDrive();
 if(isAutoDrive())
  {
  qDebug()<<autoTypeDrive<<logicFindPos<<isMotion()<<isMotionSubAxis();
@@ -1225,7 +1268,8 @@ if(isAutoDrive())
  {
  case noFind:  setPosition(getOrgPosition());
                setTruPosition(true);
-	           reset();
+               reset();
+               emit finished();
 	           break;
 
  case onlyORGHome:
@@ -1254,6 +1298,7 @@ if(isAutoDrive())
                             reset();
                             emit sendMessage(getFullName(),tr("wrong starting position")+"(inORG=1)",-8);
     					    }
+
     						break;
     
                    case 1: if(!isMotion())

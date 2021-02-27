@@ -107,7 +107,7 @@ class WLDrive : public QObject
  Q_PROPERTY(double  nowPos READ position WRITE setPosition NOTIFY changedPosition)
  Q_PROPERTY(double  minPos READ minPosition WRITE setMinPosition NOTIFY changedMinPosition)
  Q_PROPERTY(double  maxPos READ maxPosition WRITE setMaxPosition NOTIFY changedMaxPosition)
- Q_PROPERTY(double  vnow   READ Vnow NOTIFY changedVnow)
+ Q_PROPERTY(double  vnow   READ getVnow NOTIFY changedVnow)
  Q_PROPERTY(bool    truPos READ isTruPosition NOTIFY changedTruPosition)
 
 public:
@@ -235,6 +235,7 @@ protected:
    QMutex MutexCallData;
    QMutex MutexDrive;
    QMutex MutexDrivePosition;
+   QMutex MutexSetTask;
 
    dataPad  interPad;
    float curKSpeed;
@@ -243,6 +244,7 @@ protected:
  WLModuleAxis  *m_ModuleAxis;
 
 protected:
+ static QList<WLDrive*> m_driveList;
 
 public:
 
@@ -252,7 +254,8 @@ static bool isActivs();
 static bool isMotionDrives();
 
 static WLDrive *getDrive(QString name);
-static QList<WLDrive*> driveList;
+static QList <WLDrive *> getDriveList();
+
 static void  startStops(bool reset=false);
 static void  setMainPads();
 
@@ -297,6 +300,8 @@ void addSyhData(double pos);
 
 //void inicial();
 bool setVmov(double V=0);
+bool setScurve(double Scur=0);
+
 
 WLPad* pad()    {return &m_Pad;}
 
@@ -367,7 +372,7 @@ inline double getLatch3Pos(quint8 i=0) {return getLatch3PosL(i)*dimension();}
 double homePosition()         {return m_homePosition;}
   int  setHomePosition(double pos);
 
-inline bool isActiv()                  {return Flag.get(fl_activ)||Flag.get(fl_auto);}
+inline bool isActiv()                 {return Flag.get(fl_activ)||Flag.get(fl_auto);}
 inline void setActiv(bool enable=true) {Flag.set(fl_activ,enable);}
 inline bool isMotion()                 {return getAxis()? getAxis()->isMotion(): false;}// {return Flag.get(fl_motion);}
        bool isMotionSubAxis();
@@ -390,7 +395,8 @@ inline bool isDone()   {return positionDrive().step==nextPositionDrive().step;}
 inline void setDone()  {m_nextPosition=m_nowPosition;}
 
 inline bool   rot()  {return Flag.get(fl_rot);}
-inline double Vnow() {return m_Vnow;}
+inline double getVnow() {return m_Vnow;}
+inline double getVmov() {return m_Vmov;}
 
 inline double dimensionGear() {if(getAxis()) return dim.value/getAxis()->getKGear(); else return dim.value;}
 inline double dimension()     {return dim.value;}
@@ -443,6 +449,8 @@ virtual void  readXMLData(QXmlStreamReader &stream);
 protected: 
 
 virtual	void resetAuto() {
+                          qDebug()<<"resetAuto"<<getName();
+
                           Flag.set(fl_auto,0);
                           autoTypeDrive=autoNo;
                           if(getAxis()) getAxis()->setDisableManual(false);
@@ -509,17 +517,16 @@ virtual void updateAuto();
 
 virtual void startTask()  {
                           qDebug()<<"startTask"<<isWait()<<isMotion()<<Flag.get(fl_auto);
-                          if(!isWait()&&!isMotion())
+                          if(!isWait()&&!isMotion()&&isActiv())
                              {
 						     if(Flag.get(fl_auto)) 
 							    startAuto(); 
-                                   else
+                                   else                                      
 									  if(isInterp())
 										 startInterp();
 									  else
                                          {
-                                         setCurPad();
-                                         //setVmov();
+                                         setCurPad();                                  
 										 startMotion();
                                          }
                              }
@@ -531,7 +538,7 @@ public:
 protected:
    
     int startAuto() {qDebug()<<"startAuto"<<isMotion(); if(!isMotion()) updateAuto(); return 0;} //Начало работы в автоматическом режиме
-   bool startMotion(float m_Vmov=-1); //начало движения
+   bool startMotion(float _Vmov=-1); //начало движения
 
 private:
 	void toStartAccel(); //ускорение
@@ -619,7 +626,7 @@ WLDriveContext(WLDrive *_Drive) {
 
 QString nameDrive() {return Drive->getName();}
 double  position()   {return Drive->position();}
-double Vnow() {return Drive->Vnow();}
+double Vnow() {return Drive->getVnow();}
 
 bool isTruPosition() {return Drive->isTruPosition();}
 

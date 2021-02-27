@@ -148,12 +148,12 @@ foreach(QString dataStr,List)
 setDataList(dataList);
 }
 
-
+/*
 bool WLPad::setSA(dataSA data)
 {
 return setSpeed(data.speed)+setAcc(data.acc);
 }
-
+*/
 bool WLPad::setSpePer(float percent)
 {
 if(percent<=0||percent>100) return false;
@@ -168,13 +168,10 @@ return true;
 
 bool WLPad::addSpeK(float k)
 {
-qDebug()<<"addSpeK"<<k;
 if(k<=0||k>1) return false;
 
-qDebug()<<"addSpeK"<<m_nowPad.Vma;
 m_nowPad.Vma*=k;
 m_nowPad.Vst*=k;
-qDebug()<<"addSpeK"<<m_nowPad.Vma;
 
 return true;
 }

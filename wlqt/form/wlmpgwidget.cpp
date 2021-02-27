@@ -1,13 +1,13 @@
 #include "wlmpgwidget.h"
 #include "ui_wlmpgwidget.h"
 
-WLMPGWidget::WLMPGWidget(WLWhell *_whell,QWidget *parent) :
+WLMPGWidget::WLMPGWidget(WLMPG *_MPG,QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WLMPGWidget)
 {
     ui->setupUi(this);
 
-    m_whell=_whell;
+    m_MPG=_MPG;
 
     ui->buttonGroupAxis->setId(ui->rbOff,0);
     ui->buttonGroupAxis->setId(ui->rbX,1);
@@ -32,45 +32,45 @@ WLMPGWidget::~WLMPGWidget()
 
 void WLMPGWidget::update()
 {
-if(m_whell==nullptr)
+if(m_MPG==nullptr)
   {
   setDisabled(true);
   }
 else
   {
-  ui->groupBoxAxis->setEnabled(m_whell->isManualAxis());
-  ui->groupBoxX->setEnabled(m_whell->isManualX());
-  ui->groupBoxV->setEnabled(m_whell->isManualV());
+  ui->groupBoxAxis->setEnabled(m_MPG->isManualAxis());
+  ui->groupBoxX->setEnabled(m_MPG->isManualX());
+  ui->groupBoxV->setEnabled(m_MPG->isManualV());
 
   connect(ui->buttonGroupAxis,static_cast<void(QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked)
-          ,this,[=](int id){m_whell->setIndexAxis(static_cast<quint8>(id));});
+          ,this,[=](int id){m_MPG->setIndexAxis(static_cast<quint8>(id));});
 
   connect(ui->buttonGroupX,static_cast<void(QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked)
-          ,this,[=](int id){m_whell->setIndexX(static_cast<quint8>(id));});
+          ,this,[=](int id){m_MPG->setIndexX(static_cast<quint8>(id));});
 
-  connect(ui->cbVmode,&QCheckBox::clicked,[=](bool ch){m_whell->setVmode(ch);});
+  connect(ui->cbVmode,&QCheckBox::clicked,[=](bool ch){m_MPG->setVmode(ch);});
 
-  connect(m_whell,&WLWhell::changedCurIndexAxis,this,[=](quint8 index){if(ui->buttonGroupAxis->button(index)!=nullptr)
+  connect(m_MPG,&WLMPG::changedCurIndexAxis,this,[=](quint8 index){if(ui->buttonGroupAxis->button(index)!=nullptr)
                                                                        ui->buttonGroupAxis->button(index)->setChecked(true);});
 
-  connect(m_whell,&WLWhell::changedCurIndexX,this,[=](quint8 index){if(ui->buttonGroupX->button(index)!=nullptr)
+  connect(m_MPG,&WLMPG::changedCurIndexX,this,[=](quint8 index){if(ui->buttonGroupX->button(index)!=nullptr)
                                                                        ui->buttonGroupX->button(index)->setChecked(true);});
 
-  connect(m_whell,&WLWhell::changedCurVmode,this,[=](bool ch){ui->cbVmode->setChecked(ch);});
+  connect(m_MPG,&WLMPG::changedCurVmode,this,[=](bool ch){ui->cbVmode->setChecked(ch);});
 
   quint8 index;
 
-  index=m_whell->getCurIndexAxis();
+  index=m_MPG->getCurIndexAxis();
 
   if(ui->buttonGroupAxis->button(index)!=nullptr)
       ui->buttonGroupAxis->button(index)->setChecked(true);
 
-  index=m_whell->getCurIndexX();
+  index=m_MPG->getCurIndexX();
 
   if(ui->buttonGroupX->button(index)!=nullptr)
      ui->buttonGroupX->button(index)->setChecked(true);
 
-  ui->cbVmode->setChecked(m_whell->getCurVmode());
+  ui->cbVmode->setChecked(m_MPG->getCurVmode());
 }
 }
 

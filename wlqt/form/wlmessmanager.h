@@ -27,7 +27,7 @@ class WLMessManager : public QWidget
 	Q_OBJECT
 
 public:
-	WLMessManager(QWidget *parent = 0);
+    WLMessManager(QWidget *parent = nullptr);
 	~WLMessManager();
 
 

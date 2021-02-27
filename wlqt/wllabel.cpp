@@ -10,8 +10,8 @@ setData(0);
 
 WLLabel::WLLabel(QString prefix,QString suffix,double data,int n)
 {
-Prefix=prefix;
-Suffix=suffix;
+m_prefix=prefix;
+m_suffix=suffix;
 setData(data,n);
 }
 
@@ -37,7 +37,7 @@ double WLLabel::getData()
 
 void WLLabel::setText(QString txt)
 {
-QLabel::setText(Prefix+txt+Suffix);
+QLabel::setText(m_prefix+txt+m_suffix);
 }
 
 void WLLabel::setData(QString txt)

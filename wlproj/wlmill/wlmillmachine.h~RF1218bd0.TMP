@@ -393,8 +393,7 @@ WLGPoint getAxisPosition();
 WLGPoint getCurrentPosition(bool real=0);
 WLGPoint getCurrentPositionActivSC();
 
-virtual void   setAuto();
-virtual void resetAuto();
+virtual void setAuto(bool en=true);
 
 
 
@@ -547,6 +546,10 @@ private slots:
 
  public slots: 
 
+
+
+
+
 	void saveConfig();
 	void setMessage(QString name,QString data,int code) {qDebug()<<"setMessageMM"<<code;
 	                                                     if(code<0)
@@ -597,11 +600,18 @@ private slots:
 
     void setDriveManualWhell(QString name,quint8 X1=1,bool vmode=false);
 
+    void goDriveManual(QString name,int IncDec,float step=0);
+
+Q_INVOKABLE void goDriveFind(QString name);
+
+Q_INVOKABLE void goDriveTeach(QString nameDrive);
 Q_INVOKABLE void goDriveTouch(QString nameDrive,int dir,float F);
 Q_INVOKABLE	void goDriveProbe(QString nameDrive,int dir,float F,int type);
 Q_INVOKABLE	void goHProbe(float F,bool sd);
 Q_INVOKABLE	void goHToolProbe(float F,bool sd);
 	
+
+    void setPercentManual(float per);
 
     bool isPause() {return Flag.get(ma_pause);}
     void Pause(bool en);//плавная остановка
@@ -609,6 +619,7 @@ Q_INVOKABLE	void goHToolProbe(float F,bool sd);
     void setBLNextMov(bool enable)  {Flag.set(ma_blnextmov,enable);}
     void setContinueMov(bool enable){Flag.set(ma_continuemov,enable);}
 	
+
 
     //void setSimpli(bool enable) {Flag.set(ma_simpli,enable);}
     //void setSimpliDist(double val)  {m_simpliDist=qBound(0.0f,(float)val,5.0f);}

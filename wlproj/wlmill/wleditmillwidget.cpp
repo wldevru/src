@@ -53,8 +53,8 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
     ui.editInSD->   setModule(ModuleAxis->getModuleIOPut());
     ui.editInProbe->setModule(ModuleAxis->getModuleIOPut());
 
-    ui.editInEMG->  setLabel("InEMG");
-    ui.editInSD->   setLabel("InSD");
+    ui.editInEMG->  setLabel("InEMGStop");
+    ui.editInSD->   setLabel("InSDStop");
     ui.editInProbe->setLabel("InProbe");
 		
     ui.editInEMG->  setValue(ModuleAxis->getInput(MAXIS_inEMGStop)->getIndex());
@@ -93,7 +93,7 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
     ui.cbUseDriveB->setChecked(MillMachine->getDrive("B")!=nullptr);
     ui.cbUseGModel->setChecked(MillMachine->isUseGModel());
 
-    ui.sbZH0ToolProbe->setValue(MillMachine->getGCode()->getHvalue(0));
+    ui.sbOffsetHToolProbe->setValue(MillMachine->getGCode()->getOffsetHTool());
 
 	initTableCorrectS();
 
@@ -279,7 +279,7 @@ else if(MillMachine->getDrive("B")!=nullptr)
        }
 {
 
-MillMachine->getGCode()->setHTool(0,ui.sbZH0ToolProbe->value());
+MillMachine->getGCode()->setOffsetHTool(ui.sbOffsetHToolProbe->value());
 MillMachine->setEnableGModel(ui.cbUseGModel->isChecked());
 return ret;
 }

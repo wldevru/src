@@ -69,6 +69,10 @@ private slots:
 	void showEndRead();
 	
 
+
+    // QWidget interface
+protected:
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // WLFW_H

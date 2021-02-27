@@ -33,7 +33,7 @@ painter.setPen(QColor(Qt::black));
 //painter.drawRect(0,0,this->width()-1,this->height()-1);
 QString name=m_drive ? m_drive->getName() : "?";
 QString  pos=m_drive ? QString("%1").arg(m_drive->getAxisPosition(),0,'f',2) : "0000.00";
-QString    f=m_drive ? QString("%1").arg(m_drive->Vnow()*60,0,'f',2) : "0000.00";
+QString    f=m_drive ? QString("%1").arg(m_drive->getVnow()*60,0,'f',2) : "0000.00";
 
 QString ofst;
   float Hofst=0;
@@ -42,13 +42,10 @@ if(m_gcode)
    {
   if(name=="Z")
      {
-     if(m_gcode->isGCode(43))
-       {
-       Hofst=- m_gcode->getHvalue();
-       }
-       else if(m_gcode->isGCode(44))
+     if(m_gcode->isGCode(43)
+      ||m_gcode->isGCode(44))
          {
-         Hofst=m_gcode->getHvalue();
+         Hofst=m_gcode->getHofst();
          }
      }
 

@@ -4,26 +4,24 @@
 #include <QWidget>
 #include <QKeyEvent>
 
-#include "wlwhell.h"
-
+#include "wlmpg.h"
 
 namespace Ui {
 class WLMPGWidget;
 }
-
 
 class WLMPGWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WLMPGWidget(WLWhell *_whell,QWidget *parent = nullptr);
+    explicit WLMPGWidget(WLMPG *_MPG,QWidget *parent = nullptr);
     ~WLMPGWidget();
 
 private:
     Ui::WLMPGWidget *ui;
 
-    WLWhell *m_whell;
+    WLMPG *m_MPG;
 
 public slots:
 

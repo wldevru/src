@@ -37,14 +37,14 @@ fileName=QCoreApplication::applicationDirPath()+"/FW/";
 QDir dir;
 dir.mkdir(fileName);
 
-QTimer::singleShot(300,this,SLOT(onUpdateDevices()));
-
 m_netManager = new QNetworkAccessManager;
+
+QTimer::singleShot(500,this,SLOT(onUpdateDevices()));
 }
 
 WLFW::~WLFW()
 {
-    delete DFW;
+delete DFW;
 }
 
 void WLFW::onReplyFinished()
@@ -110,7 +110,11 @@ QMessageBox::information(this,tr("Message:"),tr("write data complete!"));
 
 void WLFW::showEndRead()
 {
-QMessageBox::information(this,tr("Message:"),tr("read data complete!"));
+    QMessageBox::information(this,tr("Message:"),tr("read data complete!"));
+}
+
+void WLFW::closeEvent(QCloseEvent *event)
+{
 }
 
 
@@ -223,8 +227,8 @@ void WLFW::onPBReboot()
 DFW->reboot(ui.pbFileDevice->isEnabled() ? 1:0);
 setConnect(0);
 
-if(DFW->getInfo().name=="WLM100S")
-    m_timeReboot=10000;
+if(!DFW->getInfo().HA.isNull())
+    m_timeReboot=5000;
 else
     m_timeReboot=2500;
 

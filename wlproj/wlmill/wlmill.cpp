@@ -13,7 +13,7 @@
 #include <QDebug> 
 #include <QXmlStreamReader> 
 
-#include "wlwhellwidget.h"
+#include "wleditmpgwidget.h"
 #include "wleditmillwidget.h"
 #include "wlpamwidget.h"
 #include "wldrivewidget.h"
@@ -68,7 +68,6 @@ WLMill::WLMill(QWidget *parent)
     connect(MillMachine,SIGNAL(saveLog(QString,QString)),Log,SLOT(writeLog(QString,QString)));
     connect(MessManager,SIGNAL(saveLog(QString,QString)),Log,SLOT(writeLog(QString,QString)));
 
-	qDebug()<<" createDockProgram";
     createDockProgram();	
 
 	createTBMcode();
@@ -85,8 +84,6 @@ WLMill::WLMill(QWidget *parent)
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::West);
     setTabPosition(Qt::TopDockWidgetArea,QTabWidget::South);
     setTabPosition(Qt::BottomDockWidgetArea,QTabWidget::North);
-
-
 }
 
 
@@ -159,6 +156,7 @@ connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEn
 Action=TBControl->addAction(QIcon(":/data/icons/HT.png"),tr("h tool probe"),this,SLOT(measureHTool()));
 connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
 
+//TBControl->addAction("update",MillMachine->getMotionDevice(),SLOT(update()));
 
 /*
 TBControl->setFont(font);
@@ -344,7 +342,7 @@ if(EnterNum.exec())
   }
 
  MillMachine->getGCode()->setValue('H',EnterNum.getNow());
- MillMachine->goHTool(MillMachine->VProbe(),false);
+ MillMachine->goHToolProbe(MillMachine->VProbe(),false);
  }
 };
 
@@ -410,8 +408,8 @@ MEdit->addSeparator();
 MEdit->addAction(tr("Script"),this,SLOT(onEditScript()));
 //connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
 
-if(MillMachine->getWhell())
-  MEdit->addAction(tr("Whell")+" (MPG)",this,SLOT(onEditWhell()));
+if(MillMachine->getMPG())
+  MEdit->addAction("MPG",this,SLOT(onEditMPG()));
 
 MEdit->addAction(tr("Device"),this,SLOT(onEditDevice()));
 MEdit->addAction(("GModel"),this,SLOT(onEditGModel()));
@@ -575,7 +573,7 @@ Q_UNUSED(en)
 
 void WLMill::createDockMPG()
 {
-if(!MillMachine->getWhell()) return;
+if(!MillMachine->getMPG()) return;
 
 qDebug()<<"createDockMPG";
 
@@ -584,7 +582,7 @@ dockMPG=new QDockWidget(this);
 dockMPG->setWindowTitle("MPG");
 dockMPG->setObjectName("MPGDock");
 
-MPGWidget =new WLMPGWidget(MillMachine->getWhell(),this);
+MPGWidget =new WLMPGWidget(MillMachine->getMPG(),this);
 
 dockMPG->setWidget(MPGWidget);
 dockMPG->setFeatures(QDockWidget::DockWidgetFloatable
@@ -1033,20 +1031,20 @@ if(GMW.exec())
  }
 }
 
-void WLMill::onEditWhell()
+void WLMill::onEditMPG()
 {
-if(!MillMachine->getMotionDevice()->getModuleWhell()) return;
+if(!MillMachine->getMotionDevice()->getModuleMPG()) return;
 
-WLWhellWidget WhellWidget(MillMachine->getMotionDevice()->getModuleWhell()->getWhell(0)
+WLEditMPGWidget EditMPG(MillMachine->getMotionDevice()->getModuleMPG()->getMPG(0)
                          ,MillMachine->getMotionDevice()->getModuleIOPut()
                          ,MillMachine->getMotionDevice()->getModuleEncoder()
                          ,this);
 
-WhellWidget.show();
+EditMPG.show();
 
-if(WhellWidget.exec())
+if(EditMPG.exec())
   {
-  WhellWidget.saveData();
+  EditMPG.saveData();
 
   if(MPGWidget) QTimer::singleShot(200,MPGWidget,SLOT(update()));
   }
