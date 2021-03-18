@@ -101,7 +101,23 @@ if(m_udpSocket.write(m_bufEth))
    Flags.set(fl_waitack);
    m_timerEth->start(20);
    }
+}
+}
+
+void WLDevice::updateReady()
+{
+foreach(WLModule *module,m_modules)
+ {
+ if(!module->isReady())
+    {
+    if(isReady()) setReady(false);
+
+    qDebug()<<"WLDevice::updateReady() false size"<<m_modules.size()<<module->type();
+    return;
+    }
  }
+qDebug()<<"WLDevice::updateReady() true size"<<m_modules.size();
+setReady(true);
 }
 
 void WLDevice::removeModules()
@@ -110,7 +126,8 @@ while(!m_modules.isEmpty())
   delete (m_modules.takeLast());
 
 emit changedModules(m_modules.size());
-emit changedReady(Flags.reset(fl_ready));
+
+setReady(false);
 }
 
 void WLDevice::reconnectSerialPort()
@@ -244,6 +261,13 @@ Timer.start();
 while(Timer.elapsed()<1000)
 {
 QCoreApplication::processEvents();
+/*
+foreach(WLDevice *device,Devices)
+  {
+  if(!device->isReady())  continue;
+  }
+
+break;*/
 }
 
 while(!Devices.isEmpty())
@@ -277,8 +301,11 @@ void WLDevice::setInfo(WLDeviceInfo info)
 {
 setNameDevice(info.name);
 
-initSerialPort(info.comPort);
-initUdpSocket(info.HA);
+if(!isOpenConnect())
+ {
+ initSerialPort(info.comPort);
+ initUdpSocket(info.HA);
+ }
 
 setUID96(info.UID96);
 setVersion(info.version);
@@ -449,7 +476,7 @@ bool WLDevice::initSerialPort(QString portName)
 closeConnect();
 m_serialPort.setPortName(portName);
 
-qDebug()<<"Init Serial port:"<<portName;
+qDebug()<<getNameDevice()<<"Init Serial port:"<<portName;
 return true;
 }
 
@@ -459,7 +486,7 @@ closeConnect();
 
 m_HA=HA;
 
-qDebug()<<"initUdpSocket"<<HA.toString();
+qDebug()<<getNameDevice()<<"initUdpSocket"<<HA.toString();
 return true;
 }
 
@@ -588,8 +615,8 @@ callStatus();
 
 foreach(WLModule *Module,m_modules)
  {
-     qDebug()<<Module->metaObject()->className();
-     Module->update();
+  qDebug()<<Module->metaObject()->className();
+  Module->update();
  }
 }
 
@@ -607,6 +634,7 @@ void WLDevice::addModule(WLModule *module)
 
         connect(module,SIGNAL(sendCommand(QByteArray)),SLOT(startSend(QByteArray)),Qt::DirectConnection);
         connect(module,SIGNAL(sendMessage(QString,QString,int)),SIGNAL(sendMessage(QString,QString,int)));
+        connect(module,SIGNAL(changedReady(bool)),SLOT(updateReady()));
 
  module->callProp();
 
@@ -827,9 +855,6 @@ switch(ui1)
 									     }
 									   buf[i]=ui1;
 									   }
-									  
-                                      emit changedProp(m_prop);
-                                      emit changedReady(true);
 
                                       update();
                     			      break;
@@ -847,25 +872,29 @@ switch(ui1)
                                        Stream>>ui2;
                                        Stream>>ui3;
                                        setVersion(ui1*10000+ui2*100+ui3);
-                                       break;
 
-                 case sendDev_versionProtocol:
-                                      Stream>>ui16;
-                                      setVersionProtocol(ui16);
-                                      break;
+
+                                       if(!Stream.atEnd()){
+                                           Stream>>ui16;
+                                           setVersionProtocol(ui16);
+                                           }else {
+                                           setVersionProtocol(0);
+                                           }
+                                       break;
 
                   case sendDev_status: Stream>>ui1;
                                        if(ui1!=status)//забивает статус
                                           emit changedStatus(status=static_cast<statusDevice>(ui1));
                                        break;
 
-                    case typeMFW:  if(getModule((typeModule)ui1)==nullptr) //oldFW
+                   case typeMFW:  if(getModule((typeModule)ui1)==nullptr) //oldFW
 									     {
 									     createModule((typeModule)ui1);										 
 									     };
 
                                     emit changedProp(m_prop);
-                                    emit changedReady(Flags.set(fl_ready));
+
+                                    setReady(true);
 
 						            break;
 				   }
@@ -981,7 +1010,7 @@ QString port;
 int i;
 
 WLModule *Module;
-bool add=true;
+bool add=getUID96().isEmpty();
 		
 qDebug()<<"readXMLData Device";
 

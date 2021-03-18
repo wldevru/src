@@ -366,7 +366,7 @@ return true;
 
 bool WLAxis::sendGetDataAxis()
 {
-qDebug()<<"sendGetDataAxis()"<<getIndex();
+qDebug()<<"WLAxis::sendGetDataAxis"<<getIndex();
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -389,8 +389,6 @@ Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)comAxis_setParMov<<getIndex()<<Aac<<Ade<<Fst<<Fma<<(static_cast<quint8>(type));
-
-qDebug()<<"typeMPar"<<getIndex()<<(static_cast<quint8>(type))<<Aac<<Ade<<Fst<<Fma;
 
 emit sendCommand(data);
 return true;
@@ -443,7 +441,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLAxis::dec()
+bool WLAxis::pause()
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -451,7 +449,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_dec<<(quint8)getIndex();
+Stream<<(quint8)comAxis_pause<<(quint8)getIndex();
 
 emit sendCommand(data);
 return true;
@@ -473,6 +471,8 @@ return true;
 
 bool WLAxis::setNewF(float newF)
 {
+qDebug()<<"Axis"<<getIndex()<<"setNewF"<<newF;
+
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 

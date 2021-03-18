@@ -166,7 +166,9 @@ switch(ui1)
   case sigMCon_heart:   sendHeart(); break;      
 								
   case sendModule_prop: Stream>>sizeInBuf; 
-	                    Stream>>sizeOutBuf; 	                     
+                        Stream>>sizeOutBuf;
+
+                        setReady(true);
                         break;
   case sendModule_error:  /* 
 				                  Stream>>ui1;  //Error

@@ -15,6 +15,7 @@
 #include <QComboBox>
 #include <QColorDialog>
 #include <QActionGroup>
+#include <QSplashScreen>
 
 #include "wlpamlistwidget.h"
 #include "wlvisualwidget.h"
@@ -153,6 +154,7 @@ WLMillMachine *MillMachine;
 WLEVScript *ES;
 WLEVScript *ESLoop;
 
+QSplashScreen *splash;
 
 WLLog *Log;
 
@@ -338,6 +340,8 @@ private slots:
 	void onSaveSC();
 	void onLoadSC();
 
+    void onSaveDebugFile();
+
 	void onEditScript();
 
 	void UpdateTimes();
@@ -345,6 +349,10 @@ private slots:
 	void Error(QString,QString);
 
 	void about();
+
+    void openManualWLMill();
+    void openManualDevice();
+
 	void help();
 
     void placeVisualizer();

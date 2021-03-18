@@ -95,7 +95,7 @@ qint32 getStepI32L() {return (qint32)(step&0x00000000FFFFFFFF);}
 
 double get(WLDriveDim dim) {return (dim.value*step+offset);}
   void set(double val,WLDriveDim dim)   {step=qRound64(val/dim.value);
-                                      offset=val-step*dim.value;}
+                                       offset=val-step*dim.value;}
 };
 
 #define MAXSLAVEAXIS 4
@@ -118,11 +118,12 @@ private:
 	               autoNo=0,
 	               autoFind,
 		           autoTeach,
+                   autoVerify
                    };
 	enum FlagDrive
 	           {
 		       fl_activ=      1<<0 , //активен - ожидает разрешения
-              // fl_motion=     1<<1 , //движется
+               fl_velmode=  1<<1 , //vellocity mode
               // fl_latch2=     1<<2 ,
                //fl_latch3=     1<<3 ,
                fl_lastrot=    1<<4 ,
@@ -134,7 +135,7 @@ private:
 			   fl_verpos=     1<<10,//проверять правильность позиции
             //   fl_usefb =     1<<11,
 			   fl_manual=     1<<12,//движение в ручном режиме
-              // fl_enmov=      1<<15,//разрешение движения
+               fl_pause=      1<<15,//пауза в движении
               // fl_almen=      1<<16,//разрешение исплоьз входа ошибки
 			   fl_setpos=     1<<17,//установка положения
                fl_truPos=     1<<18,//привод юстирован
@@ -193,6 +194,8 @@ public:
 
 public:
 
+    bool isPause() {return Flag.get(fl_pause);}
+
     void addInResolutionMov(WLIOPut *_inEnableMov,bool _state);
     void removeInResolutionMov(WLIOPut *_inEnableMov);
 
@@ -234,7 +237,6 @@ protected:
    QMutex MutexStatus;
    QMutex MutexCallData;
    QMutex MutexDrive;
-   QMutex MutexDrivePosition;
    QMutex MutexSetTask;
 
    dataPad  interPad;
@@ -248,16 +250,18 @@ protected:
 
 public:
 
-static void resets();
+static void resetDrives();
+static void accelDrives();
+static void pauseDrives();
 
-static bool isActivs();
+static bool isActivDrives();
 static bool isMotionDrives();
 
 static WLDrive *getDrive(QString name);
 static QList <WLDrive *> getDriveList();
 
-static void  startStops(bool reset=false);
-static void  setMainPads();
+static void  startStopDrives(bool reset=false);
+static void  setMainPadDrives();
 
 protected:
 void setVerifyPosition(bool enable=true) {Flag.set(fl_verpos,enable);}
@@ -315,7 +319,8 @@ void setInterp(bool set=true);
 bool isInterp()  {return isActiv()&&Flag.get(fl_interp); }
 
 virtual int setMovTeach();  
-virtual int setMovFind();  
+virtual int setMovFind();
+virtual int setMovVerify();
 virtual int setMov(double d) {QMutexLocker locker(&MutexDrive); return Mov(d);}
 virtual int setMot(double p) {QMutexLocker locker(&MutexDrive); return Mot(p);}
 virtual int setVel(bool dir) {QMutexLocker locker(&MutexDrive); return Vel(dir);}
@@ -369,11 +374,10 @@ inline double getLatch3Pos(quint8 i=0) {return getLatch3PosL(i)*dimension();}
  inline long getLatch3PosL(quint8 i=0) {return i<m_AxisList.size() ? m_AxisList[i]->getLatch3() : 0;}
 
 
-double homePosition()         {return m_homePosition;}
-  int  setHomePosition(double pos);
+  double homePosition()         {return m_homePosition;}
+ int  setHomePosition(double pos);
 
-inline bool isActiv()                 {return Flag.get(fl_activ)||Flag.get(fl_auto);}
-inline void setActiv(bool enable=true) {Flag.set(fl_activ,enable);}
+inline bool isActiv()                  {return Flag.get(fl_activ)||isAuto();}
 inline bool isMotion()                 {return getAxis()? getAxis()->isMotion(): false;}// {return Flag.get(fl_motion);}
        bool isMotionSubAxis();
 /*
@@ -408,12 +412,14 @@ inline bool setDriveDim(WLDriveDim dd)     {return setDimension(dd.type,dd.A,dd.
 bool setDimension(WLDriveDim::typeDim _type,double A, double B=1);
 
 bool setPad(dataPad pad,typeMParAxis m_type=typeMParAxis::AXIS_MParAll);
-bool setCurPad() {qDebug()<<pad()->getData().name; return setPad(pad()->getData());}
+bool setCurPad() {return setPad(pad()->getData());}
 
 public:
 virtual bool setReady() {return true;}
 virtual bool setMainPad();
 
+protected:
+inline void setActiv(bool enable=true) {Flag.set(fl_activ,enable);}
 
 protected:
 
@@ -427,7 +433,7 @@ virtual void updatePosition();
 public:
 virtual int setTruPosition(bool tru=true) { int ret;
 
-	                                        if(Flag.get(fl_truPos)&&!tru) ret=-1; else ret=0;
+                                           if(Flag.get(fl_truPos)&&!tru) ret=-1; else ret=0;
 
                                             Flag.set(fl_truPos,tru);
 
@@ -449,13 +455,15 @@ virtual void  readXMLData(QXmlStreamReader &stream);
 protected: 
 
 virtual	void resetAuto() {
-                          qDebug()<<"resetAuto"<<getName();
+                          qDebug()<<getName()<<"resetAuto";
 
                           Flag.set(fl_auto,0);
                           autoTypeDrive=autoNo;
                           if(getAxis()) getAxis()->setDisableManual(false);
                          }
-        bool setAuto()   {qDebug()<<"Drive::setAuto";
+
+        bool setAuto()   {qDebug()<<getName()<<"setAuto";
+
                           if(Flag.get(fl_auto))
                               return false;
                            else
@@ -490,7 +498,7 @@ virtual	QString getStatus(){QString status;
 						  <<" Motion-"<<isMotion()
 						  <<" Wait-"<<isWait()
                           <<" ModeA-"<<getAxis()->getMode()
-                          <<" StatusA-"<<getAxis()->getStatus()
+                          <<" StatusA-"<<getAxis()->getStatus()<<getVnow()
                           <<" StartPos="<<getStartPosition()
                           <<" NowPos="<<position()<<"("<<positionDrive().step<<")"
                           <<" NextPos="<<nextPosition()<<"("<<nextPositionDrive().step<<") ";
@@ -515,34 +523,20 @@ public slots:
 virtual void updateAuto();
         void setEnable(bool enable);
 
-virtual void startTask()  {
-                          qDebug()<<"startTask"<<isWait()<<isMotion()<<Flag.get(fl_auto);
-                          if(!isWait()&&!isMotion()&&isActiv())
-                             {
-						     if(Flag.get(fl_auto)) 
-							    startAuto(); 
-                                   else                                      
-									  if(isInterp())
-										 startInterp();
-									  else
-                                         {
-                                         setCurPad();                                  
-										 startMotion();
-                                         }
-                             }
-                          }
+virtual void startTask();
+
 public:
    bool startMovPos(double pos,float V) {if(setMot(pos)==1) {startMotion(V); return true;} return false;}
    void startMovVel(float V)            {startMotion(V);}
 
 protected:
    
-    int startAuto() {qDebug()<<"startAuto"<<isMotion(); if(!isMotion()) updateAuto(); return 0;} //Начало работы в автоматическом режиме
+   bool startAuto() {if(isAuto()) {updateAuto(); return true;} return false;}
    bool startMotion(float _Vmov=-1); //начало движения
 
 private:
 	void toStartAccel(); //ускорение
-	void toStartDecel(); //замедление 
+    void toStartPause(); //замедление
 	void toStartStop(); //остановка
 	void toStartEMGStop(); //остановка
 	void toSetKSpeed(float kspeed=1);
@@ -550,7 +544,7 @@ private:
 public:
 
 	void startAccel(); //ускорение
-	void startDecel(); //замедление
+    void startPause(); //замедление
     void startStop(bool reset=false);  //остановка 
     void startEMGStop();  //быстрая остановка со сбросом
     void setKSpeed(float kspeed);

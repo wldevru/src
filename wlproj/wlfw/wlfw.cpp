@@ -31,6 +31,12 @@ connect(DFW,SIGNAL(reconnected()),DFW,SLOT(closeConnect()));
 connect(ui.pbReboot,&QPushButton::clicked,this,&WLFW::onPBReboot);
 connect(ui.pbUpdate,&QPushButton::clicked,this,&WLFW::onUpdateDevices);
 
+ui.labelDriver->setText("<a href=\https://wldev.ru/data/driver/vcp\">VCP driver for WINDOWS</a>");
+ui.labelDriver->setOpenExternalLinks(true);
+
+#ifndef Q_OS_WIN
+ui.labelDriver->setVisible(false);
+#endif
 
 fileName=QCoreApplication::applicationDirPath()+"/FW/";
 
@@ -62,28 +68,20 @@ if(!fileName.isEmpty())
 
  qDebug()<<"write from url:"<<reply->url().toString();
 
- if(File.open(QIODevice::WriteOnly))
-     {
+ if(File.open(QIODevice::WriteOnly)){
      program=reply->readAll();
      qDebug()<<"write cloud file"<<File.write(program);
      File.close();
 
-     if(program.size()==DFW->getModuleFW()->getSizeFW())
-        {
+     if(program.size()==DFW->getModuleFW()->getSizeFW()) {
         ui.label->setText("write: "+fileName);
         DFW->getModuleFW()->startWriteFW(program);
-        }
-     else
-        {
+        } else {
         QMessageBox::information(this,tr("Message:"),tr("error size file!"));
         }
-     }
-    else
-     {
+     }else{
      QMessageBox::information(this,tr("Message:"),tr("error save file: ")+fileName);
      }
-
-
  }
 }
 else
@@ -144,11 +142,7 @@ if(!List.isEmpty())
     ui.gbReadWrite->setEnabled(DFW->getModuleFW()!=nullptr);
 	ui.pbFileDevice->setEnabled(List.first()!="WLFW");
 
-   /* if(List.size()>1)
-        if(List[1]=="WLM55J"
-         ||List[2]=="WLM55J"
-         ||List[0]=="WLM100S"
-         ||List[2]=="WLM100S")*/ ui.pbReboot->setEnabled(enable);
+    ui.pbReboot->setEnabled(enable);
     }
 
  if(DFW->getModuleFW())

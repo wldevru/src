@@ -72,7 +72,7 @@ const QString errorAxis("0,no error\
 #define comAxis_setKF       9 //set K(sclae (0...1]) Fmov
 #define comAxis_setFlim     10 //set Flimit
 #define comAxis_setInput    11 //set inputs Axis(inPEL..,inORG...)
-#define comAxis_dec         12 //start decel Axis
+#define comAxis_pause       12 //start decel Axis F=0
 #define comAxis_setKGear    13 //set program Gear Axis
 #define comAxis_setParMov   16 //set parametr moving
 #define comAxis_setActIn    17 //set action on input
@@ -306,7 +306,7 @@ public:
     bool movPos(quint8 mask,qint32 Dist,float Fmov);
     bool movVel(quint8 mask,float Fmov);
 	bool acc();
-	bool dec();
+	bool pause();
 	bool sdStop();
 	bool setNewF(float newF);
 	bool emgStop();

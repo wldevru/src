@@ -29,7 +29,9 @@ return false;
 
 bool WLModuleIOPut::InitInputs(int sizeInputs)
 {
-if(sizeInputs<2||Inputs.size()==sizeInputs) return false;
+if(sizeInputs<2
+ ||Inputs.size()==sizeInputs
+ ||isReady()) return false;
 
 WLIOPut *input;
 
@@ -63,7 +65,9 @@ return true;
 
 bool WLModuleIOPut::InitOutputs(int sizeOutputs)
 {
-if(sizeOutputs<1||Outputs.size()==sizeOutputs) return false;
+if(sizeOutputs<1
+ ||Outputs.size()==sizeOutputs
+ ||isReady()) return false;
 
 WLIOPut *output;
 
@@ -160,6 +164,8 @@ case  sendModule_prop: Stream>>ui1;
 					   Stream>>ui2;       
 
 					   Init(ui1,ui2);
+
+                       setReady(true);
                        break;
 
 case sendModule_error: Stream>>ui1;  //Error                				                  				 

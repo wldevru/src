@@ -61,23 +61,28 @@ public:
 
 typeModule type() {return m_type;}
       void setType(typeModule _type) {m_type=_type;}
-
+      bool isReady() {return m_ready;}
 private:
  typeModule m_type;
+       bool m_ready;
+
 
 public slots:
 virtual void reset();	
 virtual void callProp();	
 virtual void update() {}
+virtual void setReady(bool);
 
 public slots:
  void setCommand(QByteArray data);
 
 public:
-
 virtual void  readCommand(QByteArray)     {}
 
 static QString getErrorStr(QString str,int);
+
+signals:
+  void changedReady(bool);
 };
 
 #endif // WLMODULE_H

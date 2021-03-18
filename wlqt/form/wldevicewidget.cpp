@@ -9,7 +9,16 @@ WLDeviceWidget::WLDeviceWidget(QWidget *parent) :
 
     setModal(true);
 
-    init();
+    updateList();
+
+    connect(ui->pbUpdate,&QPushButton::clicked,this,&WLDeviceWidget::updateList);
+
+    ui->labelDriver->setText("<a href=\https://wldev.ru/data/driver/vcp\">VCP driver for WINDOWS</a>");
+    ui->labelDriver->setOpenExternalLinks(true);
+
+    #ifndef Q_OS_WIN
+    ui->labelDriver->setVisible(false);
+    #endif
 }
 
 WLDeviceWidget::~WLDeviceWidget()
@@ -18,7 +27,7 @@ WLDeviceWidget::~WLDeviceWidget()
 }
 
 
-void WLDeviceWidget::init()
+void WLDeviceWidget::updateList()
 {
 m_ListInfo=WLDevice::availableDevices();
 
@@ -33,34 +42,6 @@ foreach(WLDeviceInfo info,m_ListInfo)
 ui->cbDevice->addItem(info.name+" ("+info.comPort+info.HA.toString()+") id:"+info.UID96);
 }
 
-
-
-/*
-QList<QSerialPortInfo> portList=QSerialPortInfo::availablePorts();
-
-foreach(QSerialPortInfo portInfo,portList)
- {
- WLDevice  *Device = new WLDevice;
-
- Devices<<Device;
-
- connect(Device,&WLDevice::changedReady,this,&WLDeviceWidget::updateComList);
- Device->initSerialPort(portInfo.portName());
- Device->openConnect();
- }
-*/
-}
-
-void WLDeviceWidget::updateComList()
-{
- /*
-ui->cbDevice->clear();
-
-foreach(WLDevice  *Device,Devices)
- {
- ui->cbDevice->addItem(Device->getNameDevice()+" ("+Device->getPortName()+") id:"+Device->getUID96());
- }
-*/
 }
 
 void WLDeviceWidget::on_buttonBox_accepted()

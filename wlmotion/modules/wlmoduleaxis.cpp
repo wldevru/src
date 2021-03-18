@@ -29,7 +29,9 @@ while(Axis.isEmpty())
 
 bool WLModuleAxis::Init(int sizeAxis)
 {
-if(sizeAxis<1||Axis.size()== sizeAxis) return false;
+if(sizeAxis<1
+ ||Axis.size()== sizeAxis
+ ||isReady()) return false;
 
 WLAxis *axis;
 long l=0;
@@ -175,6 +177,8 @@ case  sendModule_prop: Stream>>ui1;
                        Fmax=l1;			
 
 					   Init(ui1);
+
+                       setReady(true);
                        break;
 
  case sendModule_error:

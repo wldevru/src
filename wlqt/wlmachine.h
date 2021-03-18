@@ -33,6 +33,7 @@ QString getStrFindDrivePos()            {return m_strFindDrivePos;}
 private:
 
  bool m_auto=false;
+ bool m_ready=false;
 
  float m_percentManual=25.0f;
 
@@ -48,8 +49,9 @@ bool updateFindDrivePos();
 
 private:
 
-virtual bool verifyReadyMotion() {return true;}
-virtual bool isPossiblyManual()  {return true;}
+virtual bool verifyReadyManualMotion()     {return true;}
+virtual bool verifyReadyAutoMotion()       {return true;}
+virtual bool isPossiblyManual()            {return true;}
 
 public:
 
@@ -59,24 +61,29 @@ public:
 virtual void   setAuto() {emit changedAuto(m_auto=true);}
 virtual void resetAuto() {emit changedAuto(m_auto=false);}
 
+  bool isReady() {return m_ready;}
+
   void goDriveManual(QString name,int IncDec,float step=0);
 
 Q_INVOKABLE void goDriveFind(QString nameDrive);
 Q_INVOKABLE void goDriveTeach(QString nameDrive);
+Q_INVOKABLE void goDriveVerify(QString nameDrive);
+
             void goFindDrivePos();
 
 
-
-  bool isActivDrives()  {return  WLDrive::isActivs();}
+  bool isActivDrives()  {return  WLDrive::isActivDrives();}
 
 public:
   virtual void updateAuto();
 
 public slots:
    void setPercentManual(float per);
+   void setReady(bool ready);
 
 signals:
    void changedAuto(bool);
+   void changedReady(bool);
 
 protected:
 virtual void init() {}

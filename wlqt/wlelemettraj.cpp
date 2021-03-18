@@ -341,11 +341,17 @@ Flags.set(fl_ccw,CCW);
 centerPoint=_centerPoint;
       plane=_plane;
 
-/*
-qDebug()<<"SP:"<<startPoint.toString();
-qDebug()<<"CP:"<<centerPoint.toString();
-qDebug()<<"EP:"<<endPoint.toString();
-*/
+WL3DPoint sP=WLGCode::convertPlane(startPoint,plane,true).to3D();
+WL3DPoint eP=WLGCode::convertPlane(endPoint,plane,true).to3D();
+WL3DPoint cP=WLGCode::convertPlane(centerPoint,plane,true).to3D();
+
+double R1=hypot(sP.x-cP.x,sP.y-cP.y);
+double R2=hypot(eP.x-cP.x,eP.y-cP.y);
+
+if(R1>(R2*1.01)
+ ||R1<(R2*0.99))
+       return false;
+
 return true;
 }
 

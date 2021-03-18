@@ -15,15 +15,12 @@ bool WLPad::Load(QString _name)
 {
 QMutexLocker locker(&Mutex);
 
-qDebug()<<"find Pad"<<_name;
-
 if(_name.isEmpty())	return true;
  
 for(int i=0;i<Data.size();i++)
 {
 if(Data[i].name==_name)
     {
-    qDebug()<<"LoadPad"<<_name;
     m_nowPadBase=m_nowPad=Data[i];
     Vmov=m_nowPadBase.Vma;
 	return true;
@@ -83,7 +80,6 @@ else
 
 m_nowPadBase=m_nowPad=PadSave;
 
-qDebug()<<"Ok"<<PadSave.Aac<<PadSave.Ade<<PadSave.Vst<<PadSave.Vma<<PadSave.name;
 return 1;
 }
 

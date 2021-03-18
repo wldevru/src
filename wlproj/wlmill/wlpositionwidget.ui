@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>364</width>
+    <width>350</width>
     <height>200</height>
    </rect>
   </property>
@@ -334,16 +334,7 @@
       <layout class="QVBoxLayout" name="verLayoutControl"/>
      </item>
      <item>
-      <widget class="QLabel" name="labelActivGCode">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
      </item>
      <item>
       <widget class="QComboBox" name="cbExGCode">

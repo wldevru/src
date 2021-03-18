@@ -15,7 +15,9 @@ while(DCan.isEmpty())
 
 bool WLModuleDCan::Init(int sizeDCan)
 {
-if(sizeDCan<1||DCan.size()== sizeDCan) return false;
+ if(sizeDCan<1
+ ||DCan.size()== sizeDCan
+ ||isReady()) return false;
 
 WLDCan *dcan;
 
@@ -68,6 +70,8 @@ switch(ui1)
 case  sendModule_prop: Stream>>ui1;
 					                      
 					   Init(ui1);
+
+                       setReady(true);
                        break;
 
 case  sendModule_error:

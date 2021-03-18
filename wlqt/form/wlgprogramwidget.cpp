@@ -14,21 +14,15 @@ WLGProgramWidget::WLGProgramWidget(WLGProgram *_Program,QWidget *parent)
 	connect(ui.textProgram,SIGNAL(cursorPositionChanged ()),SLOT(onChangedPositionTextProgram()));
     connect(ui.textProgram,SIGNAL(textChanged()),SLOT(onChangedTextProgram()));
 
-	connect(ui.listProgram,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),SLOT(onChangedPositionListProgram()));
-
-    //connect(ui.listProgram,SIGNAL(//
+    connect(ui.listProgram,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),SLOT(onChangedPositionListProgram(QListWidgetItem*,QListWidgetItem*)));
 	
     ui.progressBar->setVisible(false);
-    //ui.pbUpdate->setIcon(QIcon(":/data/icons/update.png"));
-    //ui.pbAccept->setIcon(QIcon(":/data/icons/accept.png"));
-    //ui.pbBackup->setIcon(QIcon(":/data/icons/backup.png"));
-    //ui.pbReload->setIcon(QIcon(":/data/icons/reload.png"));
-	
+
     connect(ui.vsbProgram,SIGNAL(valueChanged(int)),SLOT(setEditElement(int)));
 
     ui.sbPosition->setKeyboardTracking(false);
-    connect(ui.sbPosition,SIGNAL(valueChanged(int)),SLOT(setEditElement(int)));
-    connect(ui.sbPosition,SIGNAL(valueChanged(int)),SIGNAL(changedEditElement(int)));
+    connect(ui.sbPosition,SIGNAL(valueChanged(int)),this,SLOT(setEditElement(int)));
+    connect(ui.sbPosition,SIGNAL(valueChanged(int)),this,SIGNAL(changedEditElement(int)));
 
 	connect(m_GProgram,SIGNAL(ChangedProgram()),SLOT(loadTextProgram()));
 
@@ -50,6 +44,9 @@ WLGProgramWidget::WLGProgramWidget(WLGProgram *_Program,QWidget *parent)
 
     connect(timer,SIGNAL(timeout()),this,SLOT(updateTrack()));
     timer->start(100);
+
+    ui.listProgram->setItemDelegate(new WLGProgramListDelegate);
+
 }
 
 WLGProgramWidget::~WLGProgramWidget()
@@ -75,7 +72,7 @@ if((QMessageBox::question(this, tr("Confirmation:"),
 
 void  WLGProgramWidget::showListProgram(int iCenter)
 {
-qDebug()<<"showListProgram"<<iCenter;
+//qDebug()<<"showListProgram"<<iCenter;
 //QMutexLocker locker(&Program->Mutex);
 
 QListWidgetItem *item;
@@ -97,7 +94,7 @@ else
 
  ui.listProgram->blockSignals(true);
  ui.listProgram->clear();
- qDebug()<<"showListProgram"<<m_startIProgram<<m_endIProgram;
+ //qDebug()<<"showListProgram"<<m_startIProgram<<m_endIProgram;
 
  //startIProgram=0;
  //endIProgram=Program->getElementTrajCount();
@@ -106,22 +103,28 @@ else
       {    	
 	  //Program->getElementTraj(i).str.re.remove("\n");
       item=new QListWidgetItem(QString::number(i)+": "+m_GProgram->getTextElement(i).simplified());
-
 	 // qDebug()<<i<<"/"<<iCenter;
 
       if(i==iCenter)
        {/*item->setBackgroundColor(QColor(255,200,200)); */
-        itemShow=item;qDebug()<<"detect";
+       itemShow=item;
+       //qDebug()<<"detect";
        }
+
+      if(i==iEditElement)
+          {
+          itemSelect=item;
+          item->setData(Qt::BackgroundRole,QVariant(QColor(220,220,255)));
+          }
 
 	  ui.listProgram->addItem(item);	 
       }
+
 if(itemShow==nullptr) itemShow=item;
 
 ui.listProgram->setFocus();
 ui.listProgram->setCurrentItem(itemShow);
 ui.listProgram->scrollToItem(itemShow);
-
 ui.listProgram->blockSignals(false);
 
 ui.vsbProgram->setValue(iCenter);
@@ -192,8 +195,17 @@ if(m_trackElementF
  &&ui.textProgram->isReadOnly()
  &&lastTrack!=m_GProgram->getLastMovElement())
   {
-  setEditElement(lastTrack=m_GProgram->getLastMovElement());
-  ui.sbPosition->setValue(m_GProgram->getLastMovElement());
+  lastTrack=m_GProgram->getLastMovElement();
+
+  if(isListProgram())
+     {
+     iEditElement=lastTrack;
+     showListProgram(iEditElement);
+     }
+  else
+     setEditElement(lastTrack);
+
+  ui.sbPosition->setValue(lastTrack);
   }
 }
 
@@ -241,7 +253,9 @@ void WLGProgramWidget::setEditElement(int iElement)
 
 if(iElement>=0)
 {
- if(ui.stackedWidget->currentIndex()==1)
+iEditElement=iElement;
+
+ if(!isListProgram())
  {
   if(m_changedProgram) return;
 
@@ -265,7 +279,7 @@ if(iElement>=0)
   blockSignals(false);
  }
  else
-  {
+  {     
   showListProgram(iElement);
   }
 }
@@ -290,7 +304,7 @@ for(int i=0;i<m_GProgram->getElementCount();i++)
      }
 }
 
-void WLGProgramWidget::onChangedPositionListProgram()
+void WLGProgramWidget::onChangedPositionListProgram(QListWidgetItem* itemCur, QListWidgetItem *itemPrev)
 {
 if(ui.listProgram->count()==0) return;
 
@@ -331,6 +345,10 @@ else
 ui.listProgram->blockSignals(false);
 
 iEditElement=m_startIProgram+ui.listProgram->row(ui.listProgram->currentItem());
+
+if(itemPrev) itemPrev->setData(Qt::BackgroundRole,0);
+
+ui.listProgram->currentItem()->setData(Qt::BackgroundRole,QVariant(QColor(220,220,255)));
 
 emit changedEditElement(iEditElement);
 }

@@ -45,27 +45,27 @@ m_input=_input;
 
 switch(m_Module->type())
 {
- case typeMIOPut:  {
-                   WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
+ case typeMIOPut: {
+                  WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
 
-                   ui->spinBox->setRange(0,(m_input? ModuleIOPut->getSizeInputs():ModuleIOPut->getSizeOutputs())-1);
+                  ui->spinBox->setRange(0,(m_input? ModuleIOPut->getSizeInputs():ModuleIOPut->getSizeOutputs())-1);
 
-                   ui->spinBox->setVisible(true);
-                     ui->label->setVisible(true);
+                  ui->spinBox->setVisible(true);
+                  ui->label->setVisible(true);
 
-                   connect(ModuleIOPut,&WLModuleIOPut::changedInput,this,&WLEditIOWidget::setLatchInput);
+                  connect(ModuleIOPut,&WLModuleIOPut::changedInput,this,&WLEditIOWidget::setLatchInput);
 
-                   setLabel(m_input ? ("input"):("output"));
+                  setLabel(m_input ? ("input"):("output"));
                   break;;
-                   }
+                  }
 
-case typeMPWM:  {
+case typeMPWM:    {
                   WLModulePWM *ModulePWM = static_cast<WLModulePWM*>(m_Module);
 
                   ui->spinBox->setRange(0,(ModulePWM->getSizeOutPWM()-1));
 
                   ui->spinBox->setVisible(true);
-                    ui->label->setVisible(true);
+                  ui->label->setVisible(true);
 
                   setLabel(m_input ? ("in PWM"):("out PWM"));
 
@@ -87,7 +87,7 @@ case typeMAIOPut: {
 case typeMEncoder:{
                   WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
 
-                  ui->spinBox->setRange(0,ModuleEncoder->getSizeEncoder());
+                  ui->spinBox->setRange(0,ModuleEncoder->getSizeEncoder()-1);
 
                   ui->spinBox->setVisible(true);
                     ui->label->setVisible(true);

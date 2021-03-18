@@ -13,7 +13,7 @@ class WLModuleDCan : public WLModule
 	Q_OBJECT
 
 public:
-	WLModuleDCan(QObject *parent=0);
+    WLModuleDCan(QObject *parent=nullptr);
    ~WLModuleDCan();
 
 	bool Init(int sizeDCAN);	

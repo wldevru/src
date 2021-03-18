@@ -52,7 +52,8 @@ bool WLModuleAIOPut::InitOutputs(int sizeOutputs)
 {
 if(sizeOutputs<1) sizeOutputs=1;
 
-if(Outputs.size()== sizeOutputs) return false;
+if(Outputs.size()== sizeOutputs
+ ||isReady()) return false;
 
 WLAIOPut *aoutput;
 
@@ -131,6 +132,8 @@ case  comAIOPut_setDataOutput: Stream>>index;//index8
 
 case  sendModule_prop: Stream>>ui1>>ui2;
                        Init(ui1,ui2);
+                       setReady(true);
+
                        break;
 
 case  sendModule_error:Stream>>ui1;  //Error

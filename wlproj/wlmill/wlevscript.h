@@ -53,7 +53,7 @@ private slots:
 	void evalCode();
 	void evalFunc();
 
-    void eval() {qDebug()<<"retScript=";}
+    void eval() {qDebug()<<"retScript";}
 
 	void setMessage(QString txt,int code) {emit sendMessage(tr("message"),txt,code);}
 

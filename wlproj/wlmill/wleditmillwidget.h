@@ -17,7 +17,11 @@ public:
 	WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent = 0);
 	~WLEditMillWidget();
 
-bool saveData();
+void addTabWidget(QDialog *dialog,QString name) {ui.tabWidget->addTab(dialog,name);}
+void insertTabWidget(int index,QDialog *dialog,QString name) {ui.tabWidget->insertTab(index,dialog,name);}
+
+
+bool saveDataMill();
 
 QString verifyError();
 
@@ -32,12 +36,11 @@ private:
 
 private slots:
 	void onVerifyError();
-    void onAccept();
-    void onReject() {done(0);}
-    //void updatePort();
-    //void onSetPort();
 
 
+    // QDialog interface
+public slots:
+    void accept();
 };
 
 #endif // WLEDITMILLWIDGET_H

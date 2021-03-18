@@ -35,7 +35,7 @@ private:
     WLDriveDim m_ddim;
 
     QList <WLAxisWidget*> axisWidgetList;
-        QString m_unit;
+    QString m_unit;
 public:
 
  void saveDataDrive();

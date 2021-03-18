@@ -19,7 +19,9 @@ while(Encoder.isEmpty())
 
 bool WLModuleEncoder::Init(int sizeEncoder)
 {
-if((sizeEncoder<1)||(Encoder.size()== sizeEncoder)) return false;
+if((sizeEncoder<1)
+ ||(Encoder.size()== sizeEncoder)
+ ||isReady()) return false;
 
 WLEncoder *enc;
 
@@ -77,7 +79,10 @@ case   comEnc_setData  : Stream>>index;//index8
                         break;
 
 case  sendModule_prop: Stream>>ui1;					                      
+
 					   Init(ui1);
+
+                       setReady(true);
                        break;
 
 case  sendModule_error:Stream>>ui1;  //Error

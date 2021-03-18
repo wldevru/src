@@ -105,7 +105,8 @@ SOURCES += \
     ../../wlqt/form/wlaxiswidget.cpp \
     ../../wlqt/form/wlmpgwidget.cpp \
     ../../wlqt/form/wleditmpgwidget.cpp \
-    ../../wlqt/wlmachine.cpp
+    ../../wlqt/wlmachine.cpp \
+    ../../wlqt/wleditgcode.cpp
 
 
 HEADERS += \
@@ -181,7 +182,8 @@ HEADERS += \
     ../../wlqt/form/wlaxiswidget.h \
     ../../wlqt/form/wlmpgwidget.h \
     ../../wlqt/form/wleditmpgwidget.h \
-    ../../wlqt/wlmachine.h
+    ../../wlqt/wlmachine.h \
+    ../../wlqt/wleditgcode.h
 
 
 FORMS += \
@@ -207,7 +209,8 @@ FORMS += \
     wltoolswidget.ui \
     ../../wlqt/form/wlaxiswidget.ui \
     ../../wlqt/form/wlmpgwidget.ui \
-    ../../wlqt/form/wleditmpgwidget.ui
+    ../../wlqt/form/wleditmpgwidget.ui \
+    ../../wlqt/wleditgcode.ui
 
 
 RESOURCES += \

@@ -16,8 +16,10 @@ WLMessManager::WLMessManager(QWidget *parent)
 	connect(flashTimer,SIGNAL(timeout()),SLOT(updateFlash()));
 	flashTimer->start(250);
 
-	updateFlash();
-	qDebug()<<"create MessManager";
+	updateFlash();	
+
+    ui.label->setVisible(false);
+
 }
 
 WLMessManager::~WLMessManager()

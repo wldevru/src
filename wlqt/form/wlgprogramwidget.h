@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QStyledItemDelegate>
 
 #include "ui_wlgprogramwidget.h"
 
@@ -12,6 +13,31 @@
 #include "wlgprogram.h"
 #include "wlgcodesh.h"
 
+class WLGProgramListDelegate: public QStyledItemDelegate
+{
+Q_OBJECT
+
+public:
+    WLGProgramListDelegate() {}
+
+    // QAbstractItemDelegate interface
+public:
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+         {
+      /*   if((option.state & QStyle::State_HasFocus))// || (option.state & QStyle::State_MouseOver))
+           {
+               // get the color to paint with
+               QVariant var = index.model()->data(index, Qt::BackgroundRole);
+
+
+               // draw the row and its content
+               painter->fillRect(option.rect, var.value<QColor>());
+               painter->drawText(option.rect, index.model()->data(index, Qt::DisplayRole).toString());
+           }
+           else*/
+              QStyledItemDelegate::paint(painter, option, index);
+         }
+};
 
 class WLGProgramWidget : public QWidget
 {
@@ -23,6 +49,8 @@ public:
 
 private:
 	void showListProgram(int iCenter);    
+
+    bool isListProgram() {return ui.stackedWidget->currentIndex()==0;}
 
 private:
     Ui::WLGProgramWidget ui;
@@ -43,6 +71,7 @@ private:
 
     bool m_trackElementF=true;
 
+    QListWidgetItem *itemSelect=nullptr;
 
 signals:
 
@@ -72,7 +101,7 @@ private slots:
 
 	void onChangedTextProgram();
 	void onChangedPositionTextProgram();
-	void onChangedPositionListProgram();
+    void onChangedPositionListProgram(QListWidgetItem*,QListWidgetItem*);
 };
 
 #endif // WLGPROGRAMWIDGET_H

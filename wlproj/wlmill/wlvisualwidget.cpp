@@ -170,14 +170,14 @@ m_tbZoomIn -> setIcon(QPixmap(":/data/icons/zoomIn.png"));
 m_tbZoomIn -> setIconSize(QSize(32,32));
 m_tbZoomIn -> setToolTip(tr("zoom in"));
 m_tbZoomIn -> setAutoRepeat(true);
-connect(m_tbZoomIn,&QToolButton::clicked,this,&WLVisualWidget::on_tbZoomIn);
+connect(m_tbZoomIn,&QToolButton::clicked,this,[=](){zoomView(m_lastMousePos,-50);});
 
 m_tbZoomOut = new QToolButton(this);
 m_tbZoomOut -> setIcon(QPixmap(":/data/icons/zoomOut.png"));
 m_tbZoomOut -> setIconSize(QSize(32,32));
 m_tbZoomOut -> setToolTip(tr("zoom out"));
 m_tbZoomOut -> setAutoRepeat(true);
-connect(m_tbZoomOut,&QToolButton::clicked,this,&WLVisualWidget::on_tbZoomOut);
+connect(m_tbZoomOut,&QToolButton::clicked,this,[=](){zoomView(m_lastMousePos,50);});
 
 m_tbUpdate = new QToolButton(this);
 m_tbUpdate -> setIcon(QPixmap(":/data/icons/update.png"));
@@ -1090,8 +1090,6 @@ int WLVisualWidget::selectElement(int x,int y)
 
  void WLVisualWidget::mouseMoveEvent(QMouseEvent *event)
  {
- event->accept();
-
      int dx = event->x() - m_lastMousePos.x();
      int dy = event->y() - m_lastMousePos.y();
 
@@ -1101,6 +1099,8 @@ int WLVisualWidget::selectElement(int x,int y)
 	    movView(dx,-dy);
       else
         rotView(dy/3,dx/3);
+
+     m_lastMousePos = event->pos();
      }
      else if (event->buttons() & Qt::LeftButton)
          {
@@ -1108,9 +1108,12 @@ int WLVisualWidget::selectElement(int x,int y)
              rotView(dy/3,dx/3);
          else
              movView(dx,-dy);
+
+         m_lastMousePos = event->pos();
          }
 
-     m_lastMousePos = event->pos();
+
+ event->accept();
  }
 
 void WLVisualWidget::mouseDoubleClickEvent(QMouseEvent *event)
@@ -1326,7 +1329,6 @@ m_rotViewF=!m_rotViewF;
 m_tbViewRot->setIcon(m_rotViewF ?
                      QPixmap(":/data/icons/viewRot.png")
                     :QPixmap(":/data/icons/viewMov.png"));
-
 }
 
 void WLVisualWidget::setViewCenter()
@@ -1552,16 +1554,16 @@ if(m_typeView==GModel) setViewGModel();
 
 void WLVisualWidget::showEvent(QShowEvent *event)
 {
-    Q_UNUSED(event)
-    placeVisualElements();
+Q_UNUSED(event)
+placeVisualElements();
 
-    QOpenGLWidget::showEvent(event);
+QOpenGLWidget::showEvent(event);
 }
 
 void WLVisualWidget::resizeEvent(QResizeEvent *event)
 {
-    Q_UNUSED(event)
-    placeVisualElements();
+Q_UNUSED(event)
+placeVisualElements();
 
 QOpenGLWidget::resizeEvent(event);
 }

@@ -65,7 +65,7 @@ void WLEVScript::reset()
      //Delay->terminate();
      engine->abortEvaluation(sv);
      emit changedBusy(busy=false);
-     emit sendMessage(tr("script"),"brake",-1);
+     emit sendMessage(tr("script"),tr("break"),-1);
     }
 }
 
@@ -138,7 +138,7 @@ else
  emit changedBusy(busy=false);
 
 
-qDebug()<<"retScript";
+qDebug()<<"WLEVScript::evalFunc finished";
 };
 
 void WLEVScript::evalCode() 

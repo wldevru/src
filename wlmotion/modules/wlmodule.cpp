@@ -4,6 +4,7 @@ WLModule::WLModule(QObject *parent)
 	:WLElement(parent)
 {
 m_type=typeDevice;
+m_ready=false;
 }
 
 
@@ -44,6 +45,14 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)comModule_getProp;
 
 setCommand(data);
+}
+
+void WLModule::setReady(bool ready)
+{
+if(m_ready!=ready){
+ m_ready=ready;
+ emit changedReady(m_ready);
+ }
 }
 
 

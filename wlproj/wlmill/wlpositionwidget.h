@@ -68,12 +68,14 @@ private:
 
    WLLabel *labelS;
    WLLabel *labelF;
+   QLabel  *labelActivGCode;
 
    QDoubleSpinBox *sbFper;
    QDoubleSpinBox *sbFman;
    QDoubleSpinBox *sbSper;
 
    QToolButton *pbFast;
+   QToolButton *pbPause;
 
    QLabel *labelTypeManual;
 
@@ -131,8 +133,7 @@ private slots:
 
      void updateFSLabel();
 
-     void onPBFindDrivePos();
-	 void onExGCode();
+     void onExGCode();
 
      void updateEnableMoved(bool);
 	 void onPBSetXY0();

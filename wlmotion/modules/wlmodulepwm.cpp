@@ -31,7 +31,9 @@ else
 
 bool WLModulePWM::InitOut(int sizeOutPWM)
 {
-if(sizeOutPWM<1||outPWM.size()== sizeOutPWM) return false;
+if(sizeOutPWM<1
+ ||outPWM.size()== sizeOutPWM
+ ||isReady()) return false;
 
 WLPWM *pwm;
 
@@ -98,7 +100,10 @@ case comPWM_setData: Stream>>index;//index8
                      break;
 
 case  sendModule_prop: Stream>>ui1;
+
                        Init(ui1);
+
+                       setReady(true);
                        break;
 
 case  sendModule_error:

@@ -12,6 +12,7 @@ sizeFW=0;
 sizeBlockFW=0;
 prop.clear();
 
+setReady(true);
 }
  
 WLModuleFW::~WLModuleFW()

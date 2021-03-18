@@ -6,6 +6,9 @@
 #include <QString>
 #include <QStringList>
 #include <QDebug>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+
 #include "wl3dpoint.h"
 #include "wl6dpoint.h"
 #include "wlframe.h"
@@ -71,6 +74,7 @@ double v;
 double w;
 
 WLGPoint() {x=y=z=a=b=c=u=v=w=0;}
+WLGPoint(WL6DPoint point) {u=v=w=0; from6D(point); }
 
 bool isNull()
 {
@@ -352,44 +356,48 @@ struct WLGCodeData
 
  int iCurTool=0;
 
-int iSC=0;
+ int iSC=0;
 
-double drillPlane=0;
-double G64P=0;
-double G64Q=0;
+ double drillPlane=0;
+ double G64P=0;
+ double G64Q=0;
 
-bool GCode[GCodeSize];
+ bool GCode[GCodeSize];
 
-bool absIJK;
-bool stopMode;
-bool initDrillPlane;
+ bool absIJK;
+ bool stopMode;
+ bool initDrillPlane;
 
-bool MCode[MCodeSize];
+ bool MCode[MCodeSize];
 
-par gX;
-par gY;
-par gZ;
+ QString strBeforeProgram;
+ QString strAfterProgram;
+ double backOffsetLonfDrill=1;
 
-par gI;
-par gJ;
-par gK;
+ par gX;
+ par gY;
+ par gZ;
 
-par gA;
-par gB;
-par gC;
+ par gI;
+ par gJ;
+ par gK;
 
-par gF;
+ par gA;
+ par gB;
+ par gC;
 
-par gR;
-par gP;
-par gQ;
+ par gF;
 
-par gS;
-par gT;
+ par gR;
+ par gP;
+ par gQ;
 
-par gH;
+ par gS;
+ par gT;
 
-WLGCodeData();
+ par gH;
+
+ WLGCodeData();
 };
 
 class WLGCode: public QObject
@@ -525,7 +533,14 @@ Q_INVOKABLE  bool isGCode(int i) {return m_data.GCode[i];}
     void verifyG51();
     void verifyG43();
 
+    QString getStrBeforeProgram() {return m_data.strBeforeProgram;}
+    QString getStrAfterProgram() {return m_data.strAfterProgram;}
 
+    void setStrBeforeProgram(QString str) {m_data.strBeforeProgram=str;}
+    void setStrAfterProgram(QString str) {m_data.strAfterProgram=str;}
+
+    void setOffsetBackLongDrill(double offset=0) {if(offset>=0) m_data.backOffsetLonfDrill=offset;}
+    double getOffsetBackLongDrill() {return  m_data.backOffsetLonfDrill;}
 
     void setData(const WLGCodeData &data);
 
@@ -547,6 +562,10 @@ void changedSK(int);
 void changedF();
 void changedTool();
 
+public:
+
+virtual void writeXMLData(QXmlStreamWriter &stream);
+virtual void  readXMLData(QXmlStreamReader &stream);
 };
 
 #endif // WLGCODE_H

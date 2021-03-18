@@ -66,6 +66,8 @@ double D;
 QString comment;
 };
 */
+
+
 struct SHProbeData
 {
 double hTablet;
@@ -178,7 +180,7 @@ private:
                //ma_smooth=    1<<6,     //сглаживание
 			   ma_activ=     1<<7,     //машина активная
 			   ma_blcomp=    1<<8,     //выбераются люфты
-               ma_ready=     1<<9,     //кнопка
+               //ma_ready=     1<<9,     //кнопка
 			   ma_blnextmov=  1<<10,     //опережение отрабатывания люфта
 			   ma_continuemov=1<<11,    //непрерывное движение
 			   ma_spindle    =1<<12,
@@ -224,7 +226,6 @@ QList<WLElementTraj>  showMillTraj;
 Q_INVOKABLE bool runGCode(QString gtxt); 
             bool runGProgram(int istart=0);
 
-bool isReady() {return Flag.get(ma_ready);}
 
 bool isCompleteProgram() {return m_iProgram==m_Program->getElementCount();}
 bool isRunProgram() {return Flag.get(ma_runprogram);}
@@ -329,9 +330,9 @@ private:
   float calcCorrectSOut(float);
 
 
-   WLMotion *m_motDevice;
+   WLMotion *motDevice;
 public:
-   WLMotion* getMotionDevice() {return m_motDevice;}
+   WLMotion* getMotionDevice() {return motDevice;}
 
  public:
 
@@ -361,7 +362,7 @@ void setHProbeData(SHProbeData hPData) {hProbeData=hPData;}
 double getBaseOffsetTool() {return m_baseOffsetTool;}
 void setBaseOffsetTool(double offset) {m_baseOffsetTool=offset;}
 
-float getVMax() {WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
+float getVMax() {WLModuleAxis *ModuleAxis=motDevice->getModuleAxis();
                  if(ModuleAxis)
 					 return ModuleAxis->getFmax()*m_mainDim;
 				 else
@@ -430,7 +431,8 @@ private:
   int updateMovBuf();
   int updateMovProgram();
 
-  bool verifyReadyMotion();
+virtual  bool verifyReadyAutoMotion();
+virtual  bool verifyReadyManualMotion();
 
 private slots:
   void init();
@@ -463,21 +465,21 @@ public:
             //float getSmoothDist()    {return m_smoothDist;}
             //float getSimpliDist()    {return m_simpliDist;}
 
-Q_INVOKABLE bool getInProbe()   {return m_motDevice->getModuleAxis()->getInput(MAXIS_inProbe)->getNow();}
-Q_INVOKABLE bool getInSDStop()  {return m_motDevice->getModuleAxis()->getInput(MAXIS_inSDStop)->getNow();}
-Q_INVOKABLE bool getInEMGStop() {return m_motDevice->getModuleAxis()->getInput(MAXIS_inEMGStop)->getNow();}
-Q_INVOKABLE bool getIn(int index)  {return m_motDevice->getModuleIOPut()->getInput(index)->getNow();}
-Q_INVOKABLE bool getOut(int index) {return m_motDevice->getModuleIOPut()->getOutput(index)->getNow();}
+Q_INVOKABLE bool getInProbe()   {return motDevice->getModuleAxis()->getInput(MAXIS_inProbe)->getNow();}
+Q_INVOKABLE bool getInSDStop()  {return motDevice->getModuleAxis()->getInput(MAXIS_inSDStop)->getNow();}
+Q_INVOKABLE bool getInEMGStop() {return motDevice->getModuleAxis()->getInput(MAXIS_inEMGStop)->getNow();}
+Q_INVOKABLE bool getIn(int index)  {return motDevice->getModuleIOPut()->getInput(index)->getNow();}
+Q_INVOKABLE bool getOut(int index) {return motDevice->getModuleIOPut()->getOutput(index)->getNow();}
 Q_INVOKABLE void setOutput(int index,bool set)            {setOut(index,set);} //old command
-Q_INVOKABLE void setOut(int index,bool set)               {m_motDevice->getModuleIOPut()->getOutput(index)->setOut(set);}
-Q_INVOKABLE void setOutPulse(int index,bool set,int time) {m_motDevice->getModuleIOPut()->getOutput(index)->setOutPulse(set,time);}
-Q_INVOKABLE void setOutTog(int index)                     {m_motDevice->getModuleIOPut()->getOutput(index)->setTog();}
+Q_INVOKABLE void setOut(int index,bool set)               {motDevice->getModuleIOPut()->getOutput(index)->setOut(set);}
+Q_INVOKABLE void setOutPulse(int index,bool set,int time) {motDevice->getModuleIOPut()->getOutput(index)->setOutPulse(set,time);}
+Q_INVOKABLE void setOutTog(int index)                     {motDevice->getModuleIOPut()->getOutput(index)->setTog();}
 
 Q_INVOKABLE	  int getCurTool()       {return m_curTool;}
 Q_INVOKABLE  void setSOut(float S);
 Q_INVOKABLE  void enableSOut(bool enable) {
                                           setSOut(m_GCode.getValue('S'));
-                                          m_motDevice->getModulePlanner()->setEnableSOut(enable);
+                                          motDevice->getModulePlanner()->setEnableSOut(enable);
                                           } 
 
 	        bool isDetPlasmaOn()    {return Flag.get(ma_detplasma);}
@@ -489,17 +491,19 @@ Q_INVOKABLE void rotAboutRotPointSC(int i,float a);
 Q_INVOKABLE void setCurPositionSC(QString nameCoord,double pos);
 
 Q_INVOKABLE bool isActiv() {
-                           WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
+                           WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
                            qDebug()<<!MillTraj.isEmpty()
                                    <<!ModulePlanner->isEmpty()
                                    <<ModulePlanner->isMoving()
-                                   <<isAuto();
+                                   <<isAuto()
+                                   <<isPause();
 
                            return   !MillTraj.isEmpty()
                                   ||!ModulePlanner->isEmpty()
                                   ||ModulePlanner->isMoving()
-                                  ||isAuto();
+                                  ||isAuto()
+                                  ||isPause();
                            }
 
 Q_INVOKABLE double getCurPosition(QString name);
@@ -618,11 +622,11 @@ Q_INVOKABLE	void goHToolProbe(float F,bool sd);
 
     void setDetPlasmaOn(bool on)   { Flag.set(ma_detplasma,on);}
 
-    void setPercentSpeed(double per) {if(0.1<=per&&per<=300)   {emit changedPercentSpeed(m_percentSpeed=per);}
-                                      m_motDevice->getModulePlanner()->setKF(m_percentSpeed/100);}
+    void setPercentSpeed(double per) {if(0<=per&&per<=300)   {emit changedPercentSpeed(m_percentSpeed=per);}
+                                      motDevice->getModulePlanner()->setKF(m_percentSpeed/100);}
 
     void setPercentSOut(double per) {if(0.1<=per&&per<=300)   {emit changedPercentSOut(m_percentSOut=per);}
-                                     m_motDevice->getModulePlanner()->setKSOut(m_percentSOut/100); }
+                                     motDevice->getModulePlanner()->setKSOut(m_percentSOut/100); }
 	                                    
 								      
 
@@ -660,8 +664,6 @@ signals:
 	void finished();
 	
 	void noActiv();
-
-	void ready();
 
     void changedMotion(bool);
 

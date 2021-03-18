@@ -6,10 +6,10 @@ TEMPLATE = app
 TARGET = wlfw
 
 QMAKE_LFLAGS = -no-pie
-DEFINES += QT_NO_DEBUG_OUTPUT\
-           QT_NO_INFO_OUTPUT\
-           QT_NO_WARNING_OUTPUT\
-
+#DEFINES += QT_NO_DEBUG_OUTPUT\
+#           QT_NO_INFO_OUTPUT\
+#           QT_NO_WARNING_OUTPUT\
+#
 QT += core widgets serialport gui network xml
 
 #CONFIG += release debug

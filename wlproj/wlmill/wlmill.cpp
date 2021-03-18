@@ -15,6 +15,7 @@
 
 #include "wleditmpgwidget.h"
 #include "wleditmillwidget.h"
+#include "wleditgcode.h"
 #include "wlpamwidget.h"
 #include "wldrivewidget.h"
 #include "wlenternum.h"
@@ -28,6 +29,15 @@
 WLMill::WLMill(QWidget *parent)
 : QMainWindow(parent)
 {
+    setEnabled(false);
+
+    splash =  new QSplashScreen(QPixmap(":/data/icons/logoWLMill.png"));
+    splash->showMessage("WLDEV 2007-2021");
+    splash->setWindowFlags(splash->windowFlags()|Qt::WindowStaysOnTopHint);
+    splash->show();
+
+    QTimer::singleShot(3000,splash,SLOT(close()));
+
     m_bclose=false;
     m_lifeM=0;
 
@@ -56,7 +66,7 @@ WLMill::WLMill(QWidget *parent)
     connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
     connect(MillMachine->getGCode(),SIGNAL(changedSK(int)),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
 
-    connect(MillMachine,SIGNAL(ready()),SLOT(readyMachine()));
+    connect(MillMachine,&WLMillMachine::changedReady,this,&WLMill::readyMachine);
     MillMachine->start();
 
     VisualWidget=new WLVisualWidget(Program,MillMachine);
@@ -84,6 +94,10 @@ WLMill::WLMill(QWidget *parent)
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::West);
     setTabPosition(Qt::TopDockWidgetArea,QTabWidget::South);
     setTabPosition(Qt::BottomDockWidgetArea,QTabWidget::North);
+
+    WLLog::getInstance()->setEnableDebug(true);
+
+
 }
 
 
@@ -145,11 +159,11 @@ menuStart->addAction((tr("start at...")),this,SLOT(onPBStartAt()));
 menuStart->addAction((tr("continue...")),this,SLOT(onPBStartContinue()));
 Action->setMenu(menuStart);
 
-connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
-
+//connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
+/*
 Action=TBControl->addAction(QIcon(":/data/icons/pause.png"),tr("pause"),MillMachine,SLOT(Pause()));
 Action->setShortcut(QKeySequence("Space"));
-
+*/
 Action=TBControl->addAction(QIcon(":/data/icons/H.png"),tr("h probe"),MillMachine,[=](){MillMachine->goHProbe(MillMachine->VProbe(),false);});
 connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
 
@@ -292,7 +306,9 @@ if(EP.exec())
 
 void WLMill::onPBStart()
 {
-if(!MillMachine->isEmptyMotion()) MillMachine->Start();
+if(MillMachine->isPause())  MillMachine->Pause(false);
+else
+if(!MillMachine->isEmptyMotion())  MillMachine->Start();
 else
     {
     MillMachine->runGProgram();
@@ -436,9 +452,13 @@ connect(MillMachine,SIGNAL(changedOn(bool)),MEdit,SLOT(setDisabled(bool)));
 
 MenuBar->addMenu(MEdit);
 
-QMenu *MHelp= new QMenu(tr("about")); 
-MHelp->addAction(tr("program"),this,SLOT(about()));
+QMenu *MHelp= new QMenu(tr("Help"));
+MHelp->addAction(tr("Manual"),this,SLOT(openManualWLMill()));
+MHelp->addAction(tr("Device"),this,SLOT(openManualDevice()));
+
+MHelp->addAction(tr("about WLMill"),this,SLOT(about()));
 MHelp->addAction(tr("Qt"),qApp,SLOT(aboutQt()));///??
+MHelp->addAction(tr("save debug file"),this,SLOT(onSaveDebugFile()));///??
 
 MenuBar->addMenu(MHelp);
 
@@ -654,11 +674,14 @@ if(MillMachine->getDrive(nameDrive))
 void WLMill::onEditWLMill()
 {
 WLEditMillWidget EditMill(MillMachine);
+WLEditGCode EditGCode(MillMachine->getGCode());
+
+EditMill.addTabWidget(&EditGCode,"GCode");
 EditMill.show();
 
 if(EditMill.exec())
    {
-   if(EditMill.saveData())
+   if(EditMill.saveDataMill())
     {
     QMessageBox::information(this,tr("Attention"),tr("Please restart WLMill"));
     close();
@@ -814,6 +837,13 @@ if(FileXML.open(QIODevice::ReadOnly))
 }
 }
 
+void WLMill::onSaveDebugFile()
+{
+QString dir=QFileDialog::getExistingDirectory(this, tr("Save File Device"),WLLog::getDirDebug());
+
+if(!dir.isEmpty()) WLLog::saveDebugFile(dir," title:"+windowTitle());
+}
+
 void WLMill::onLoadProgram()
 {
 if(MillMachine->isActiv())  return;
@@ -947,6 +977,7 @@ Q_UNUSED(event)
 	
 void WLMill::readyMachine()
 {	
+qDebug()<<"readyMachine";
 loadConfig();
 
 createMenuBar();
@@ -958,7 +989,6 @@ createDockMPG();
 
 loadDataState();
 
-
 connect(MillMachine->getMotionDevice(),SIGNAL(changedVersion(quint32)),SLOT(updateTitle()));
 connect(this,SIGNAL(changedLife()),SLOT(updateTitle()));
 
@@ -966,6 +996,10 @@ updateTitle();
 
 if(MillMachine->getMotionDevice()->getUID96().isEmpty())
     QTimer::singleShot(1000,this,SLOT(onEditDevice()));
+
+setEnabled(true);
+
+WLLog::getInstance()->setEnableDebug(true);
 }
 
 void WLMill::onGoHome()
@@ -1110,7 +1144,7 @@ WLMotion *MD=MillMachine->getMotionDevice();
  if(MillMachine
   &&MD)
  {
- if(!MD->isReady())
+ if(MD->isReady())
   title+=" / "+MD->getNameDevice()+" ver="+QString::number(MD->getVersion());
 else
   title+=QString(" /noDevice");
@@ -1273,18 +1307,28 @@ return ret;
 
 void WLMill::about()
 {
-QMessageBox::about(this,("program"),
+QMessageBox::about(this,("WLMill"),
 		   tr(" WLMill <br>"
   		      " http://wldev.ru <br>"
 			  " wldev@mail.ru <br>"
-			  "<br>WhiteLine</b> <br>"
-			  " Qt ¹<b>1549622</b><br>"              
+              "<br>WhiteLine</b> <br>"
 #ifdef enableExportKuka
 			  "buyer:"buyer
 #endif
 			  ));
 
 }
+
+void WLMill::openManualWLMill()
+{
+QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/WLMill.pdf"));
+}
+
+void WLMill::openManualDevice()
+{
+QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/"+MillMachine->getMotionDevice()->getNameDevice()+".pdf"));
+}
+
 
 void WLMill::help()
 {

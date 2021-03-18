@@ -12,7 +12,7 @@ m_Program=_Program;
 
 m_EVMScript=_EVMScript;
 m_EVLScript=nullptr;
-m_motDevice=nullptr;
+motDevice=nullptr;
 
 m_hPause=0;
 
@@ -127,7 +127,7 @@ WLMillMachine::~WLMillMachine()
 
 saveConfig();
 
-m_motDevice->deleteLater();
+motDevice->deleteLater();
 
 //quit();
 //wait();
@@ -199,7 +199,7 @@ if((m_correctSList.isEmpty())||(m_correctSList.last().Sadj!=m_maxS))
 
 WLMPG *WLMillMachine::getMPG()
 {
-WLModuleMPG *MMPG=m_motDevice->getModuleMPG();
+WLModuleMPG *MMPG=motDevice->getModuleMPG();
 
 if(MMPG)
   return MMPG->getMPG(0);
@@ -269,6 +269,8 @@ void WLMillMachine::setOn(bool on)
 {
 WLMPG *Whell=getMPG();
 
+qDebug()<<"WLMillMachine::setOn"<<on;
+
 if(!on) runScript("OFF()");
 
 Flag.set(ma_on,on);  
@@ -281,7 +283,7 @@ if(on)
   {
   runScript("ON()");
 
-  WLDrive::setMainPads();  
+  WLDrive::setMainPadDrives();
 
   QVector <quint8> indexsAxis;
 
@@ -290,7 +292,7 @@ if(on)
 
   WLModulePlanner *ModulePlanner=getMotionDevice()->getModulePlanner();
 
-  qDebug()<<"Indexs size"<<indexsAxis.size();
+  qDebug()<<"WLModulePlanner indexs size"<<indexsAxis.size();
   if(ModulePlanner) ModulePlanner->setIAxisSlave(indexsAxis.data(),indexsAxis.size());
 
   if(Whell&&isUseMPG())
@@ -339,27 +341,27 @@ qDebug()<<"Init MillMachine"<<thread();
 if(!QDir(configMMDir).exists())
     QDir().mkdir(configMMDir);
 
-m_motDevice=new WLMotion;
+motDevice=new WLMotion;
 
-connect(m_motDevice,SIGNAL(sendMessage(QString,QString,int)),this,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
+connect(motDevice,SIGNAL(sendMessage(QString,QString,int)),this,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
 loadConfig();
 
 updateMainDimXYZ();
-qDebug("runned machine");
+
 setEVMScript();
-qDebug("runned machine");
-Flag.set(ma_ready);
-emit ready();
 
-qDebug("runned machine");
+if(motDevice->isValidProtocol()
+  ||(!motDevice->isReady())){ //no device   
+   setReady(true);
+   }else{
+   motDevice->closeConnect();
+   };
 }
-
-
 
 bool WLMillMachine::isEmptyMotion()
 {
-WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
+WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
 if(ModulePlanner)
      return    MillTraj.isEmpty()
@@ -472,7 +474,7 @@ emit changedSValue(curSOut=S);
 
 void WLMillMachine::Stop() //полная остановка
 {
-qDebug()<<"Stop MM";
+qDebug()<<"WLMillMachine::Stop";
 
 MillTraj.clear();
 
@@ -487,11 +489,11 @@ resetAuto();
 Flag.reset(ma_runlist
           |ma_runprogram);
 
-WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
+WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
 if(ModulePlanner) ModulePlanner->stopMov();
 
-WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
+WLModuleAxis *ModuleAxis=motDevice->getModuleAxis();
 
 if(ModuleAxis)
    ModuleAxis->setActInProbe(AXIS_actNo);
@@ -540,7 +542,6 @@ lastEndPos.clear();
 
 Flag.reset(ma_runlist
           |ma_runscript
-          |ma_pause
           |ma_continue);
 
 if(m_EVMScript) m_EVMScript->reset();
@@ -549,7 +550,8 @@ Stop();
 
 m_iProgram=0;
 
-emit changedReadyRunList(Flag.set(ma_readyRunList,false));
+emit changedPause(Flag.reset(ma_pause));
+emit changedReadyRunList(Flag.reset(ma_readyRunList));
 }
 
 void WLMillMachine::startMovList() 
@@ -558,9 +560,9 @@ qDebug()<<"startListMov";
 
 QMutexLocker locker(&Mutex);
 
-WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
+WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
-if(!verifyReadyMotion()) {reset();return;}
+if(!verifyReadyManualMotion()) {reset();return;}
 
 saveConfig();
 
@@ -570,7 +572,7 @@ if((ModulePlanner->getStatus()==MPLANNER_pause
 {
 if(Flag.get(ma_pause))
  {
- Flag.set(ma_pause,0);
+ emit changedPause(Flag.reset(ma_pause));
  Flag.set(ma_continue,runScript("CONTINUE()"));
  }
 
@@ -598,9 +600,11 @@ qDebug()<<isEmptyMotion()<<isActivScript()<<isRunScript();
     ModulePlanner->startMov();
     updateMovBuf();
     }
-   }
+   } 
  }
 }
+
+ModulePlanner->update();
 }
 
 
@@ -644,7 +648,7 @@ QByteArray Data;
 
 QXmlStreamWriter stream(&Data);
 
-if(!Flag.get(ma_ready)) return;
+if(!isReady()) return;
 
 stream.setAutoFormatting(true);
 
@@ -689,7 +693,7 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
 */
 
  stream.writeStartElement("Device");
-     stream.writeAttribute("WLMotion",m_motDevice->getNameDevice());
+     stream.writeAttribute("WLMotion",motDevice->getNameDevice());
 
  stream.writeEndElement();
 
@@ -734,6 +738,10 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
  stream.writeEndElement();
  }
 
+ stream.writeStartElement("GCode");
+ getGCode()->writeXMLData(stream);
+ stream.writeEndElement();
+
 stream.writeEndElement();
 
 stream.writeEndDocument();
@@ -745,7 +753,7 @@ FileXML.close();
 qDebug()<<"Write XML";
 }
 
-m_motDevice->writeToFile(configMMDir+m_motDevice->getNameDevice()+".xml");
+motDevice->writeToFile(configMMDir+motDevice->getNameDevice()+".xml");
 
  QFile FileJS(mScriptFile);
  qDebug()<<"save mScriptFile";
@@ -765,7 +773,7 @@ connect(millDrive,SIGNAL(finished()),this,SLOT(setFinished()),Qt::QueuedConnecti
 connect(millDrive,SIGNAL(paused()),this,SLOT(setFinished()),Qt::QueuedConnection);
 connect(millDrive,SIGNAL(sendMessage(QString,QString,int)),this,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
-millDrive->setModuleAxis(m_motDevice->getModuleAxis());
+millDrive->setModuleAxis(motDevice->getModuleAxis());
 }
 
 void WLMillMachine::removeDrive(WLMillDrive *millDrive)
@@ -927,21 +935,39 @@ if(FileXML.isOpen())
                {
                findOk=true;
 
-               m_motDevice->setInfo(info);
-               m_motDevice->openConnect();
+               motDevice->setInfo(info);
+               motDevice->openConnect();
+
+               QElapsedTimer Timer;
+
+               Timer.start();
+
+                while(Timer.elapsed()<100
+                    &&!motDevice->isReady())
+                {
+                QCoreApplication::processEvents();
+                }
+
+               if(!motDevice->isReady())
+                   motDevice->closeConnect();
+               else
+                   findOk=true;
+
                break;
                }
 
             }
 
-            m_motDevice->initFromFile(initFile);
+            motDevice->initFromFile(initFile);
 
-            if(m_motDevice->getModuleConnect())
-                             m_motDevice->getModuleConnect()->setEnableHeart(true);
+            if(motDevice->getModuleConnect())
+                             motDevice->getModuleConnect()->setEnableHeart(true);
 
             if(!findOk
-             &&!m_motDevice->getUID96().isEmpty())
-                emit sendMessage("WLMillMachine",tr("device %1 not found.").arg(m_motDevice->getNameDevice())+" ("+m_motDevice->getUID96()+")",0);
+             &&!motDevice->getUID96().isEmpty())
+                {
+                emit sendMessage("WLMillMachine",tr("device %1 not found.").arg(motDevice->getNameDevice())+" ("+motDevice->getUID96()+")",0);
+                }
             }
 
        }
@@ -965,7 +991,7 @@ if(FileXML.isOpen())
 
       if(stream.name()=="Drive")
        {
-       if(m_motDevice->getModuleAxis())
+       if(motDevice->getModuleAxis())
            while(!stream.atEnd())
             {
             stream.readNextStartElement();
@@ -1080,15 +1106,22 @@ if(FileXML.isOpen())
            }
 
          }
+
+        if(stream.name()=="GCode")
+         {
+         qDebug()<<"loadGCode";
+         getGCode()->readXMLData(stream);
+         continue;
+         }
      
      }
 	}
    }
 
-  if(m_motDevice->getModuleAxis())
+  if(motDevice->getModuleAxis())
     {
-    connect(m_motDevice->getModuleAxis(),SIGNAL(changedInEMGStop()),SLOT(updateInput()));
-    connect(m_motDevice->getModuleAxis(),SIGNAL(changedInSDStop()),SLOT(updateInput()));
+    connect(motDevice->getModuleAxis(),SIGNAL(changedInEMGStop()),SLOT(updateInput()));
+    connect(motDevice->getModuleAxis(),SIGNAL(changedInSDStop()),SLOT(updateInput()));
     }
 
   if(getDrive("X")) millDrives+=getDrive("X");
@@ -1101,7 +1134,7 @@ if(FileXML.isOpen())
   if(getDrive("V")) millDrives+=getDrive("V");
   if(getDrive("W")) millDrives+=getDrive("W");
 
-  WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();  
+  WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
   if(ModulePlanner)
   {
@@ -1113,7 +1146,7 @@ if(FileXML.isOpen())
 
   connect(ModulePlanner,SIGNAL(changedStatus(int)),SLOT(on_changedStatusMPlanner(int)));
 
-  connect(m_motDevice->getModulePlanner(),SIGNAL(changedSOut(float)),SLOT(setDataSOut(float)));
+  connect(motDevice->getModulePlanner(),SIGNAL(changedSOut(float)),SLOT(setDataSOut(float)));
   setSOut(m_GCode.getValue('S'));
 /*
   if(m_motDevice->getModulePWM())
@@ -1139,16 +1172,17 @@ return false;
 
 void WLMillMachine::setFinished()
 {
-qDebug()<<"setFinished?";
+qDebug()<<"WLMillMachine::setFinished() actDrive"<<isActivDrives()
+                                  <<"emptyMotion"<<isEmptyMotion()
+                                  <<"runProgram"<<isRunProgram()
+                                  <<"auto"<<isAuto()
+                                  <<"ready"<<isReady();
 
 if(!isReady()) return;
 
 QMutexLocker locker(&Mutex);
 
 setActiv(isActivDrives());
-qDebug()<<"setFinished"<<isActivDrives()<<!isEmptyMotion()
-                                        <<Flag.get(ma_runprogram)
-                                        <<isAuto();
 if(isAuto())
  updateAuto();
 else
@@ -1196,11 +1230,11 @@ else
 
 void WLMillMachine::updateMillMachineAuto()
 {    
-qDebug()<<"update Auto MillMachine";
+qDebug()<<"WLMillMachine::updateMillMachineAuto";
 
 QMutexLocker locker(&MutexAuto);
 
-if(isAuto()) 
+if(isAuto()&&!isPause())
 switch(m_typeAutoMMachine)
  {
  case AUTO_ProbeEMG:
@@ -1216,9 +1250,9 @@ switch(m_typeAutoMMachine)
 
 bool WLMillMachine::updateProbe()
 {
-qDebug()<<"update Auto Probe"<<iOperation<<driveProbe->isMotion();
+qDebug()<<"WLMillMachine::updateProbe"<<iOperation<<driveProbe->isMotion();
 
-WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
+WLModuleAxis *ModuleAxis=motDevice->getModuleAxis();
 
 if(!driveProbe->isMotion())
 switch(iOperation)
@@ -1257,7 +1291,7 @@ switch(iOperation)
 
          resetAuto();
          QTimer::singleShot(10,this,SLOT(setFinished()));
-         qDebug()<<"Complete probeR";
+         qDebug()<<"WLMillMachine::updateProbe()-Complete probeR";
 		 break;	
 
  case 3: if(ModuleAxis->isLatchProbe3())
@@ -1277,12 +1311,12 @@ switch(iOperation)
 
          resetAuto();
          QTimer::singleShot(10,this,SLOT(setFinished()));
-         qDebug()<<"Complete probeF";
+         qDebug()<<"WLMillMachine::updateProbe()-Complete probeF";
 		 break;	
 
  case 4: resetAuto();
 	     QTimer::singleShot(10,this,SLOT(setFinished()));
-         qDebug()<<"Complete probe+";
+         qDebug()<<"WLMillMachine::updateProbe()-Complete probe+";
 	     break;
  }
 
@@ -1293,9 +1327,9 @@ return 1;
 bool WLMillMachine::isTryProbe(bool dir) 
 {
 if(dir) 
-   return m_motDevice->getModuleAxis()->isLatchProbe2();
+   return motDevice->getModuleAxis()->isLatchProbe2();
  else
-   return m_motDevice->getModuleAxis()->isLatchProbe3();
+   return motDevice->getModuleAxis()->isLatchProbe3();
 }
 
 double WLMillMachine::getProbePosition(QString nameDrive,bool dir)
@@ -1309,11 +1343,11 @@ if(MDrive
 {
  if(dir)
   {
-  ret=m_motDevice->getModuleAxis()->getLatchProbe2(MDrive->getAxis()->getIndex());
+  ret=motDevice->getModuleAxis()->getLatchProbe2(MDrive->getAxis()->getIndex());
   }
   else
   {
-  ret=m_motDevice->getModuleAxis()->getLatchProbe3(MDrive->getAxis()->getIndex());
+  ret=motDevice->getModuleAxis()->getLatchProbe3(MDrive->getAxis()->getIndex());
   }
 return ret*MDrive->dimension();
 }
@@ -1353,7 +1387,7 @@ bool WLMillMachine::updateHToolProbe()
 {
 qDebug()<<"update Auto HTool %d"<<iOperation<<!WLDrive::isMotionDrives()<<!Flag.get(ma_runlist);
 
-WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
+WLModuleAxis *ModuleAxis=motDevice->getModuleAxis();
 
 if(!WLDrive::isMotionDrives())
 switch(iOperation)
@@ -1441,7 +1475,7 @@ bool WLMillMachine::updateHProbe()
 {
 qDebug("update Auto HProbe %d",iOperation);
 
-WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
+WLModuleAxis *ModuleAxis=motDevice->getModuleAxis();
 
 if(!driveProbe->isMotion())
 switch(iOperation)
@@ -1623,7 +1657,7 @@ m_GCode.rotAboutRotPointSC(i,a);
 
 void WLMillMachine::setDriveManualWhell(QString nameDrive,quint8 X1,bool vmode)
 {
-WLModuleMPG *ModuleMPG=m_motDevice->getModuleMPG();
+WLModuleMPG *ModuleMPG=motDevice->getModuleMPG();
 
 WLMillDrive *Drive=getDrive(nameDrive,false);
 
@@ -1656,7 +1690,7 @@ void WLMillMachine::goDriveProbe(QString nameDrive,int dir,float F,int type)
 {
 qDebug()<<"goDriveProbe"<<nameDrive<<F;
 
-if(!verifyReadyMotion()) return;
+if(!verifyReadyAutoMotion()) return;
 
 driveProbe=getDrive(nameDrive,true);
 
@@ -1684,7 +1718,7 @@ else if(driveProbe
      }
      else
       {
-      qWarning()<<"driveProbe is Motion"<<driveProbe->isMotion();
+      qWarning()<<nameDrive<<"driveProbe is Motion"<<driveProbe->isMotion();
       }
 
 }
@@ -1694,7 +1728,8 @@ else if(driveProbe
 
 void WLMillMachine::goHProbe(float F,bool sd)
 {
-if(!verifyReadyMotion()) {return;}
+qDebug()<<"goHProbe";
+if(!verifyReadyAutoMotion()) {return;}
 
 driveProbe=getDrive("Z",true);
 
@@ -1717,7 +1752,8 @@ updateAuto();
 
 void WLMillMachine::goHToolProbe(float F, bool sd)
 {
-if(!verifyReadyMotion()) {return;}
+qDebug()<<"goHToolProbe";
+if(!verifyReadyAutoMotion()) {return;}
 
 driveProbe=getDrive("Z",true);
 
@@ -1784,7 +1820,7 @@ void WLMillMachine::goDriveTouch(QString nameDrive,int dir,float F)
 {
 qDebug()<<"goDriveTouch"<<nameDrive;
 
-if(!verifyReadyMotion()) {return;}
+if(!verifyReadyAutoMotion()) {return;}
 
 WLMillDrive *Drive=getDrive(nameDrive,true);
 
@@ -1825,41 +1861,58 @@ if(IncDec==0)
 */
 void WLMillMachine::Pause(bool pause) //остановка в любой момент
 {
-QMutexLocker locker(&Mutex);
 
-qDebug()<<"MillMachine Pause()"<<pause;
+Mutex.lock();
+qDebug()<<"MillMachine Pause()"<<pause<<" runList"<<isRunList();
+/*
 if(isAuto()) 
 {
 //Stop(); -- иначе пробинг не срабатывает
 updateAuto();
 }
-else if(pause)
+else
+*/
+if(pause!=Flag.get(ma_pause))
+{
+if(pause)
      {
-     if(isRunList())
+     if(isRunList()
+     &&!isRunScript())
       {
-      if(m_motDevice->getModulePlanner())
-          m_motDevice->getModulePlanner()->pauseMov();
+      if(motDevice->getModulePlanner())
+          motDevice->getModulePlanner()->pauseMov();
 
       if(isRunProgram())
           sendMessage("program pause: \""+m_Program->getName()+"\"",QString(" element: %1").arg(m_Program->getLastMovElement()),1);
       }
-      else if(!isRunProgram())
-           {
-           reset();//!!!
-           }
+      else
+         {
+         WLDrive::pauseDrives();//!!!
+         }
      }
      else
        {
-       startMovList();
+       if(isRunProgram()
+        &&!isRunScript()) QTimer::singleShot(0,this,SLOT(Start()));
+        else
+        {
+        WLDrive::accelDrives();
+        if(getMotionDevice()->getModulePlanner()) getMotionDevice()->getModulePlanner()->update();
+        }
        }
+}
+
+Mutex.unlock();
+
+emit changedPause(Flag.set(ma_pause,pause));
 }
 
 void WLMillMachine::on_changedStatusMPlanner(int status)
 {
 switch(status)
  {
- case MPLANNER_pause:    Flag.set(ma_pause,1);
-                         Flag.set(ma_runlist,0);
+ case MPLANNER_pause:    Flag.set(ma_runlist,0);
+                         emit changedPause(Flag.set(ma_pause));
 
                          runScript("PAUSE()");    break;
 
@@ -1974,13 +2027,15 @@ void WLMillMachine::resetAuto()
 if(getMPG()&&isUseMPG())
    getMPG()->setEnable(true);
 
+m_typeAutoMMachine=AUTO_no;
+
 WLMachine::resetAuto();
 }
 
 void WLMillMachine::setSOut(float S)
 {
     tarSOut=S;
-    m_motDevice->getModulePlanner()->setSOut(calcSOut(tarSOut)/100);
+    motDevice->getModulePlanner()->setSOut(calcSOut(tarSOut)/100);
 }
 
 
@@ -2114,7 +2169,10 @@ updateMovProgram();
 emit changedTrajSize(MillTraj.size());
 emit changedReadyRunList(Flag.set(ma_readyRunList,!MillTraj.isEmpty()));
 
-if(Flag.get(ma_autostart)) startMovList();
+if(Flag.get(ma_autostart))
+    startMovList();
+  else
+    emit changedPause(Flag.set(ma_pause));
 
 return true;
 }
@@ -2131,7 +2189,7 @@ qDebug()<<"GCode"<<gtxt;
 
 const float simpliD=m_mainDim*(1<<xPD);
 
-WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
+WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
 if(MillTraj.isEmpty()
 && ModulePlanner->isEmpty()
@@ -2199,10 +2257,11 @@ int isimpli;
 
 if(!MillTraj.isEmpty()&&!MillTraj.last().isEmptyM()) return 0;
 
-if(!MillTraj.isEmpty())
-qDebug()<<"last M"<<MillTraj.last().isEmptyM();
 
-qDebug()<<"updateMovProgram m_iProgram"<<m_iProgram<<isRunProgram()<<isRunScript()<<m_MList.isEmpty();
+qDebug()<<"updateMovProgram m_iProgram"<<m_iProgram
+                         <<"runProgram"<<isRunProgram()
+                          <<"runScript"<<isRunScript()
+                      <<"MList.isEmpty"<<m_MList.isEmpty();
 
 if(isRunProgram()
 &&!isRunScript()
@@ -2219,8 +2278,8 @@ if(isRunProgram()
  
    baseTraj+=curTraj;
 
-   if(!curTraj.isEmpty())
-       qDebug()<<"MCode"<<!curTraj.first().isEmptyM();
+  // if(!curTraj.isEmpty())
+   //    qDebug()<<"MCode"<<!curTraj.first().isEmptyM();
 
 /*
    if(m_GCode.isGCode(61))
@@ -2273,7 +2332,7 @@ if(isRunProgram()
 return 1;
 }
 
-bool WLMillMachine::verifyReadyMotion()
+bool WLMillMachine::verifyReadyManualMotion()
 {
 if(!isOn())
    {sendMessage(metaObject()->className(),tr("is off!"),0); return false;}
@@ -2281,6 +2340,16 @@ if(getMotionDevice()->getModuleAxis()->getInput(MAXIS_inEMGStop)->getNow())
    {sendMessage(nameClass(),tr("wrong state")+"(inEMGStop=0)",0);return false;}
 if(getMotionDevice()->getModuleAxis()->getInput(MAXIS_inSDStop)->getNow())
    {sendMessage(nameClass(),tr("wrong state")+"(inSDStop=0)",0);return false;}
+
+return true;
+}
+
+bool WLMillMachine::verifyReadyAutoMotion()
+{
+if(!verifyReadyManualMotion()) return false;
+
+if(isPause())
+   {sendMessage(nameClass(),tr("activ pause"),0);return false;}
 
 return true;
 }
@@ -2386,7 +2455,7 @@ dt=1.0f/20;
 
 for(int i=1;i<addTraj.size();i++)
   {
-  qDebug()<<"addTraj.smooth"<<addTraj[i].getG64P();
+ // qDebug()<<"addTraj.smooth"<<addTraj[i].getG64P();
   if(addTraj[i-1].isNoMov()
    ||addTraj[i].isNoMov()
    ||addTraj[i-1].isCirc()
@@ -2636,13 +2705,14 @@ m_nowBL=nextBL;
 
 int WLMillMachine::updateMovBuf() 
 {
-qDebug()<<"update MovBuf"<<Flag.get(ma_runprogram);
+qDebug()<<"WLMillMachine::updateMovBuf"<<Flag.get(ma_runprogram);
 
 QMutexLocker locker(&MutexMillTraj);
 
-WLModulePlanner *ModulePlanner=m_motDevice->getModulePlanner();
+WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
-if(!ModulePlanner) return 0;
+if(!ModulePlanner
+  ||isPause()) return 0;
 
 if(Flag.get(ma_runprogram)) // if run program
   {    
@@ -2681,7 +2751,7 @@ else
 {
 WLElementTraj ME=MillTraj.takeFirst();
 
-qDebug()<<"takeMovElement";
+qDebug()<<"takeMovElement"<<ME.index<<ME.str;
 
 if(ME.getType()!=WLElementTraj::nomov) 
 {
@@ -2943,7 +3013,7 @@ MutexShowTraj.unlock();
 void WLMillMachine::updateInput()
 {
 //QMutexLocker locker(&MutexInput);
-WLModuleAxis *ModuleAxis=m_motDevice->getModuleAxis();
+WLModuleAxis *ModuleAxis=motDevice->getModuleAxis();
 
 
 if(ModuleAxis->getInput(MAXIS_inEMGStop)->getCond()>1) emit changedEMG(ModuleAxis->getInput(MAXIS_inEMGStop));
@@ -3144,7 +3214,7 @@ if(func.isNull()) return;
 else
 if(func=="CONTINUE()") {
     Flag.reset(ma_continue);
-    m_motDevice->getModulePlanner()->startMov();
+    motDevice->getModulePlanner()->startMov();
     QTimer::singleShot(0,this,SLOT(updateMovBuf()));
    }
 else

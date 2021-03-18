@@ -8,6 +8,7 @@ m_viewPosition=0;
 
 setRealPosition(0);
 
+autoTypeMDrive=autoNo;
 //inicial();
 }
 
@@ -43,8 +44,8 @@ return m_viewPosition+getOffset();
   
 int WLMillDrive::setRealPosition(double pos)
 {
-qDebug()<<"setRealPosition "<<pos<<getAxisPosition()+getHalfBacklash()<<getAxisPosition()-getHalfBacklash();
-qDebug()<<(pos>(getAxisPosition()+getHalfBacklash()))<<((getAxisPosition()-getHalfBacklash())>pos);
+qDebug()<<getName()<<"setRealPosition "<<pos<<getAxisPosition()+getHalfBacklash()<<getAxisPosition()-getHalfBacklash();
+//qDebug()<<(pos>(getAxisPosition()+getHalfBacklash()))<<((getAxisPosition()-getHalfBacklash())>pos);
 
 if((pos-0.001f)>(getAxisPosition()+getHalfBacklash())
 	 ||(getAxisPosition()-getHalfBacklash())>(pos+0.001f))	
@@ -73,7 +74,7 @@ int WLMillDrive::setMot(double p)//движение в заданное положение в размере
 {
 double pos=getRealPosition();
 
-qDebug()<<"setMot MillDrive"<<p;
+qDebug()<<getName()<<"setMot MillDrive"<<p;
 
 if(pos!=p)
 {
@@ -135,7 +136,8 @@ else
 
 void WLMillDrive::updateMillDriveAuto()
 {
-if(isAuto())
+qDebug()<<getName()<<"updateMillDriveAuto()"<<isPause();
+if(isAutoDrive()&&!isPause())
 switch(autoTypeMDrive)
  {
  case autoTouchSD:   
@@ -147,7 +149,7 @@ switch(autoTypeMDrive)
 
 int WLMillDrive::updateTouch()
 {
-qDebug()<<"update touch motion "<<autoOperation;
+qDebug()<<getName()<<"update touch"<<autoOperation;
 
 if(autoTypeMDrive==autoTouchSD
  ||autoTypeMDrive==autoTouchEMG) 
@@ -175,12 +177,12 @@ switch(autoOperation)
 						  {
 						  autoOperation=4;
 						  //emgStop();  
-						  qDebug()<<"ch2/ch3"<<isLatch2()<<isLatch3();
+                          qDebug()<<getName()<<"ch2/ch3"<<isLatch2()<<isLatch3();
 					      }
 					     else
 						 if(!isMotion())
 						     {
-							 qDebug()<<"no ch2/ch3";
+                             qDebug()<<getName()<<"no ch2/ch3";
                              reset();
                              emit sendMessage(getName(),tr("no sensor signal (inORG)"),-212);
 							 }
@@ -199,7 +201,7 @@ return 1;
 void  WLMillDrive::setMovTouch(int dir,float _Ftouch,bool sd)
 {
 QMutexLocker locker(&MutexDrive);
-qDebug("setMovTouch");
+qDebug()<<getName()<<"setMovTouch";
 if(setAuto())
    {
    autoOperation=dir; 

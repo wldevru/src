@@ -97,9 +97,6 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 
 	initTableCorrectS();
 
-    connect(ui.buttonBox,SIGNAL(accepted()),SLOT(onAccept()));
-	connect(ui.buttonBox,SIGNAL(rejected()),SLOT(onReject()));
-
 	connect(ui.pbVerError,SIGNAL(clicked()),SLOT(onVerifyError()));
 
 	setModal(true);
@@ -138,15 +135,16 @@ if(str.isEmpty()) str=tr("No error!!!");
 QMessageBox::information(this, tr("Verify error"),str,QMessageBox::Ok);
 }
 
-void WLEditMillWidget::onAccept()
+void WLEditMillWidget::accept()
 {
-QString str;
+saveDataMill();
 
-if(!verifyError().isEmpty())
-    onVerifyError();
-  else
-    done(1);
+for(int i=1;i<ui.tabWidget->count();i++)    {
+  QDialog *Dialog=static_cast<QDialog*>(ui.tabWidget->widget(i));
+  Dialog->accept();
+  }
 
+QDialog::accept();
 }
 
 
@@ -191,7 +189,7 @@ for(int i=0;i<ui.twCorrectS->rowCount()&&i<correctSList.size();i++)
  }
 }
 
-bool WLEditMillWidget::saveData()
+bool WLEditMillWidget::saveDataMill()
 {
 bool ret=false;
 

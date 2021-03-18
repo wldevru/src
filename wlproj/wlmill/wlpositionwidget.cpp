@@ -48,7 +48,7 @@ WLPositionWidget::WLPositionWidget(WLMillMachine *_MillMachine,WLGProgram *_Prog
 
     connect(ui.cbExGCode->lineEdit(),SIGNAL(returnPressed()),this,SLOT(onExGCode()));
 
-    connect(ui.pbFindDrivePos,SIGNAL(clicked()),this,SLOT(onPBFindDrivePos()));
+    connect(ui.pbFindDrivePos,&QToolButton::clicked,[=](){MillMachine->goFindDrivePos();});
 
     connect(ui.pbReset,SIGNAL(clicked()),MillMachine,SLOT(reset()),Qt::DirectConnection);
 
@@ -236,7 +236,7 @@ horLayout->addWidget(TB100);
 
 sbFper = new QDoubleSpinBox(this);
 sbFper->setAlignment(Qt::AlignLeft);
-sbFper->setRange(0.1,300);
+sbFper->setRange(0,300);
 sbFper->setSingleStep(0.05);
 sbFper->setValue(100);
 sbFper->setPrefix("F:");
@@ -355,7 +355,7 @@ pbFast->setIconSize(m_buttonSize);
 pbFast->setSizePolicy(sizePolicy);
 
 connect(pbFast,&QToolButton::pressed,this,&WLPositionWidget::on_pbFast_pressed);
-connect(pbFast,&QToolButton::pressed,this,&WLPositionWidget::on_pbFast_released);
+connect(pbFast,&QToolButton::released,this,&WLPositionWidget::on_pbFast_released);
 
 horLayout->addWidget(pbFast);
 
@@ -373,7 +373,6 @@ connect(sbFper,SIGNAL(valueChanged(double)),MillMachine,SLOT(setPercentSpeed(dou
 
 horLayout->addWidget(sbFman);
 
-verLayoutEL->addLayout(horLayout);
 //ui.laElementControl->addLayout(horLayout);
 
 //horLayout=new QHBoxLayout(this);
@@ -394,6 +393,31 @@ TBP->setAutoRepeat(true);
 TBP->setSizePolicy(sizePolicy);
 connect(TBP,&QToolButton::clicked,this,&WLPositionWidget::on_pbPlusFman_pressed);
 horLayout->addWidget(TBP);
+
+verLayoutEL->addLayout(horLayout);
+
+horLayout=new QHBoxLayout(this);
+
+labelActivGCode = new QLabel(this);
+labelActivGCode->setFont(font);
+labelActivGCode->setText("GCode");
+labelActivGCode->setSizePolicy(sizePolicyE);
+labelActivGCode->setWordWrap(true);
+
+horLayout->addWidget(labelActivGCode);
+
+pbPause = new QToolButton(this);
+pbPause->setFont(font);
+pbPause->setIcon(QPixmap(":/data/icons/pause.png"));
+pbPause->setIconSize(m_buttonSize*2.5);
+pbPause->setSizePolicy(sizePolicy);
+pbPause->setCheckable(true);
+pbPause->setShortcut(Qt::Key_Space);
+
+horLayout->addWidget(pbPause);
+
+connect(MillMachine,&WLMillMachine::changedPause,pbPause,&QToolButton::setChecked);
+connect(pbPause,&QToolButton::toggled,MillMachine,[=](bool checked){MillMachine->Pause(checked);});
 
 verLayoutEL->addLayout(horLayout);
 }
@@ -423,7 +447,8 @@ focusElement=f;
 void WLPositionWidget::keyPressEvent ( QKeyEvent * event )
 {
 if(!event->isAutoRepeat())
-{
+{    
+qDebug()<<"WLPositionWidget press"<<event->key();
 switch(event->key())
    {
    case Qt::Key_Left:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(true);onPBAxis("X", -1,1);} break;
@@ -460,6 +485,8 @@ void WLPositionWidget::keyReleaseEvent ( QKeyEvent * event )
 {
 if(!event->isAutoRepeat())
 {
+qDebug()<<"WLPositionWidget release"<<event->key();
+
   switch(event->key())
   {
   case Qt::Key_Left:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);} break;
@@ -729,6 +756,7 @@ case 'J': on_pbMinusFman_pressed(); break;
 
 void WLPositionWidget::onPBAxis(QString name, int rot,bool press)
 {
+qDebug()<<name<<"onPBAxis"<<rot<<press;
 
 if(press)
     {
@@ -754,10 +782,6 @@ labelF->setData(MillMachine->getCurSpeed()*60);
 labelS->setData(MillMachine->getCurSOut());
 }
 
-void WLPositionWidget::onPBFindDrivePos()
-{
-MillMachine->goFindDrivePos();
-}
 
 void WLPositionWidget::onExGCode()
 {    
@@ -880,16 +904,16 @@ gALabelB->update();
 
 ui.pbRotSC->setText(QString::number(MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).a,'f',2));
 
-ui.labelActivGCode->setText(MillMachine->m_GCode.getActivGCodeString());
+labelActivGCode->setText(MillMachine->m_GCode.getActivGCodeString());
 
 
-if(MillMachine->m_motDevice->getModuleConnect())
- ui.labelConnect->setEnabled(MillMachine->m_motDevice->getModuleConnect()->isConnect());
+if(MillMachine->motDevice->getModuleConnect())
+ ui.labelConnect->setEnabled(MillMachine->motDevice->getModuleConnect()->isConnect());
 else
  ui.labelConnect->setEnabled(false);
 
-if(MillMachine->m_motDevice->getModuleConnect())
- ui.labelConnect->setEnabled(MillMachine->m_motDevice->getModuleConnect()->isConnect());
+if(MillMachine->motDevice->getModuleConnect())
+ ui.labelConnect->setEnabled(MillMachine->motDevice->getModuleConnect()->isConnect());
 else
  ui.labelConnect->setEnabled(false);
 
@@ -943,6 +967,9 @@ if(type==WLGAxisLabel::typeName)
 
  act=menuOper.addAction(tr("Reset Find"));
  connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->getDrive(nameDrive)->setTruPosition(false);});
+
+ act=menuOper.addAction(tr("Verify"));
+ connect(act, &QAction::triggered,this,[=](){MillMachine->goDriveVerify(nameDrive);});
 
  act=menuOper.addAction(tr("Teach"));
  connect(act, &QAction::triggered,this,[=](){onTeachAxis(nameDrive);});

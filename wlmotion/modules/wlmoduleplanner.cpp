@@ -451,8 +451,6 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Mutex.lock();
 
-qDebug()<<"readCommand MPlanner"<<Data.size();
-
 Stream>>ui1;
 
 switch(ui1)
@@ -486,6 +484,9 @@ switch(ui1)
 								
 	case  sendModule_prop: Stream>>ui1; 
                            m_sizeBuf=ui1;
+
+                           setReady(true);
+
                            update();
                            break;
 	case sendModule_error:   

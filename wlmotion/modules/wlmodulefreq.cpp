@@ -15,7 +15,9 @@ while(outFreq.isEmpty())
 
 bool WLModuleFreq::Init(int sizeOutFreq)
 {
-if(sizeOutFreq<1||outFreq.size()== sizeOutFreq) return false;
+if(sizeOutFreq<1
+ ||outFreq.size()== sizeOutFreq
+ ||isReady()) return false;
 
 WLFreq *freq;
 
@@ -76,6 +78,8 @@ case sendFreq_dataOut: Stream>>index;//index8
 case  sendModule_prop: Stream>>ui1;
 					                      
 					   Init(ui1);
+
+                       setReady(true);
                        break;
 
 case  sendModule_error:Stream>>ui1;

@@ -46,7 +46,7 @@ m_driveList.removeOne(this);
 
 int WLDrive::setPosition(double pos)
 {
-QMutexLocker locker1(&MutexDrivePosition);
+QMutexLocker locker(&MutexDrive);
 
 if(isMotion())
      {sendMessage(getFullName(),tr("error setting axis position"),-34);return -1;}
@@ -55,7 +55,7 @@ m_nowPosition.set(pos,dim);
 
 emit changedPosition(pos);
 
-qDebug()<<"setPosition()"<<getName()<<pos;
+qDebug()<<getName()<<"setPosition"<<pos;
 
 setTruPosition(false);
 
@@ -90,6 +90,8 @@ return false;
 bool WLDrive::setPad(dataPad pad,typeMParAxis type)
 {
 bool ret=true;
+
+qDebug()<<getName()<<"setPad"<<pad.toString()<<type;
 
 foreach(WLAxis *Axis,m_AxisList)
 {
@@ -126,19 +128,18 @@ return false;
 
 void WLDrive::updatePosition()
 {
-QMutexLocker locker(&MutexDrivePosition);
+QMutexLocker locker(&MutexDrive);
 }
 
 bool WLDrive::startMotion(float _Vmov)
 {
-qDebug()<<"startMotionDrive"<<getName()
-                            <<minPosition()
-                            <<maxPosition()
-                            <<position()<<">>"
-                            <<nextPosition();
+qDebug()<<getName()<<"startMotionDrive"
+                   <<minPosition()
+                   <<maxPosition()
+                   <<position()<<">>"
+                   <<nextPosition();
 
 QMutexLocker locker(&MutexDrive);
-QMutexLocker locker1(&MutexDrivePosition);
 
 if(!Flag.get(fl_activ)
   ||isMotion()
@@ -150,62 +151,63 @@ if(isAlarm()) {sendMessage(getFullName(),tr("drive controller has an error."),-3
 
 if(_Vmov>=0.0f)   m_Vmov=_Vmov;
 
-if(!isDone())
- {
- if(waitForStartMotion()<0) {sendMessage(getFullName(),tr("error when preparing for movement"),-32);return -1;}
- //if(!Flag.get(fl_enmov))    {sendMessage(Name(),tr("no permission for movement"),-15);return -1;}
+if(Flag.get(fl_velmode))
+{
+if(waitForStartMotion()<0) {sendMessage(getFullName(),tr("error when preparing for movement"),-32);return -1;}
 
- m_startPosition=position();
+m_startPosition=position();
 
- if(getAxis()->movPos(MASK_abs,nextPositionDrive().step,m_Vmov/dim.value))
-   { 
-   qDebug()<<"+"<<positionDrive().step<<">>"<<nextPositionDrive().step<<" F="<<m_Vmov/dim.value;
-   m_nowPosition.offset=m_nextPosition.offset;
-   //setMotion();
-   waitAfterStartMotion();
-   }
+if(getAxis()->movVel(Flag.get(fl_rot) ? MASK_dir:0,m_Vmov/dim.value))
+  {
+  qDebug()<<getName()<<"velMode"<<" F="<<m_Vmov/dim.value;
+  Flag.reset(fl_velmode);
+  waitAfterStartMotion();
+  }
+}
+else if(!isDone())
+      {
+      if(waitForStartMotion()<0) {sendMessage(getFullName(),tr("error when preparing for movement"),-32);return -1;}
 
- }
-else
- if(isInfinity())
- {
- if(getAxis()->movVel(Flag.get(fl_rot) ? MASK_dir:0,m_Vmov/dim.value))
-   {
-  // setMotion();
-   waitAfterStartMotion();
-   }
- }
- else
- {
- qDebug()<<"Error Drive start noActiv"<<m_name;
- emit finished();
- }
+      m_startPosition=position();
+
+      if(getAxis()->movPos(MASK_abs,nextPositionDrive().step,m_Vmov/dim.value))
+        {
+        qDebug()<<getName()<<"posMode"<<positionDrive().step<<">>"<<nextPositionDrive().step<<" F="<<m_Vmov/dim.value;
+        m_nowPosition.offset=m_nextPosition.offset;
+        waitAfterStartMotion();
+        }
+
+      }
+     else
+      {
+      qDebug()<<getName()<<"Error Drive start noActiv"<<m_name;
+      emit finished();
+      }
 
 if(isManual())
-    qDebug()<<"start manual";
+    qDebug()<<getName()<<"start manual mode";
+
 return true;
 }
 
 void WLDrive::reset()
 {
 QMutexLocker locker(&MutexDrive);
-qDebug()<<"WLDrive::reset"<<getName();
+qDebug()<<"WLDrive::reset()"<<getName();
 
 if(Flag.get(fl_auto)) emit autoFinished();
 
 resetAuto();
 
-//setMotion(false);
-
 Flag.reset(fl_activ
           |fl_auto
           |fl_wait
           |fl_interp
-          |fl_manual);
+          |fl_manual
+          |fl_velmode
+          |fl_pause);
 
 setVerifyPosition();
-
-updatePosition();
 
 m_nextPosition=m_nowPosition;
 
@@ -214,6 +216,8 @@ if(getAxis())
   getAxis()->reset();
   getAxis()->restoreDelaySCurve();//set default
   getAxis()->setKF(1.0);
+
+  if(isMotion()) getAxis()->sendGetDataAxis();
   }
 
 emit finished();
@@ -278,7 +282,9 @@ if(!isInfinity())
 if(calcForStartMotion()<0)  return -1;
 
 Flag.set(fl_rot,dir);
-Flag.set(fl_activ,true);
+Flag.set(fl_activ
+        |fl_velmode);
+
 return 1;
 }
 
@@ -386,39 +392,30 @@ return false;
 
 void WLDrive::setFinished()
 {
-qDebug()<<"Drive setFinished"<<getName();
+qDebug()<<getName()<<"setFinished"<<isMotion();
 
-QMutexLocker locker(&MutexDrive);
-//MutexDrive.lock();
-//if(!isMotion()) 	return;
+QMutexLocker  locker(&MutexDrive);
 
-//setMotion(false);
-/*
-if(isAuto()) 
-    {
-	//MutexDrive.unlock(); 
-	updateAuto();	
-    }
-*/
+if(isMotion()) return;
+
 waitAfterMotion();
 
 if(Flag.get(fl_manual))
  {
- Flag.set(fl_manual,0);
+ Flag.reset(fl_manual);
  setDone();
  }
 
-//if(isActiv())//если только активен то посылает сигналы
 if(isDone())   
   {
   Flag.set(fl_activ
 	      |fl_interp,0);
-  qDebug()<<"Finshed drive"<<getName()<<m_nowPosition.step;
+  qDebug()<<getName()<<"finshed"<<m_nowPosition.step;
   emit finished();
   }
 else
   {
-  qDebug()<<"Paused drive"<<getName()<<m_nowPosition.step<<m_nextPosition.step;
+  qDebug()<<getName()<<"paused"<<m_nowPosition.step<<m_nextPosition.step;
   emit paused();
   }
 }
@@ -427,7 +424,7 @@ else
 
 void WLDrive::startMovManual(bool _rot,double dist)
 {
-qDebug()<<"Start Manual"<<getName()<<_rot;
+qDebug()<<getName()<<"start Manual rot="<<_rot;//<<isMotion();
 
 if(isMotion()) 
    {
@@ -522,6 +519,7 @@ bool WLDrive::setVmov(double V)
 {
 if(V>=0)
 {
+qDebug()<<getName()<<"set Vmov="<<V;
 m_Vmov=V;
 
 return true;
@@ -536,6 +534,10 @@ if(getAxis())
  {
  if(Scur<getAxis()->getDelaySCurve())
        Scur=getAxis()->getDelaySCurve();
+
+ qDebug()<<getName()<<" Scur="<<Scur;
+
+ if(isMotion()) qDebug()<<"error setScurve"<<Scur;
 
  getAxis()->setDelaySCurve(Scur,false);
 
@@ -572,9 +574,11 @@ return false;
 
 void WLDrive::setInterp(bool set)
 {
-Flag.set(fl_interp,set);
-interPad=pad()->getData();
-
+if(distance()!=0)
+ {
+ Flag.set(fl_interp,set);
+ interPad=pad()->getData();
+ }
 }
 
 
@@ -668,14 +672,6 @@ for (int i=0;i<MAXSLAVEAXIS;i++)
 str.chop(1);
 
 stream.writeAttribute("ofstSlaveAxis",str);
-/*
-stream.writeAttribute("kSTCurve",     QString::number(getKSTCurve()));
-stream.writeAttribute("delaySCurve",  QString::number(getDelaySCurve()));
-
-stream.writeAttribute("typePulse",    QString::number(typePulse));
-stream.writeAttribute("outSDinv",     QString::number(outSDinv));
-*/
-
 stream.writeAttribute("feedVFind",     QString::number(feedVFind()));
 stream.writeAttribute("Pad",     m_Pad.toString());
 
@@ -758,11 +754,15 @@ bool WLDrive::startInterp()
 {
 QList <WLDrive*> Drives;
 
-qDebug()<<"startInterp";
+if(!isInterp()) return false;
+
+qDebug()<<getName()<<"startInterp";
 
 for(int i=0;i<m_driveList.size();i++)
-    {
-    if(m_driveList[i]->isInterp())
+    {    
+    if(m_driveList[i]->isInterp()
+    &&!m_driveList[i]->isMotion()
+    &&(m_driveList[i]->distance()!=0.0))
 		{
         if(m_driveList[i]->isWait())
           {
@@ -847,6 +847,7 @@ return true;
 
 void WLDrive::toStartAccel()
 {
+Flag.reset(fl_pause);
 getAxis()->acc();
 }
 
@@ -873,9 +874,9 @@ if((0.0f<per)&&(per<=100.0f))
  {
  manualPercent=per;
 
- qDebug()<<"setManualPercent"<<per<<isManual();
+ qDebug()<<getName()<<"setManualPercent"<<per<<isManual();
  if(isMotion()
-  //&&isManual()
+//&&isManual()
          ) setKSpeed(manualPercent/100.0f);
  }
 
@@ -884,16 +885,22 @@ if((0.0f<per)&&(per<=100.0f))
 
 void WLDrive::toSetKSpeed(float k)
 {
-   getAxis()->setKF(k);
+getAxis()->setKF(k);
 }
 
-void WLDrive::toStartDecel()   
+void WLDrive::toStartPause()
 {
-   getAxis()->dec();
+if(!isManual())
+ {
+ Flag.set(fl_pause);
+ getAxis()->pause();
+ }
 }
 
 void WLDrive::toStartStop()   
 {
+qDebug()<<getName()<<"toStartStop()";
+
 foreach(WLAxis *axis,getAxisList())
  {
  axis->sdStop();
@@ -909,17 +916,19 @@ if(isInterp())
    }
 else
  toStartAccel();
+
+QTimer::singleShot(10,this,SLOT(updateAuto()));
 }
 
-void WLDrive::startDecel()   
+void WLDrive::startPause()
 {
 if(isInterp())
    {
    for(int i=0;i<m_driveList.size();i++)
-       if(m_driveList[i]->isInterp())  m_driveList[i]->toStartDecel();
+       if(m_driveList[i]->isInterp())  m_driveList[i]->toStartPause();
    }
 else
- toStartDecel();
+ toStartPause();
 }
 
 void WLDrive::startStop(bool reset)
@@ -963,13 +972,25 @@ void WLDrive::updateInputs()
 {
 }
 
-void WLDrive::resets()
+void WLDrive::resetDrives()
 {
 for(int i=0;i<m_driveList.size();i++)
-        m_driveList[i]->reset();
+    m_driveList[i]->reset();
 }
 
-bool WLDrive::isActivs()
+void WLDrive::accelDrives()
+{
+for(int i=0;i<m_driveList.size();i++)
+        m_driveList[i]->startAccel();
+}
+
+void WLDrive::pauseDrives()
+{
+for(int i=0;i<m_driveList.size();i++)
+        m_driveList[i]->startPause();
+}
+
+bool WLDrive::isActivDrives()
 {
 bool ret=false;
 
@@ -1011,13 +1032,13 @@ QList<WLDrive *> WLDrive::getDriveList()
 return m_driveList;
 }
 
-void WLDrive::startStops(bool reset)
+void WLDrive::startStopDrives(bool reset)
 {
 foreach(WLDrive *drive,m_driveList)
           drive->startStop(reset);
 }
 
-void WLDrive::setMainPads()
+void WLDrive::setMainPadDrives()
 {
 foreach(WLDrive *drive,m_driveList)
            drive->setMainPad();
@@ -1139,49 +1160,67 @@ foreach(WLAxis *Axis,getAxisList())
 
 }
 
+void WLDrive::startTask()
+{
+ qDebug()<<getName()<<"startTask motion"<<isMotion()
+          <<"activ"<<isActiv()
+          <<"wait"<<isWait()
+          <<"auto"<<isAuto();
+
+if(isWait()) return;
+    else
+        if(startAuto()) return;
+        else
+            if(startInterp()) return;
+            else
+            {
+            setCurPad();
+            startMotion();
+            }
+}
+
 
 void WLDrive::updatePos(qint32 Pos)
 {
-QMutexLocker locker0(&MutexDrive);
-QMutexLocker locker1(&MutexDrivePosition);
+    QMutexLocker locker0(&MutexDrive);
 
-if(Flag.get(fl_setpos))
-  {
-  if(m_nowPosition.getStepI32L()==Pos)
+    if(Flag.get(fl_setpos))
     {
-    qDebug()<<"setPos complete"<<getName()<<Pos;
-    m_posLast=Pos;
-    Flag.set(fl_setpos,0); //позиция установлена
-    }
-  return;
-  }
-  else
-  {   
-   bool dir;
-
-   qint64 newPos=m_nowPosition.step;
-
-   newPos&=0xFFFFFFFF00000000;
-
-   newPos|=(quint32)Pos;
-
-   dir=isInfinity()? (Pos-m_posLast)>0: Pos>m_posLast;
-
-   if(dir)
-    {
-    if(m_posLast<0&&Pos>=0)
-      {
-      //qDebug()<<"+"<<getName()<<m_posLast<<Pos;
-      newPos+=(qint64)1<<32;
-      }
+        if(m_nowPosition.getStepI32L()==Pos)
+        {
+            qDebug()<<getName()<<"setPos finished"<<Pos<<position();
+            m_posLast=Pos;
+            Flag.reset(fl_setpos); //позиция установлена
+        }
+        return;
     }
     else
     {
-    if(m_posLast>=0&&Pos<0)
-      {
-      //qDebug()<<"-"<<getName()<<m_posLast<<Pos;
-      newPos-=(qint64)1<<32;
-      }
+        bool dir;
+
+        qint64 newPos=m_nowPosition.step;
+
+        newPos&=0xFFFFFFFF00000000;
+
+        newPos|=(quint32)Pos;
+
+        dir=isInfinity()? (Pos-m_posLast)>0: Pos>m_posLast;
+
+        if(dir)
+        {
+            if(m_posLast<0&&Pos>=0)
+            {
+                //qDebug()<<"+"<<getName()<<m_posLast<<Pos;
+                newPos+=(qint64)1<<32;
+            }
+        }
+        else
+        {
+            if(m_posLast>=0&&Pos<0)
+            {
+                //qDebug()<<"-"<<getName()<<m_posLast<<Pos;
+                newPos-=(qint64)1<<32;
+            }
     }
 
     if(m_nowPosition.step!=newPos)
@@ -1227,7 +1266,7 @@ getAxis()->addSyhData(drivePos.step);
 int WLDrive::setMovFind()  
 {
 QMutexLocker locker(&MutexDrive);
-qDebug("go Find");
+qDebug()<<getName()<<"go Find";
 if(setAuto())
    {
    setVerifyPosition(false);
@@ -1244,7 +1283,7 @@ return 0;
 int  WLDrive::setMovTeach()  
 {
 QMutexLocker locker(&MutexDrive);
-qDebug("go Teach");
+qDebug()<<getName()<<"go Teach";
 if(setAuto())
    {
    setVerifyPosition(false);
@@ -1258,10 +1297,28 @@ if(setAuto())
 return 1;
 }; 
 
+int  WLDrive::setMovVerify()
+{
+QMutexLocker locker(&MutexDrive);
+qDebug()<<getName()<<"go Verify";
+if(setAuto())
+   {
+   setVerifyPosition(false);
+   autoOperation=0;
+   autoTypeDrive=autoVerify;
+   return 1;
+   }
+   else
+   sendMessage(getFullName(),tr("movement setup error"),-10);
+
+return 1;
+};
+
 void WLDrive::updateAuto()
 {
-qDebug()<<"updateAuto Drive"<<isAutoDrive();
-if(isAutoDrive())
+qDebug()<<getName()<<"updateAuto"<<isAutoDrive();
+if(isAutoDrive()
+ &&!isPause())
  {
  qDebug()<<autoTypeDrive<<logicFindPos<<isMotion()<<isMotionSubAxis();
  switch(logicFindPos)
@@ -1382,26 +1439,35 @@ if(isAutoDrive())
                               m_posCount+=getLatch3Pos();
     
                               m_posCount/=4;
-							  
-    						  if(autoTypeDrive==autoTeach) 
-							      {
-                                  setOrgPosition(m_posCount);
-								  setTruPosition();
-								  reset();
-							      }
-    						  else	 
-    						     if(autoTypeDrive==autoFind)   
-							       {
-                                   corPosition(m_posCount);
-    					           setTruPosition();
 
-								   reset();
+                              switch(autoTypeDrive)
+                              {
+                              case autoTeach: setOrgPosition(m_posCount);
+                                              setTruPosition();
+                                              reset();
+                                              break;
+
+                              case autoFind: corPosition(m_posCount);
+                                             setTruPosition();
+                                             reset();
 								   
-								   if(logicFindPos==onlyORGHome)
-                                      {
-                                      if(setMovHome())  startMotion();
-								      }							        					      
-							       }
+                                             if(logicFindPos==onlyORGHome)
+                                               {
+                                               if(setMovHome())  startMotion();
+                                               }
+                                            break;
+
+                              case autoVerify: emit sendMessage(getFullName(),QString(tr("verify position:%1")
+                                                                                     .arg(m_posCount-getOrgPosition(),0,'f',3)),0);
+                                               reset();
+
+                                               if(logicFindPos==onlyORGHome)
+                                                 {
+                                                 if(setMovHome())  startMotion();
+                                                 }
+
+                                              break;
+                              }
 						      }
     					   else
     						  {			
@@ -1447,7 +1513,10 @@ if(isAutoDrive())
                              {                                
                              Axis->setLatchSrc(Axis->getInput(typePM)->getIndex());
                              Axis->resetLatch();
-                             Axis->setPos(getAxis()->getNowPos());
+
+                             if(Axis!=getAxis())
+                                Axis->setPos(getAxis()->getNowPos()); //set position subAxis
+
                              Axis->setKF(1.0);
                              }
 
@@ -1460,7 +1529,6 @@ if(isAutoDrive())
                                  Axis->movVel(MASK_disubaxis|0,m_feedVFind/dim.value);
 
                              }
-
                             //setMotion();
     						}
                            else
@@ -1483,61 +1551,75 @@ if(isAutoDrive())
                                qDebug()<<"latch"<<Axis->getLatch2();
                                }
 
-    						  if(autoTypeDrive==autoTeach) 
-								 {
-                                 setOrgPosition(m_posCount);
+                              switch (autoTypeDrive)
+                              {
+                              case autoTeach: setOrgPosition(m_posCount);
 
-                                 setTruPosition();
-								 reset();
-							     }
-    						  else	 
-    						  if(autoTypeDrive==autoFind)     
-								 {
-                                 corPosition(m_posCount);
+                                               for(quint8 i=1;i<getAxisList().size();i++)
+                                                {
+                                                setOffsetAxis(i,getAxis(i)->getLatch2()*dim.value-m_posCount);
+                                                }
 
-                                 if(!getSubAxisList().isEmpty())
-                                  {
-                                   double Offset=0;
+                                              setTruPosition();
+                                              reset();
+                                              break;
 
-                                   WLDrivePosition DPos;
+                              case autoFind:  corPosition(m_posCount);
 
-                                   for(quint8 i=1;i<getAxisList().size();i++)
-                                       {
-                                       DPos.set(getOffsetAxis(i),dim);
-                                       DPos.step-=(getAxis(i)->getNowPos()-getAxis(i)->getLatch2());
+                                              if(!getSubAxisList().isEmpty())
+                                               {
+                                                double Offset=0;
 
-                                       if(typePM==AXIS_inPEL)
-                                           {
-                                           if(Offset<DPos.step) Offset=DPos.step;;
-                                           }
-                                         else
-                                           {
-                                           if(Offset>DPos.step) Offset=DPos.step;;
-                                           }
-                                       }
-                                   qDebug()<<"Offset"<<Offset;
+                                                WLDrivePosition DPos;
 
-                                   for(quint8 i=0;i<getAxisList().size();i++)
-                                       {
-                                       DPos.set(getOffsetAxis(i),dim);
-                                       DPos.step-=(getAxis(i)->getNowPos()-getAxis(i)->getLatch2());
-                                       DPos.step-=Offset;
+                                                for(quint8 i=1;i<getAxisList().size();i++)
+                                                    {
+                                                    DPos.set(getOffsetAxis(i),dim);  //set offset position
+                                                    DPos.step-=(getAxis(i)->getNowPos()-getAxis(i)->getLatch2()); //move back to SD distance
 
-                                      if(DPos.getStepI32L()!=0)
-                                        {
-                                        qDebug()<<"Mov Axis"<<DPos.getStepI32L();
-                                        getAxis(i)->movPos(MASK_disubaxis,DPos.getStepI32L(),m_feedVFind/dim.value);
-                                        }
-                                      }
+                                                    if(((typePM==AXIS_inPEL)&&(Offset<DPos.step))
+                                                     ||((typePM==AXIS_inMEL)&&(Offset>DPos.step))) Offset=DPos.step; // find max/min offset
 
-                                 QTimer::singleShot(250,this,SLOT(updateAuto()));
-                                 }
-                                 else
-                                    {
-                                    goto endfind;
-                                    }
+                                                    }
+                                                qDebug()<<"Offset"<<Offset;
 
-                                }
+                                                for(quint8 i=0;i<getAxisList().size();i++)
+                                                    {
+                                                    DPos.set(getOffsetAxis(i),dim);
+                                                    DPos.step-=(getAxis(i)->getNowPos()-getAxis(i)->getLatch2());
+                                                    DPos.step-=Offset;
+
+                                                   if(DPos.getStepI32L()!=0)
+                                                     {
+                                                     qDebug()<<"Mov Axis"<<DPos.getStepI32L();
+                                                     getAxis(i)->movPos(MASK_disubaxis,DPos.getStepI32L(),m_feedVFind/dim.value);
+                                                     }
+                                                   }
+
+                                              QTimer::singleShot(250,this,SLOT(updateAuto()));
+                                              }
+                                              else
+                                                 {
+                                                 goto endfind;
+                                                 }
+                                             break;
+
+                               case autoVerify:
+                                               QString str;
+
+                                               for(quint8 i=0;i<getAxisList().size();i++)
+                                                   str+=QString(" axis%1:%2").arg(getAxis(i)->getIndex())
+                                                                             .arg(getAxis(i)->getLatch2()*dim.value
+                                                                              -getOffsetAxis(i)
+                                                                              -getOrgPosition(),0,'f',3);
+
+                                               emit sendMessage(getFullName(),str,1);
+
+                                               goto endfind;
+                                               break;
+
+                               }
+
     					      }
     					     else
     						  {	

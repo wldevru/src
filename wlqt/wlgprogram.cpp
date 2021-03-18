@@ -556,7 +556,8 @@ else
 
 if(GCode->isValid('R') //Если R для круга то перещитываем в I и J
  &&GCode->isGCode(80)){                      
-                      ok=GCode->calcCenterPointR(lastGPoint,GCode->getPointActivSC(curGPoint));
+                      ok=GCode->calcCenterPointR(GCode->getPointActivSC(lastGPoint)
+                                                ,GCode->getPointActivSC(curGPoint));
                       }
 if(!ok) return ok;
 
@@ -603,7 +604,7 @@ if(GCode->isValid('I')
   }
   else
   ok=ElementTraj.setCircleXY(GCode->getPointActivSC(lastGPoint)
-					        ,GCode->getPointIJK(lastGPoint)
+                            ,GCode->getPointActivSC(GCode->getPointIJK(lastGPoint))
 						    ,GCode->getPointActivSC(curGPoint)
 						    ,GCode->isGCode(3)
 							,GCode->getPlaneCirc());
@@ -649,6 +650,7 @@ bool WLGProgram::calcDrill(WLElementTraj ElementTraj,QList <WLElementTraj> &curL
 WLGPoint Point;
 
 float F=ElementTraj.getF();
+float R;
 
 Point=GCode->getPointGCode(lastGPoint);
 
@@ -657,9 +659,7 @@ if(GCode->isInitDrillPlane())  GCode->setDrillPlane(lastGPoint.z);
 ElementTraj.Type=WLElementTraj::line;
 ElementTraj.setFast(true);            //??????
 ElementTraj.startPoint=GCode->getPointActivSC(lastGPoint);
-
-ElementTraj.endPoint=GCode->getPointGCode(lastGPoint);
-ElementTraj.endPoint=GCode->getPointActivSC(ElementTraj.endPoint);
+ElementTraj.endPoint=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
 
 ElementTraj.endPoint.z=ElementTraj.startPoint.z;
 
@@ -673,7 +673,7 @@ ElementTraj.setFast(true);            //Быстро опускаемся
 ElementTraj.str=str+"//fast plane R";
 ElementTraj.startPoint=ElementTraj.endPoint;
 
-Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
+Point=GCode->getPointGCode(lastGPoint);
 Point.z=GCode->getValue('R')+GCode->getHofst();
 
 ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
@@ -697,7 +697,7 @@ if(GCode->isGCode(81))               //??????? ?????????
   ElementTraj.str=str+"//back R";
   ElementTraj.startPoint=ElementTraj.endPoint;
 
-  Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
+  Point=GCode->getPointGCode(lastGPoint);
 
   if(GCode->isGCode(99))
      Point.z=GCode->getValue('R')+GCode->getHofst();
@@ -725,14 +725,34 @@ if(GCode->isGCode(83))               //с подъёмами
   ElementTraj.str=str+"//drill to Z";
   ElementTraj.startPoint=ElementTraj.endPoint;
 
-  Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
+  Point=GCode->getPointGCode(lastGPoint);
   Point.z=GCode->getValue('R')+GCode->getHofst();
 
   for(int i=0;i<n;i++)
    {
+   if(i!=0){
+           ElementTraj.setFast(true);
+           ElementTraj.str=str+"//back to drill";
+           ElementTraj.startPoint=ElementTraj.endPoint;
+
+           Point=GCode->getPointGCode(lastGPoint);
+           Point.z=GCode->getValue('R')+GCode->getHofst();
+           Point.z-=step*(i+1-1);
+
+           if((GCode->getOffsetBackLongDrill()>0)
+            &&((Point.z+GCode->getOffsetBackLongDrill())<=R))
+               Point.z+=GCode->getOffsetBackLongDrill();
+
+           ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
+           curListTraj+=ElementTraj;
+           }
+
    ElementTraj.setF(F);            //сверлим
    ElementTraj.str=str+"//drill to Z";
    ElementTraj.startPoint=ElementTraj.endPoint;
+
+   Point=GCode->getPointGCode(lastGPoint);
+   Point.z=GCode->getValue('R')+GCode->getHofst();
 
    Point.z-=step*(i+1);
 
@@ -757,7 +777,7 @@ if(GCode->isGCode(83))               //с подъёмами
   ElementTraj.str=str+"//back R";
   ElementTraj.startPoint=ElementTraj.endPoint;
 
-  Point=GCode->getPointActivSC(GCode->getPointGCode(lastGPoint));
+  Point=GCode->getPointGCode(lastGPoint);
 
   if(GCode->isGCode(99))
      Point.z=GCode->getValue('R')+GCode->getHofst();

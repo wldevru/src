@@ -16,7 +16,6 @@ setGCode(02);
 setGCode(01);
 setGCode(54);
 setGCode(61);
-
 }
 
 WLGCode::WLGCode(WLGCodeData _data):WLGCode()
@@ -129,7 +128,7 @@ if((isGCode(43)||isGCode(44))
 
 void WLGCode::setData(const WLGCodeData &data)
 {
-    m_data = data;
+m_data = data;
 }
 
 WLGCodeData WLGCode::getData() const
@@ -172,7 +171,21 @@ return getDataTool(index).h;
 
 double WLGCode::getDTool(int index)
 {
-return index<0 ? getDataTool(getT()).d : getDataTool(index).d;
+    return index<0 ? getDataTool(getT()).d : getDataTool(index).d;
+}
+
+void WLGCode::writeXMLData(QXmlStreamWriter &stream)
+{
+stream.writeAttribute("ofstBackLongDrill",QString::number(getOffsetBackLongDrill()));
+stream.writeAttribute("strBeforeProgram",getStrBeforeProgram());
+stream.writeAttribute("strAfterProgram",getStrAfterProgram());
+}
+
+void WLGCode::readXMLData(QXmlStreamReader &stream)
+{
+setOffsetBackLongDrill(stream.attributes().value("ofstBackLongDrill").toDouble());
+setStrBeforeProgram(stream.attributes().value("strBeforeProgram").toString());
+setStrAfterProgram(stream.attributes().value("strAfterProgram").toString());
 }
 
 
@@ -351,7 +364,7 @@ switch(code)
            m_data.stopMode=false;
            break;
    //**13
-   case 80:m_data.GCode[80]=0;
+   case 80:m_data.GCode[80]=1;
            m_data.GCode[81]=0; //"Off Drill";
            m_data.GCode[83]=0;
 		   break;
@@ -702,19 +715,48 @@ WLGPoint WLGCode::getPointIJK(WLGPoint lastGPoint)
 WLGPoint newPoint=lastGPoint;
 
 if(m_data.absIJK)
- {
- if(isValid('I')) newPoint.x=getValue('I')*m_data.G51Scale.x;
- if(isValid('J')) newPoint.y=getValue('J')*m_data.G51Scale.y;
- if(isValid('K')) newPoint.z=getValue('K')*m_data.G51Scale.z;
+ { 
+ switch(getPlaneCirc())
+  {
+  case 17: if(isValid('I')) newPoint.x=getValue('I')*m_data.G51Scale.x;
+           if(isValid('J')) newPoint.y=getValue('J')*m_data.G51Scale.y;
+           if(isValid('K')) newPoint.z=getValue('K')*m_data.G51Scale.z;
+           break;
+
+  case 18: if(isValid('I')) newPoint.z=getValue('I')*m_data.G51Scale.z;
+           if(isValid('J')) newPoint.x=getValue('J')*m_data.G51Scale.x;
+           if(isValid('K')) newPoint.y=getValue('K')*m_data.G51Scale.y;
+           break;
+
+  case 19: if(isValid('I')) newPoint.y=getValue('I')*m_data.G51Scale.y;
+           if(isValid('J')) newPoint.z=getValue('J')*m_data.G51Scale.z;
+           if(isValid('K')) newPoint.x=getValue('K')*m_data.G51Scale.x;
+           break;
+  }
+
  }
 else
  {
- if(isValid('I')) newPoint.x+=getValue('I')*m_data.G51Scale.x;
- if(isValid('J')) newPoint.y+=getValue('J')*m_data.G51Scale.y;
- if(isValid('K')) newPoint.z+=getValue('K')*m_data.G51Scale.z;
+ switch(getPlaneCirc())
+  {
+  case 17: if(isValid('I')) newPoint.x+=getValue('I')*m_data.G51Scale.x;
+           if(isValid('J')) newPoint.y+=getValue('J')*m_data.G51Scale.y;
+           if(isValid('K')) newPoint.z+=getValue('K')*m_data.G51Scale.z;
+           break;
+
+  case 18: if(isValid('I')) newPoint.z+=getValue('I')*m_data.G51Scale.z;
+           if(isValid('J')) newPoint.x+=getValue('J')*m_data.G51Scale.x;
+           if(isValid('K')) newPoint.y+=getValue('K')*m_data.G51Scale.y;
+           break;
+
+  case 19: if(isValid('I')) newPoint.y+=getValue('I')*m_data.G51Scale.y;
+           if(isValid('J')) newPoint.z+=getValue('J')*m_data.G51Scale.z;
+           if(isValid('K')) newPoint.x+=getValue('K')*m_data.G51Scale.x;
+           break;
+  }
  }
 
-return getPointActivSC(newPoint);
+return newPoint;
 }
 
 WLGPoint WLGCode::getPointG28(WLGPoint lastGPoint)
@@ -874,17 +916,13 @@ bool WLGCode::calcCenterPointR(WLGPoint startGPoint,WLGPoint endGPoint)
 //qDebug()<<"calcIJfromR";
 WL3DPoint startPoint;
 WL3DPoint   endPoint;
+const int plane=getPlaneCirc();
 
-startPoint.x=startGPoint.x;
-startPoint.y=startGPoint.y;
-startPoint.z=startGPoint.z;
-
-endPoint.x=endGPoint.x;
-endPoint.y=endGPoint.y;
-endPoint.z=endGPoint.z;
+startPoint=WLGCode::convertPlane(startGPoint,plane,true).to3D();
+  endPoint=WLGCode::convertPlane(endGPoint,plane,true).to3D();
 
 WL3DPoint O=(endPoint+startPoint)/2;//Находим среднюю точку
-WL3DPoint C=(endPoint-O);                  //Находим вектор от средней точки к концу
+WL3DPoint C=(endPoint-O);          //Находим вектор от средней точки к концу
 WL3DPoint N,Pr;
 
 if(!isValid('R')) return false;
@@ -912,9 +950,15 @@ if(Rnq<0) return false;
 
 // qDebug()<<"x"<<O.x<<" y"<<O.y<<" Rnq="<<Rnq;
 
- O+=(C*N).normalize()*sqrt(Rnq)//находим перпендикуляр и прибавляем к средней точке
-    -startPoint;        //находим разницу от начала к центру
- //qDebug()<<"x"<<O.x<<" y"<<O.y;
+O+=(C*N).normalize()*sqrt(Rnq)-startPoint; //находим разницу от начала к центру если не абс положение;//находим перпендикуляр и прибавляем к средней точке
+
+if(m_data.absIJK){
+ WLGPoint GO=WLGCode::convertPlane(WLGPoint(O),plane,false);
+ GO=GO+startGPoint;
+ GO=getPointActivSC(GO,true);
+ O=WLGCode::convertPlane(GO,plane,true).to3D();
+ }
+
 setValue('I',O.x);//устанавливаем величины
 setValue('J',O.y);
 

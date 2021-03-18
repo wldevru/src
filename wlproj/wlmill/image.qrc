@@ -45,5 +45,6 @@
         <file>data/icons/refresh.png</file>
         <file>data/icons/tracktext.png</file>
         <file>data/icons/HT.png</file>
+        <file>data/icons/logoWLMill.png</file>
     </qresource>
 </RCC>

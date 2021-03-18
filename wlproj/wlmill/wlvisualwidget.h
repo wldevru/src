@@ -184,10 +184,6 @@ private slots :
     void  resetProgramBuffer() {lastSizeSPsize=0;}
     void  placeVisualElements();
 
-
-    void on_tbZoomIn()  {zoomView(m_lastMousePos,-50);}
-    void on_tbZoomOut() {zoomView(m_lastMousePos,50);}
-
     void on_TButtonRot();
 
 public slots:
@@ -219,9 +215,7 @@ public slots:
     // QWidget interface
 protected:
    void showEvent(QShowEvent *event);
-
-protected:
-    void resizeEvent(QResizeEvent *event);
+   void resizeEvent(QResizeEvent *event);
 };
 
 #endif // WLVISUALWIDGET_H

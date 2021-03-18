@@ -40,7 +40,6 @@
 #define sendDev_UID      102 //send uid
 #define sendDev_status   103 //send status
 #define sendDev_version  104 //send version
-#define sendDev_versionProtocol 105//send version protocol
 
 #define errorDevice_nomodule 20
 
@@ -51,7 +50,7 @@
  #define UDPPORT 2020
 #endif
 
-#define VERSION_PROTOCOL 0x0100
+#define WLM_PROTOCOL 0x0001
 
 const QString errorDevice("0,no error\
 ,20,no module");
@@ -82,7 +81,7 @@ public:
 
     enum flag{fl_openconnect = 1<<0
              ,fl_connect = 1<<1
-             ,fl_ready   = 1<<2
+            // ,fl_ready   = 1<<2
              ,fl_waitack = 1<<3};
 
 	 WLDevice();
@@ -92,7 +91,6 @@ public:
 
 
 private:
-
     QList <WLModule*> m_modules;
 
     WLDeviceInfo m_deviceInfo;
@@ -133,7 +131,7 @@ private:
 
 public:
 
-bool isValidProtocol() {return m_versionProtocol==VERSION_PROTOCOL;}
+bool isValidProtocol() {return m_versionProtocol==WLM_PROTOCOL;}
 
 bool initSerialPort(QString portName="");
 bool initUdpSocket(QHostAddress HA);
@@ -155,7 +153,7 @@ bool initFromFile(QString nameFile);
 bool writeToFile(QString nameFile);
 bool writeToDir(QString dir) {return writeToFile(dir+"\\"+getNameDevice()+".xml");}
 
-bool isReady()   {return Flags.get(fl_ready);}
+//bool isReady()   {return Flags.get(fl_ready);}
 bool isOpenConnect() {return Flags.get(fl_openconnect);}
 bool isConnect() {return Flags.get(fl_connect);}
 
@@ -182,6 +180,7 @@ public:
 private slots:	
 
 void sendEthData();
+void updateReady();
 
 virtual	void readSlot();
 
@@ -212,7 +211,6 @@ signals:
 
     void changedConnect(bool);
     void changedModules(int);
-    void changedReady(bool);
     void changedProp(QString);
     void changedStatus(statusDevice);
     void changedUID96(QString);

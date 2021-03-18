@@ -13,15 +13,15 @@ wait();
 
 void WLMachine::SDStop()
 {
-WLDrive::startStops(true);
+WLDrive::startStopDrives(true);
 }
 
 
 void WLMachine::goDriveManual(QString nameDrive,int IncDec,float step)
 {
-qDebug()<<"go drive Manual "<<IncDec<<step;
+qDebug()<<nameDrive<<"goDriveManual"<<IncDec<<step;
 
-if(IncDec!=0&&!verifyReadyMotion()) return;
+if(IncDec!=0&&!verifyReadyManualMotion()) return;
 
 WLDrive *drive=WLDrive::getDrive(nameDrive);
 
@@ -82,7 +82,7 @@ return 1;
 
 void WLMachine::goFindDrivePos()
 {
-if(!verifyReadyMotion()) return;
+if(!verifyReadyManualMotion()) return;
 
 if(isAuto())
    {
@@ -90,7 +90,7 @@ if(isAuto())
    }
 else
  {
- WLDrive::resets();
+ WLDrive::resetDrives();
 
  m_listFindDrivePos=m_strFindDrivePos.split(",");
 
@@ -112,11 +112,19 @@ foreach(WLDrive *Drive,WLDrive::getDriveList())
 }
 }
 
+void WLMachine::setReady(bool ready)
+{
+if(m_ready!=ready){
+     m_ready=ready;
+     emit changedReady(m_ready);
+     }
+}
+
 void WLMachine::goDriveFind(QString nameDrive)
 {
 qDebug()<<"goDriveFind"<<nameDrive;
 
-if(!verifyReadyMotion()) {return;}
+if(!verifyReadyAutoMotion()) {return;}
 
 WLDrive *drive=WLDrive::getDrive(nameDrive);
 
@@ -142,7 +150,7 @@ else
 void WLMachine::goDriveTeach(QString nameDrive)
 {
 qDebug()<<"goDriveTeach"<<nameDrive;
-if(!verifyReadyMotion()) {return;}
+if(!verifyReadyAutoMotion()) {return;}
 
 WLDrive *drive=WLDrive::getDrive(nameDrive);
 
@@ -154,21 +162,17 @@ if(drive)
  }
 }
 
-
-/*
-void WLMachine::goDriveTouch(QString nameDrive,int dir,float F)
+void WLMachine::goDriveVerify(QString nameDrive)
 {
-qDebug()<<"goDriveTouch"<<nameDrive;
+qDebug()<<"goDriveVerify"<<nameDrive;
+if(!verifyReadyAutoMotion()) {return;}
 
-if(!verifyReadyMotion()) {return;}
+WLDrive *drive=WLDrive::getDrive(nameDrive);
 
-WLMillDrive *Drive=getDrive(nameDrive,true);
-
-if(Drive)
-{
-Drive->reset();
-
-Drive->setMovTouch(dir,F);
-Drive->startTask();
+if(drive)
+ {
+ drive->reset();
+ drive->setMovVerify();
+ drive->startTask();
+ }
 }
-}*/
