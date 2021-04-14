@@ -106,6 +106,11 @@ foreach(WLAIOPut *aioput,Outputs)
        }
 }
 
+void WLModuleAIOPut::backup()
+{
+
+}
+
 void  WLModuleAIOPut::readCommand(QByteArray Data)
 {
 quint8 index,ui1,ui2;

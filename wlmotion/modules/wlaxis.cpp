@@ -28,6 +28,7 @@ m_latchPos3=0;
 error=0;
 
 typePulse=AXIS_pulse_SD;
+outSDinv=0;
 
 homePosition=0;
 orgSize=100;
@@ -168,7 +169,7 @@ setOutput(AXIS_outENB,index);
 bool WLAxis::setTypePulse(typePulseAxis type,quint8 _SDinv)
 {
 typePulse=type;
-outSDinv=_SDinv;
+outSDinv=_SDinv&(MAF_invStep|MAF_invDir);
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -176,7 +177,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_setTypePulse<<getIndex()<<((((quint8)type)<<4)|outSDinv);
+Stream<<(quint8)comAxis_setTypePulse<<getIndex()<<((((quint8)typePulse)<<4)|outSDinv);
 
 emit sendCommand(data);
 return true;
@@ -262,6 +263,8 @@ return true;
 
 bool WLAxis::setModeSub(quint8 imasterAxis)
 {
+m_iMasterAxis=imasterAxis;
+
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 
@@ -273,6 +276,37 @@ Stream<<(quint8)comAxis_setModeSub<<getIndex()<<imasterAxis;
 emit sendCommand(data);
 return true;
 }
+
+void WLAxis::update()
+{
+sendGetDataAxis();
+}
+
+void WLAxis::backup()
+{
+setEnable(isEnable());
+setTypePulse((typePulseAxis)getTypePulse(),getOutSDInv());
+
+setInORG(getInput(AXIS_inORG)->getIndex());
+setInPEL(getInput(AXIS_inPEL)->getIndex());
+setInMEL(getInput(AXIS_inMEL)->getIndex());
+setInALM(getInput(AXIS_inALM)->getIndex());
+
+setActIn(AXIS_inPEL,getActIn(AXIS_inPEL));
+setActIn(AXIS_inMEL,getActIn(AXIS_inMEL));
+setActIn(AXIS_inALM,getActIn(AXIS_inALM));
+
+setOutENB(getOutput(AXIS_outENB)->getIndex());
+setOutRALM(getOutput(AXIS_outRALM)->getIndex());
+
+setMinMaxPos(getMinPos(),getMaxPos());
+setKGear(getKGear());
+setDelaySCurve(getDelaySCurve());
+
+if(getMode()==AXIS_sub) setModeSub(m_iMasterAxis);
+}
+
+
 
 bool WLAxis::setInput(typeInputAxis type,quint8 num)
 {

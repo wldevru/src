@@ -19,7 +19,7 @@ WLMessManager::WLMessManager(QWidget *parent)
 	updateFlash();	
 
     ui.label->setVisible(false);
-
+    ui.status->setVisible(false);
 }
 
 WLMessManager::~WLMessManager()

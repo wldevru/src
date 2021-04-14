@@ -17,12 +17,16 @@ int main(int argc, char *argv[])
 
     a.installTranslator(&translator);
 
-   QTextCodec *codec = QTextCodec::codecForName("UTF-8"); //Windows-1251
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8"); //Windows-1251
 
     QTextCodec::setCodecForLocale(codec);
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // DPI support
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps); //HiDPI pixmaps
+
+   #ifndef QT_DEBUG
+    WLLog::getInstance()->setEnableDebug(true);
+   #endif
 
     WLMill w;
     w.show();

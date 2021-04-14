@@ -72,6 +72,9 @@ public slots:
 virtual void reset() {}
 virtual void callStatus() {}
 
+virtual void update() {} //get current data
+virtual void backup() {} //backup current data
+
 public:
 virtual void writeXMLData(QXmlStreamWriter &) {}
 virtual void  readXMLData(QXmlStreamReader &) {}

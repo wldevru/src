@@ -60,6 +60,8 @@ public slots:
     void  setMessage(QString txt,int code) {setMessage(txt,"",code);};
     void  setMessage(QString txt)          {setMessage(txt,"",0);}
 
+    void setState(bool en) {ui.status->setEnabled(en);}
+
 signals:
     void saveLog(QString,QString);
 

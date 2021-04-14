@@ -25,14 +25,16 @@ public:
 QString getDirLog()               {return m_dirLog;}
 
 private:
-    QMutex m_mutex;
+     QMutex m_mutex;
     QString m_dirLog;
 
  static QMutex debugMutex;
 	
 public slots:
     void writeLog(QString Name,QString Data);
+
     void setEnableDebug(bool en);
+    void clearDebug();
 
 signals:
 
@@ -52,6 +54,7 @@ public:
   static QString getDirDebug()             {return QCoreApplication::applicationDirPath()+"/debug/";;}
 
   static void saveDebugFile(QString dir="",QString comment="");
+
   static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString& txt);
   static bool isEnableDebug() {return enableDebug;}
 };

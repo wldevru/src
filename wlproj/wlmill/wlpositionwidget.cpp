@@ -106,6 +106,8 @@ setFocusElement('J');
 
 ui.pbOnMachine->setBaseSize(m_buttonSize);
 
+//ui.labelConnect->setVisible(false);
+
 }
 
 WLPositionWidget::~WLPositionWidget()
@@ -946,11 +948,16 @@ if(type==WLGAxisLabel::typeName)
  QMenu menu(this);
  QAction *act;
 
- act=menu.addAction(tr("0"));
+ QMenu menuPos(this);
+ menuPos.setTitle(tr("position"));
+
+ act=menuPos.addAction(tr("0"));
  connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->setCurPositionSC(nameDrive,0);});
 
- act=menu.addAction(tr("1/2"));
+ act=menuPos.addAction(tr("1/2"));
  connect(act, &QAction::triggered,MillMachine,[=](){MillMachine->setCurPositionSC(nameDrive,MillMachine->getCurPositionSC(nameDrive)/2);});
+
+ menu.addMenu(&menuPos);
 
  if(nameDrive=="Z")
  {

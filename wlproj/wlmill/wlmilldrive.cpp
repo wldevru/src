@@ -1,7 +1,7 @@
 #include "wlmilldrive.h"
 
-WLMillDrive::WLMillDrive(QString name)
-    : WLDrive(name)
+WLMillDrive::WLMillDrive(QString _name,WLModuleAxis *_MAxis)
+    : WLDrive(_name,_MAxis)
 {
 m_halfBacklash=0;
 m_viewPosition=0;

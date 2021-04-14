@@ -43,8 +43,8 @@ public:
         switch(role)
         {
         case Qt::DisplayRole:         if(index.column()==0)
-                                               ret=m_input ? m_moduleAIOPut->getInput(index.row())->value()
-                                                            :m_moduleAIOPut->getOutput(index.row())->value();
+                                               ret=m_input ? m_moduleAIOPut->getInput(index.row())->getValue()
+                                                            :m_moduleAIOPut->getOutput(index.row())->getValue();
 
                                       break;
 
@@ -253,8 +253,8 @@ public:
                                   break;
         case Qt::DisplayRole:         switch(index.column())
                                       {                                      
-                                      case 0: ret=QString::number(m_modulePWM->getOutPWM(index.row())->value(),'f',3);break;
-                                      case 1: ret=QString::number(m_modulePWM->getOutPWM(index.row())->freq(),'f',2)+"Hz";break;
+                                      case 0: ret=QString::number(m_modulePWM->getOutPWM(index.row())->getValue(),'f',3);break;
+                                      case 1: ret=QString::number(m_modulePWM->getOutPWM(index.row())->getFreq(),'f',2)+"Hz";break;
                                       }
                                       break;
 

@@ -151,11 +151,12 @@ m_lastNameProgram=m_GProgram->getNameFile();
 if(m_GProgram->getElementCount()<20000)
  {
  int pos=ui.textProgram->textCursor().position();
+ QString txt=m_GProgram->getTextProgram();
 
  ui.stackedWidget->setCurrentIndex(1);
  ui.textProgram->setEnabled(true);
- ui.textProgram->blockSignals(true);
- ui.textProgram->setPlainText(m_GProgram->getTextProgram());
+ ui.textProgram->blockSignals(true); 
+ ui.textProgram->setPlainText(txt);
  ui.textProgram->blockSignals(false); 
  //QTimer::singleShot(100,this,SLOT(saveTextProgram()));
 
@@ -232,7 +233,6 @@ void WLGProgramWidget::onChangedTextProgram()
 qDebug()<<"onChangedTextProgram";
 if(ui.textProgram->isEnabled()&&(m_changedProgram==false))
 	{
-	qDebug()<<"send";
 	emit changed(m_changedProgram=true);
     }
 }
@@ -260,14 +260,16 @@ iEditElement=iElement;
   if(m_changedProgram) return;
 
   int pos=0;
+
   QTextCursor cursor=ui.textProgram->textCursor();
 
   ui.textProgram->setFocus();
 
-  if(iElement==0)
+  if(iElement==0){
      pos=0;
-  else
+    }else{
      pos= m_GProgram->indexData[iElement-1].offsetInFile;
+     }
 
 
   cursor.setPosition(pos);
@@ -275,7 +277,7 @@ iEditElement=iElement;
   cursor.select(QTextCursor::LineUnderCursor);
 
   blockSignals(true);
-   ui.textProgram->setTextCursor(cursor);
+  ui.textProgram->setTextCursor(cursor);
   blockSignals(false);
  }
  else
@@ -289,14 +291,12 @@ void WLGProgramWidget::onChangedPositionTextProgram()
 {
 QTextCursor cursor=ui.textProgram->textCursor();
 int posF=cursor.position();
-int pos=0;
 
 if(!m_changedProgram)
 for(int i=0;i<m_GProgram->getElementCount();i++)
-     {			 
-	 if(posF<=(m_GProgram->indexData[i].offsetInFile-1)) 
-	    {
-	    qDebug()<<"onChangedPositionTextProgram()"<<posF<<(m_GProgram->indexData[i].offsetInFile-1);
+     {
+     if(posF<=(m_GProgram->indexData[i].offsetInFile-1))
+	    {        
         iEditElement=i;
         emit changedEditElement(iEditElement);
 		break;
@@ -311,7 +311,7 @@ if(ui.listProgram->count()==0) return;
 ui.listProgram->blockSignals(true);
 
 QListWidgetItem *item=ui.listProgram->currentItem();
-qDebug()<<"ui.listProgram->count()"<<ui.listProgram->count();
+//qDebug()<<"ui.listProgram->count()"<<ui.listProgram->count();
 if(ui.listProgram->item(ui.listProgram->count()-1)==item)
   {
   if((m_endIProgram+1)<(m_GProgram->getElementCount()))

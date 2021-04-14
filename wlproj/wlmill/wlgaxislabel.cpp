@@ -14,9 +14,13 @@ setToolTip(tr("press for edit"));
 
 void WLGAxisLabel::setDrive(WLMillDrive *_drive)
 {
+//if(m_drive)
+
 m_drive=_drive;
 
 setVisible(m_drive ? true : false);
+
+//connect()
 }
 
 void WLGAxisLabel::setGCode(WLGCode *_gcode)

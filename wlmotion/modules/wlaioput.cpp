@@ -95,6 +95,19 @@ Stream<<(quint8)comAIOPut_setDataOutput
 emit sendCommand(data);
 }
 
+void WLAIOPut::update()
+{
+sendGetData();
+}
+
+void WLAIOPut::backup()
+{
+setInv(isInv());
+
+if(!isInput())
+    setValue(getValue());
+}
+
 
 void WLAIOPut::writeXMLData(QXmlStreamWriter &stream)
 {

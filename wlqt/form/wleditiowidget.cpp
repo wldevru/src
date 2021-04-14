@@ -219,7 +219,7 @@ void WLEditIOWidget::onActSetFreq()
 {
 WLEnterNum EN(this);
 
-EN.setMinMaxNow(1,30000, getPWM()->freq());
+EN.setMinMaxNow(1,30000, getPWM()->getFreq());
 EN.setLabel(tr("Eneter Frequency:"));
 EN.setSuffix(tr("Hz"));
 
@@ -286,7 +286,7 @@ if(!m_Module) return;
        actTog->setCheckable(true);
        actTog->setChecked(getPWM()->isInv());
 
-       menu.addAction("F:"+QString::number(getPWM()->freq())+"Hz",this,SLOT(onActSetFreq()));
+       menu.addAction("F:"+QString::number(getPWM()->getFreq())+"Hz",this,SLOT(onActSetFreq()));
        }
 
 

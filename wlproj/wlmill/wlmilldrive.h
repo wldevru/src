@@ -15,7 +15,7 @@ private:
 		  autoTouchEMG
           };
 public:
-    WLMillDrive(QString name="");
+    WLMillDrive(QString name,WLModuleAxis *_MAxis);
 	~WLMillDrive();
 
 double getViewPosition();

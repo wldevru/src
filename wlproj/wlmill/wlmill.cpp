@@ -69,9 +69,18 @@ WLMill::WLMill(QWidget *parent)
     connect(MillMachine,&WLMillMachine::changedReady,this,&WLMill::readyMachine);
     MillMachine->start();
 
+    tabWidget = new QTabWidget(this);
+
     VisualWidget=new WLVisualWidget(Program,MillMachine);
 
-    setCentralWidget(VisualWidget);
+    tabWidget->addTab(VisualWidget,tr("Visual"));
+
+    #ifdef DEF_CAMERA
+    camera = new WLCamera(this);
+    tabWidget->addTab(camera,tr("Camera"));
+    #endif
+
+    setCentralWidget(tabWidget);
 
     Log = new WLLog(this);
 
@@ -94,10 +103,6 @@ WLMill::WLMill(QWidget *parent)
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::West);
     setTabPosition(Qt::TopDockWidgetArea,QTabWidget::South);
     setTabPosition(Qt::BottomDockWidgetArea,QTabWidget::North);
-
-    WLLog::getInstance()->setEnableDebug(true);
-
-
 }
 
 
@@ -459,6 +464,7 @@ MHelp->addAction(tr("Device"),this,SLOT(openManualDevice()));
 MHelp->addAction(tr("about WLMill"),this,SLOT(about()));
 MHelp->addAction(tr("Qt"),qApp,SLOT(aboutQt()));///??
 MHelp->addAction(tr("save debug file"),this,SLOT(onSaveDebugFile()));///??
+MHelp->addAction(tr("clear debug file"),WLLog::getInstance(),SLOT(clearDebug()));///??
 
 MenuBar->addMenu(MHelp);
 
@@ -629,7 +635,7 @@ QMessageBox::information(this, tr("Stop error"),Pstr,QMessageBox::Ok);
 
 WLMill::~WLMill()
 {
-qDebug("DELETE WHITE");
+qDebug("DELETE WLMill");
 MillMachine->reset();
 
 EVMScript->quit();
@@ -644,7 +650,7 @@ delete Program;
 delete MillMachine;
 delete EVMScript;
 
-qDebug("DELETE WHITE END");
+qDebug("WLMill END");
 }
 
 void WLMill::onEditDrive(QString nameDrive)
@@ -681,7 +687,7 @@ EditMill.show();
 
 if(EditMill.exec())
    {
-   if(EditMill.saveDataMill())
+   if(EditMill.getNeedClose())
     {
     QMessageBox::information(this,tr("Attention"),tr("Please restart WLMill"));
     close();
@@ -741,6 +747,7 @@ void WLMill::onEditScript()
 {
 WLEditText EditText;
 WLMCodeSH  codeSH(EditText.getDocument());
+
 EditText.setText(EVMScript->getCode());
 EditText.setLabel(tr("Please modify:"));
 
@@ -955,7 +962,7 @@ switch(QMessageBox::question(this, tr("Confirmation:"),
 	   QMessageBox::Yes|QMessageBox::No))
 	    {
 		
-        case QMessageBox::Yes:     qDebug()<<"exit";
+        case QMessageBox::Yes:     qDebug()<<"WLMill close";
                                    saveDataState();
 			                       MillMachine->setOff(true);
 			                       break;
@@ -977,7 +984,8 @@ Q_UNUSED(event)
 	
 void WLMill::readyMachine()
 {	
-qDebug()<<"readyMachine";
+qDebug()<<"WLMill::readyMachine() <<<";
+
 loadConfig();
 
 createMenuBar();
@@ -992,6 +1000,15 @@ loadDataState();
 connect(MillMachine->getMotionDevice(),SIGNAL(changedVersion(quint32)),SLOT(updateTitle()));
 connect(this,SIGNAL(changedLife()),SLOT(updateTitle()));
 
+if(MillMachine->getMotionDevice()->getModuleConnect())
+{
+connect(MillMachine->getMotionDevice()->getModuleConnect()
+       ,&WLModuleConnect::changedConnect
+       ,MessManager,&WLMessManager::setState);
+
+MessManager->setState(MillMachine->getMotionDevice()->getModuleConnect()->isConnect());
+}
+
 updateTitle();
 
 if(MillMachine->getMotionDevice()->getUID96().isEmpty())
@@ -999,7 +1016,7 @@ if(MillMachine->getMotionDevice()->getUID96().isEmpty())
 
 setEnabled(true);
 
-WLLog::getInstance()->setEnableDebug(true);
+qDebug()<<"WLMill::readyMachine() >>>";
 }
 
 void WLMill::onGoHome()

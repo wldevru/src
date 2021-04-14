@@ -70,16 +70,18 @@ return index<getSizeOutPWM() ? outPWM[index]: nullptr;
 void WLModulePWM::update()
 {
 foreach(WLPWM *pwm,outPWM)
-  {
-  pwm->sendGetData();
-  }
+   pwm->update();
+}
+
+void WLModulePWM::backup()
+{
+foreach(WLPWM *pwm,outPWM)
+  pwm->backup();
 }
 
 void  WLModulePWM::readCommand(QByteArray Data)
 {
 quint8 index,ui1;
-
-float f1,f2;
 
 QDataStream Stream(&Data,QIODevice::ReadOnly);
 

@@ -3,11 +3,10 @@
 
 QList<WLDrive*> WLDrive::m_driveList;
 
-WLDrive::WLDrive(QString _nameDrive)
+WLDrive::WLDrive(QString _nameDrive,WLModuleAxis *_MAxis)
 {
 m_name = _nameDrive;
-
-setModuleAxis(nullptr);
+m_ModuleAxis=_MAxis;
 
 for(int i=0;i<MAXSLAVEAXIS; i++)  m_ofstSlaveAxis[i]=0;
 
@@ -55,7 +54,7 @@ m_nowPosition.set(pos,dim);
 
 emit changedPosition(pos);
 
-qDebug()<<getName()<<"setPosition"<<pos;
+qDebug()<<getName()<<"setPosition"<<pos<<m_nowPosition.step<<" ofst:"<<m_nowPosition.offset;
 
 setTruPosition(false);
 
@@ -231,6 +230,8 @@ return Mot(m_nowPosition.get(dim)+dist);
 
 int WLDrive::Mot(double pos)
 {    
+if(pos==position()) return 0;
+
 if(isMotion())
  { 
  emit sendMessage(getFullName(),tr("unfinished previous move"),-1);
@@ -240,9 +241,10 @@ if(isMotion())
 m_nextPosition=m_nowPosition;
 
 if(isTruPosition()
- &&(pos<minPosition()||maxPosition()<pos)
+ &&((pos<minPosition()&&pos<position())||(maxPosition()<pos&&pos>position()))
  &&!isInfinity())
  {
+ qDebug()<<getName()<<"out limit now"<<position()<<">>"<<pos<<"("<<minPosition()<<maxPosition()<<")";
  emit sendMessage(getFullName(),tr("task out limit axis"),-1);
  return -1;
  }
@@ -339,11 +341,16 @@ return true;
 return false;
 }
 
+int WLDrive::corPosition(double pos)
+{
+return setPosition(positionDrive().step*getDriveDim().value-(pos-getOrgPosition()));
+}
+
 bool WLDrive::isLatch2()
 {
-foreach(WLAxis *Axis,getAxisList())
- {
- qDebug()<<"isLatch2"<<Axis->isLatch2();
+    foreach(WLAxis *Axis,getAxisList())
+    {
+        qDebug()<<"isLatch2"<<Axis->isLatch2();
  if(!Axis->isLatch2()) return false;
  }
 
@@ -452,7 +459,7 @@ if(dist!=0.0)
 {    
 if(_rot)
  {
- if(((position()+dist)<maxPosition()) || isInfinity())
+ if(((position()+dist)<maxPosition()) || isInfinity() || !isTruPosition())
        setMov(dist);
     else
        setMot(maxPosition());
@@ -460,7 +467,7 @@ if(_rot)
  }
 else //rot -dist
  {
- if(((position()-dist)>minPosition()) || isInfinity())
+ if(((position()-dist)>minPosition()) || isInfinity() || !isTruPosition())
      setMov(-dist);
  else
      setMot(minPosition());
@@ -741,9 +748,21 @@ if(!stream.attributes().value("Pad").isEmpty())
 Init();
 }
 
+int WLDrive::setMovToHome()
+{
+qDebug()<<getName()<<"setMovToHome";
+return setMot(homePosition());
+}
+
+int WLDrive::setMovToORG()
+{
+qDebug()<<getName()<<"setMovToORG";
+return setMot(getOrgPosition());
+}
+
 bool WLDrive::getInput(typeInputAxis type)
 {
-foreach(WLAxis *axis,getAxisList())
+    foreach(WLAxis *axis,getAxisList())
  {
  if(axis->getInput(type)->getNow()) return true;
  }
@@ -1057,13 +1076,23 @@ if(getAxis())
 return false;
 }
 
+void WLDrive::setModuleAxis(WLModuleAxis *_ModuleAxis)
+{
+if(_ModuleAxis) {
+    m_ModuleAxis=_ModuleAxis;
+    m_AxisList.clear();
+}
+}
+
 
 void WLDrive::setIndexModuleAxisStr(QString str)
 {
 QList <quint8> indexs;
 QStringList List=str.split(",",QString::SkipEmptyParts);
 
-qDebug()<<"setIndexModuleAxisStr"<<str<<List.size();
+qDebug()<<getName()<<"setIndexModuleAxisStr"<<str;
+
+if(!getModuleAxis()) qDebug()<<getName()<<"no ModuleAxis";
 
 foreach(WLAxis *axis,m_AxisList)
  {
@@ -1453,7 +1482,7 @@ if(isAutoDrive()
 								   
                                              if(logicFindPos==onlyORGHome)
                                                {
-                                               if(setMovHome())  startMotion();
+                                               if(setMovToHome())  startMotion();
                                                }
                                             break;
 
@@ -1463,7 +1492,7 @@ if(isAutoDrive()
 
                                                if(logicFindPos==onlyORGHome)
                                                  {
-                                                 if(setMovHome())  startMotion();
+                                                 if(setMovToHome())  startMotion();
                                                  }
 
                                               break;
@@ -1548,7 +1577,7 @@ if(isAutoDrive()
 
                               foreach(WLAxis *Axis,getAxisList())
                                {
-                               qDebug()<<"latch"<<Axis->getLatch2();
+                               qDebug()<<getName()<<"latch"<<Axis->getLatch2();
                                }
 
                               switch (autoTypeDrive)
@@ -1581,7 +1610,7 @@ if(isAutoDrive()
                                                      ||((typePM==AXIS_inMEL)&&(Offset>DPos.step))) Offset=DPos.step; // find max/min offset
 
                                                     }
-                                                qDebug()<<"Offset"<<Offset;
+                                               // qDebug()<<"Offset"<<Offset;
 
                                                 for(quint8 i=0;i<getAxisList().size();i++)
                                                     {
@@ -1591,7 +1620,7 @@ if(isAutoDrive()
 
                                                    if(DPos.getStepI32L()!=0)
                                                      {
-                                                     qDebug()<<"Mov Axis"<<DPos.getStepI32L();
+                                                    // qDebug()<<"Mov Axis"<<DPos.getStepI32L();
                                                      getAxis(i)->movPos(MASK_disubaxis,DPos.getStepI32L(),m_feedVFind/dim.value);
                                                      }
                                                    }
@@ -1607,11 +1636,13 @@ if(isAutoDrive()
                                case autoVerify:
                                                QString str;
 
+                                               WLDrivePosition orgPos;
+                                               orgPos.set(getOrgPosition(),dim);
+
                                                for(quint8 i=0;i<getAxisList().size();i++)
-                                                   str+=QString(" axis%1:%2").arg(getAxis(i)->getIndex())
-                                                                             .arg(getAxis(i)->getLatch2()*dim.value
-                                                                              -getOffsetAxis(i)
-                                                                              -getOrgPosition(),0,'f',3);
+                                                   str+=QString(" axis %1: %2").arg(getAxis(i)->getIndex())
+                                                                                  .arg(getLatch2Pos(i)-getOrgPosition()
+                                                                                  -getOffsetAxis(i),0,'f',5);
 
                                                emit sendMessage(getFullName(),str,1);
 
@@ -1639,7 +1670,13 @@ if(isAutoDrive()
                               if(logicFindPos==onlyPELHome
                                ||logicFindPos==onlyMELHome)
                                 {
-                                if(setMovHome())  startMotion(0);
+                                if(setMovToHome())  startMotion(0);
+                                }
+
+                              if(logicFindPos==onlyPEL
+                               ||logicFindPos==onlyMEL)
+                                {
+                                if(setMovToORG())  startMotion(0);
                                 }
 
                               break;

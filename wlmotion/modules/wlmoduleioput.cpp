@@ -174,14 +174,13 @@ case sendModule_error: Stream>>ui1;  //Error
                        emit sendMessage(metaObject()->className()+getErrorStr(errorIOPut,ui1),QString::number(index),-(ui1));
 					   break;
  }
-
-
 }
 
 
 
 void WLModuleIOPut::setInputInvStr(QString data)
 {
+qDebug()<<"WLModuleIOPut::setInputInvStr"<<data;
 QStringList List=data.split(",");
 
 for(int i=2;i<getSizeInputs();i++)
@@ -206,6 +205,7 @@ return  ret;
 
 void WLModuleIOPut::setOutputInvStr(QString data)
 {
+qDebug()<<"WLModuleIOPut::setOutputInvStr"<<data;
 QStringList List=data.split(",");
 
 for(int i=1;i<getSizeOutputs();i++)
@@ -232,28 +232,6 @@ void WLModuleIOPut::setDefInvOutputs()
 {
 for(int i=1;i<getSizeOutputs();i++)
     getOutput(i)->setDefInvOut();
-}
-
-void WLModuleIOPut::updateAllInputData()
-{
-for(int i=2;i<getSizeInputs();i++)
- {
- if(Inputs[i]->isEnable())
-     Inputs[i]->setInv(Inputs[i]->isInv());
- callInputData(i);
- }
-}
-
-void WLModuleIOPut::updateAllOutputData()
-{
-for(int i=1;i<getSizeOutputs();i++)
- {
- if(Outputs[i]->isEnable()) {
-  Outputs[i]->setInv(Outputs[i]->isInv());
-  Outputs[i]->setOut(Outputs[i]->getNow());
-  }
- callOutputData(i);
- }
 }
 
 void WLModuleIOPut::callInputData(quint8 index)
@@ -326,8 +304,28 @@ for(quint8 i=0;i<Outputs.size();i++)
 
 void WLModuleIOPut::update()
 {
-updateAllInputData();
-updateAllOutputData();
+for(int i=2;i<getSizeInputs();i++) {
+   callInputData(i);
+   }
+
+for(int i=1;i<getSizeOutputs();i++) {
+   callOutputData(i);
+   }
+}
+
+void WLModuleIOPut::backup()
+{
+for(int i=2;i<getSizeInputs();i++)
+ {
+ Inputs[i]->setInv(Inputs[i]->isInv());
+ callInputData(i);
+ }
+
+for(int i=1;i<getSizeOutputs();i++)
+ {
+ Outputs[i]->setInv(Outputs[i]->isInv());
+ Outputs[i]->setOut(Outputs[i]->getNow());
+ }
 }
 
 void WLModuleIOPut::readXMLData(QXmlStreamReader &stream)

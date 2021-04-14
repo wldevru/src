@@ -35,6 +35,7 @@ public:
 
 public slots:
 virtual void update();
+virtual void backup();
 
 public:
 

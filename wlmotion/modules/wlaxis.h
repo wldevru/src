@@ -202,6 +202,8 @@ statusAxis status;
 
 quint8 error;
 
+quint8 m_iMasterAxis=0;
+
 float kSTCurve;
 float delaySCurve;
 
@@ -326,6 +328,11 @@ public:
     bool setKGear(float kGear);
 	bool setEnable(bool enable);
     bool setModeSub(quint8 imasterAxis);
+
+
+public slots:
+virtual void update(); //get current data
+virtual void backup(); //backup current data
 
 public:
 virtual void writeXMLData(QXmlStreamWriter &stream);

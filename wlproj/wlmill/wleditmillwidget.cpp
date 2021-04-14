@@ -95,6 +95,13 @@ WLEditMillWidget::WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent)
 
     ui.sbOffsetHToolProbe->setValue(MillMachine->getGCode()->getOffsetHTool());
 
+    ui.sbAccSOut->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getAccSOut()!=0 ?
+                          ui.sbSmaxOut->value()/100.0/1000.0/MillMachine->getMotionDevice()->getModulePlanner()->getAccSOut()
+                          :0);
+    ui.sbDecSOut->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getDecSOut()!=0 ?
+                         -ui.sbSmaxOut->value()/100.0/1000.0/MillMachine->getMotionDevice()->getModulePlanner()->getDecSOut()
+                          :0);
+
 	initTableCorrectS();
 
 	connect(ui.pbVerError,SIGNAL(clicked()),SLOT(onVerifyError()));
@@ -126,9 +133,14 @@ WLMillDrive *ZD=MillMachine->getDrive("Z");
 return str;
 }
 
+bool WLEditMillWidget::getNeedClose() const
+{
+return m_needClose;
+}
+
 void WLEditMillWidget::onVerifyError()
 {
-QString str=verifyError();
+    QString str=verifyError();
 
 if(str.isEmpty()) str=tr("No error!!!");
 
@@ -137,12 +149,10 @@ QMessageBox::information(this, tr("Verify error"),str,QMessageBox::Ok);
 
 void WLEditMillWidget::accept()
 {
-saveDataMill();
+m_needClose=saveDataMill();
 
-for(int i=1;i<ui.tabWidget->count();i++)    {
-  QDialog *Dialog=static_cast<QDialog*>(ui.tabWidget->widget(i));
-  Dialog->accept();
-  }
+foreach(QDialog *dialog,dialogList)
+                dialog->accept();
 
 QDialog::accept();
 }
@@ -230,6 +240,9 @@ MillMachine->setFeedVProbe(ui.sbFprobe->value());
 
 MillMachine->getMotionDevice()->getModulePlanner()->setKFpause(ui.sbPerFpause->value()/100.0f);
 
+MillMachine->getMotionDevice()->getModulePlanner()->setAccSOut(ui.sbAccSOut->value()!=0 ? ui.sbSmaxOut->value()/100.0/1000.0/ui.sbAccSOut->value():0);
+MillMachine->getMotionDevice()->getModulePlanner()->setDecSOut(ui.sbDecSOut->value()!=0 ?-ui.sbSmaxOut->value()/100.0/1000.0/ui.sbDecSOut->value():0);
+
 if(!ui.gbSOut->isChecked())
 {
 MillMachine->getMotionDevice()->getModulePlanner()->resetElementSOut();
@@ -248,8 +261,8 @@ if(ui.cbUseDriveA->isChecked())
 {
 if(MillMachine->getDrive("A")==nullptr)
     {
-    WLMillDrive *MD = new WLMillDrive;
-    MD->setName("A");
+    WLMillDrive *MD = new WLMillDrive("A",MillMachine->getMotionDevice()->getModuleAxis());
+
     MillMachine->addDrive(MD);
     ret=true;
     }
@@ -264,8 +277,8 @@ if(ui.cbUseDriveB->isChecked())
 {
 if(MillMachine->getDrive("B")==nullptr)
     {
-    WLMillDrive *MD = new WLMillDrive;
-    MD->setName("B");
+    WLMillDrive *MD = new WLMillDrive("B",MillMachine->getMotionDevice()->getModuleAxis());
+
     MillMachine->addDrive(MD);
     ret=true;
     }
@@ -275,10 +288,16 @@ else if(MillMachine->getDrive("B")!=nullptr)
        MillMachine->removeDrive(MillMachine->getDrive("B"));
        ret=true;
        }
-{
 
 MillMachine->getGCode()->setOffsetHTool(ui.sbOffsetHToolProbe->value());
 MillMachine->setEnableGModel(ui.cbUseGModel->isChecked());
+
+
 return ret;
 }
+
+
+void WLEditMillWidget::keyPressEvent(QKeyEvent *event)
+{
+event->accept();
 }

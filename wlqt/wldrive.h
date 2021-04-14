@@ -277,7 +277,7 @@ double distanceMoved() {return position()-m_startPosition;}
 
 
 public:
-     WLDrive(QString name);
+     WLDrive(QString name="",WLModuleAxis *_ModuleAxis=nullptr);
 	~WLDrive();
 
 bool Init();
@@ -288,12 +288,13 @@ QString getFullName() {return metaObject()->className()+getName();}
 QString getName() {return m_name;}
 
 void setName(QString _name) {m_name=_name; emit changedName(m_name);}
-void setModuleAxis(WLModuleAxis *_ModuleAxis) {m_ModuleAxis=_ModuleAxis; m_AxisList.clear();}
+
+void setModuleAxis(WLModuleAxis *_ModuleAxis);
+
 void setIndexModuleAxisStr(QString str);
 QString getIndexModuleAxisStr();
 
-//WLModuleAxis *getModuleAxis() {return ModuleAxis;}
-
+WLModuleAxis *getModuleAxis() {return m_ModuleAxis;}
 
 WLAxis* getAxis(quint8 i=0) {return i<m_AxisList.size()? m_AxisList.at(i):nullptr;}
 
@@ -353,7 +354,7 @@ inline WLDrivePosition nextPositionDrive() {return m_nextPosition;}
 
 inline void   setOrgPosition(double pos) {m_orgPosition=pos;}
 inline double getOrgPosition()           {return m_orgPosition;}
-inline int    corPosition(double pos)    {return setPosition(position()-(pos-getOrgPosition()));}
+inline int    corPosition(double pos);
 
 inline double getORGSize()            {return m_orgSize;}
 inline void   setORGSize(double size) {if(size>0) m_orgSize=size;}
@@ -479,7 +480,8 @@ private :
 
 public:
 
-int setMovHome() {return setMot(homePosition());}
+int setMovToHome();
+int setMovToORG();
 
 public:
     bool getInput(typeInputAxis type);

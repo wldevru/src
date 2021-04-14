@@ -118,6 +118,8 @@ foreach(WLModule *module,m_modules)
  }
 qDebug()<<"WLDevice::updateReady() true size"<<m_modules.size();
 setReady(true);
+
+update();
 }
 
 void WLDevice::removeModules()
@@ -178,6 +180,7 @@ setCommand(data);
 
 QList<WLDeviceInfo> WLDevice::availableDevices()
 {
+QElapsedTimer Timer;
 QList<WLDeviceInfo>  retDevicesInfo;
 QList<QSerialPortInfo> portList=QSerialPortInfo::availablePorts();
 QList<WLDevice*> Devices;
@@ -218,8 +221,14 @@ for (int i = 0; i < ifaces.size(); i++)
         if ((addrs[j].ip().protocol() == QAbstractSocket::IPv4Protocol) && (addrs[j].broadcast().toString() != ""))
             udpSocket.writeDatagram(BA,addrs[j].broadcast(),UDPPORT);
 }
-while(udpSocket.waitForReadyRead(50))
-{    
+
+
+Timer.start();
+
+while(Timer.elapsed()<500)
+{
+QCoreApplication::processEvents();
+
 n=udpSocket.readDatagram(dataBuf,512,&HA,&port);
 
 bool add=false;
@@ -254,20 +263,10 @@ foreach(QHostAddress HAD,HADList)
  Devices+=Device;
  }
 
-QElapsedTimer Timer;
-
 Timer.start();
-
-while(Timer.elapsed()<1000)
+while(Timer.elapsed()<500)
 {
 QCoreApplication::processEvents();
-/*
-foreach(WLDevice *device,Devices)
-  {
-  if(!device->isReady())  continue;
-  }
-
-break;*/
 }
 
 while(!Devices.isEmpty())
@@ -427,11 +426,11 @@ int n;
 if(!outBuf.isEmpty())
 {
  if(m_serialPort.isOpen())
-    {   
-    m_serialPort.write(outBuf);
-    m_serialPort.flush();
+   {
+   m_serialPort.write(outBuf);
+   m_serialPort.flush();
 
-    outBuf.clear();
+   outBuf.clear();
    }
  else
    {              
@@ -549,6 +548,20 @@ reset();
 return true;
 }
 
+bool WLDevice::waitForReady(int timeout)
+{
+QElapsedTimer Timer;
+
+Timer.start();
+
+while((Timer.elapsed()<timeout)&&(!isReady()))
+ {
+ QCoreApplication::processEvents();
+ }
+
+return isReady();
+}
+
 void WLDevice::closeConnect()
 {
 if(isOpenConnect())
@@ -609,15 +622,26 @@ else
 
 void WLDevice::update()
 {
-qDebug()<<"update Modules";
-
 callStatus();
 
 foreach(WLModule *Module,m_modules)
  {
-  qDebug()<<Module->metaObject()->className();
+  qDebug()<<Module->metaObject()->className()<<"update";
   Module->update();
- }
+}
+}
+
+void WLDevice::backup()
+{
+callStatus();
+setStatus(getStatus());
+
+foreach(WLModule *Module,m_modules)
+ {
+  qDebug()<<Module->metaObject()->className()<<"backup";
+  Module->backup();
+}
+
 }
 
 
@@ -833,7 +857,10 @@ switch(ui1)
                                        {
                                        m_prop=bufStr;
 
-                                       setNameDevice(m_prop.split(".").first());
+                                       QStringList List=m_prop.split(".");
+
+                                       setNameDevice(List.takeFirst());
+                                       m_typeFW=List.takeFirst();
 
                                        emit changedProp(m_prop);
                                        emit changedConnect(Flags.set(fl_connect));
@@ -856,7 +883,6 @@ switch(ui1)
 									   buf[i]=ui1;
 									   }
 
-                                      update();
                     			      break;
 
                    case sendDev_UID: for(quint8 i=0;i<(96/8);i++)
@@ -883,8 +909,13 @@ switch(ui1)
                                        break;
 
                   case sendDev_status: Stream>>ui1;
+
+                                       if(status==DEVICE_connect
+                                           &&ui1!=DEVICE_connect)   emit sendMessage(getNameDevice(),"detect reset controller!!!",-1);
+
                                        if(ui1!=status)//забивает статус
                                           emit changedStatus(status=static_cast<statusDevice>(ui1));
+
                                        break;
 
                    case typeMFW:  if(getModule((typeModule)ui1)==nullptr) //oldFW
@@ -967,7 +998,7 @@ if(type==typeMConnect)
   connect(this,&WLDevice::readDataDevice,MConnect,&WLModuleConnect::restartHeart);
 
   connect(MConnect,&WLModuleConnect::timeoutHeart,this,&WLDevice::reconnectSerialPort,Qt::DirectConnection);
-  connect(MConnect,&WLModuleConnect::backupConnect,this,&WLDevice::update);
+  connect(MConnect,&WLModuleConnect::backupConnect,this,&WLDevice::backup);
 
   Module=MConnect;
   }

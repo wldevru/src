@@ -227,7 +227,12 @@ if(!verifyError().isEmpty())
     }
 
   QDialog::accept();
-  }
+}
+}
+
+void WLDriveWidget::keyPressEvent(QKeyEvent *event)
+{
+event->accept();
 }
 
 void WLDriveWidget::updateCBDimm(int index)

@@ -426,19 +426,27 @@ int WLGCode::setMCode(int code)
    {
    case 3: m_data.MCode[3]=1;
            m_data.MCode[4]=0;
-		   break; //вращение вперед
+           m_data.MCode[5]=0; break; //вращение вперед
+
    case 4: m_data.MCode[3]=0;
            m_data.MCode[4]=1;
-		   break; //вращение назад
-   case 5: m_data.MCode[3]=0;
-           m_data.MCode[4]=0;break; //остановить вращение
+           m_data.MCode[5]=0; break; //вращение назад
 
-   case 7: m_data.MCode[7]=1;
-           m_data.MCode[8]=0;break; //дополнительное охлаждение
-   case 8: m_data.MCode[8]=1;
-           m_data.MCode[7]=0;break; //основное охлаждение
-   case 9: m_data.MCode[7]=0;
-           m_data.MCode[8]=0;break; //выключить охлаждение
+   case 5: m_data.MCode[3]=0;
+           m_data.MCode[4]=0;
+           m_data.MCode[5]=1; break; //остановить вращение
+
+  case 7: m_data.MCode[7]=1;
+          m_data.MCode[8]=0;
+          m_data.MCode[9]=0;break; //дополнительное охлаждение
+
+  case 8: m_data.MCode[8]=1;
+          m_data.MCode[7]=0;
+          m_data.MCode[9]=0;break; //основное охлаждение
+
+  case 9: m_data.MCode[7]=0;
+          m_data.MCode[8]=0;
+          m_data.MCode[10]=0;break; //выключить охлаждение
 
   case 13: setMCode(3);
            setMCode(8);break;//вращение + осн охл

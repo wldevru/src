@@ -31,9 +31,23 @@ quint16 WLMPG::getPulses() const
 return m_pulses;
 }
 
+void WLMPG::update()
+{
+sendGetData();
+}
+
+void WLMPG::backup()
+{
+setInX(getIndexInX(),sizeInX);
+setInAxis(getIndexInAxis(),sizeInX);
+setInVmode(getInVmode());
+
+setEncoder(getEncoder());
+}
+
 void WLMPG::setPulses(const quint16 &pulses)
 {
-    m_pulses = pulses;
+m_pulses = pulses;
 }
 
 bool WLMPG::setEnable(bool enable)

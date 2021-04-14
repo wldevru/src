@@ -109,12 +109,6 @@ if(FileJS.isOpen())
 
 connect(m_EVMScript,&WLEVScript::changedBusy,this,&WLMillMachine::verifyPosibleManual);
 
-QTimer *autoSaveTimer = new QTimer;
-connect(autoSaveTimer,SIGNAL(timeout()),SLOT(saveConfig()));
-autoSaveTimer->start(5*60*1000);
-
-connect(&m_GCode,SIGNAL(changedSK(int)),SLOT(saveConfig()));
-
 Flag.set(ma_go,false);
 Flag.set(ma_busy,false);
 //flag(ma_activ,false);
@@ -357,6 +351,13 @@ if(motDevice->isValidProtocol()
    }else{
    motDevice->closeConnect();
    };
+
+
+QTimer *autoSaveTimer = new QTimer;
+connect(autoSaveTimer,SIGNAL(timeout()),SLOT(saveConfig()));
+autoSaveTimer->start(5*60*1000);
+
+connect(&m_GCode,SIGNAL(changedSK(int)),SLOT(saveConfig()));
 }
 
 bool WLMillMachine::isEmptyMotion()
@@ -642,6 +643,8 @@ sortCorrectSList();
 
 void WLMillMachine::saveConfig()
 {
+QMutexLocker locker(&MutexSaveConfig);
+
 QFile FileXML(configMMFile);
 
 QByteArray Data;
@@ -698,6 +701,15 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
  stream.writeEndElement();
 
  stream.writeStartElement("Drive");
+
+ foreach(WLMillDrive *drive,millDrives)
+ {
+ stream.writeStartElement(drive->metaObject()->className());
+   drive->writeXMLData(stream);
+ stream.writeEndElement();
+ }
+
+ /*
  QList <WLDrive*> driveList=WLDrive::getDriveList();
 
   for (int i=0;i<driveList.size();i++)
@@ -706,6 +718,7 @@ stream.writeAttribute("SimpliDist",QString::number(m_simpliDist));
     driveList[i]->writeXMLData(stream);
   stream.writeEndElement();
   }
+ */
  stream.writeEndElement();
 
  stream.writeStartElement("Position");
@@ -767,13 +780,18 @@ motDevice->writeToFile(configMMDir+motDevice->getNameDevice()+".xml");
 
 void WLMillMachine::addDrive(WLMillDrive *millDrive)
 {
+QStringList List=QString("X,Y,Z,A,B,C,U,V,W").split(",");
+
+qDebug()<<"WLMillMachine::addDrive"<<millDrive->getName();
+if(List.indexOf(millDrive->getName())==-1) return;
+
 millDrive->moveToThread(this->thread());
 
 connect(millDrive,SIGNAL(finished()),this,SLOT(setFinished()),Qt::QueuedConnection);
 connect(millDrive,SIGNAL(paused()),this,SLOT(setFinished()),Qt::QueuedConnection);
 connect(millDrive,SIGNAL(sendMessage(QString,QString,int)),this,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
-millDrive->setModuleAxis(motDevice->getModuleAxis());
+millDrives+=millDrive;
 }
 
 void WLMillMachine::removeDrive(WLMillDrive *millDrive)
@@ -781,12 +799,11 @@ void WLMillMachine::removeDrive(WLMillDrive *millDrive)
 disconnect(millDrive,nullptr,nullptr,nullptr);
 
 millDrives.removeOne(millDrive);
-
-millDrive->deleteLater();
 }
 
 bool WLMillMachine::loadConfig()
 {
+QMutexLocker locker(&MutexSaveConfig);
 QFile FileXML(configMMFile);
 QXmlStreamReader stream;
 QStringList List;
@@ -801,7 +818,6 @@ if(!FileXML.open(QIODevice::ReadOnly))    {
 
 if(FileXML.isOpen())
   {
-  qDebug()<<"open XML";
   stream.setDevice(&FileXML);
 
   while(!stream.atEnd())
@@ -930,7 +946,6 @@ if(FileXML.isOpen())
 
             foreach(WLDeviceInfo info,infoList)
             {
-            qDebug()<<"info"<<info.comPort<<info.UID96;
             if(info.isValid(WLMDev.getInfo()))
                {
                findOk=true;
@@ -938,27 +953,20 @@ if(FileXML.isOpen())
                motDevice->setInfo(info);
                motDevice->openConnect();
 
-               QElapsedTimer Timer;
-
-               Timer.start();
-
-                while(Timer.elapsed()<100
-                    &&!motDevice->isReady())
-                {
-                QCoreApplication::processEvents();
-                }
-
-               if(!motDevice->isReady())
+               if(!motDevice->waitForReady())
+                   {
                    motDevice->closeConnect();
+                   emit sendMessage("WLMillMachine",tr("device %1 not ready.").arg(motDevice->getNameDevice())+" ("+motDevice->getUID96()+")",0);
+                   }
                else
                    findOk=true;
 
                break;
                }
-
             }
 
-            motDevice->initFromFile(initFile);
+            if(!motDevice->initFromFile(initFile))
+                emit sendMessage("WLMillMachine",tr("error read file device: ")+initFile,0);
 
             if(motDevice->getModuleConnect())
                              motDevice->getModuleConnect()->setEnableHeart(true);
@@ -1002,11 +1010,10 @@ if(FileXML.isOpen())
 
             if(stream.name()=="WLMillDrive")
              {
-             WLMillDrive *millDrive = new WLMillDrive();
-
-             addDrive(millDrive);
+             WLMillDrive *millDrive = new WLMillDrive("",motDevice->getModuleAxis());
 
              millDrive->readXMLData(stream);
+             addDrive(millDrive);
              }
 
             }
@@ -1124,15 +1131,6 @@ if(FileXML.isOpen())
     connect(motDevice->getModuleAxis(),SIGNAL(changedInSDStop()),SLOT(updateInput()));
     }
 
-  if(getDrive("X")) millDrives+=getDrive("X");
-  if(getDrive("Y")) millDrives+=getDrive("Y");
-  if(getDrive("Z")) millDrives+=getDrive("Z");
-  if(getDrive("A")) millDrives+=getDrive("A");
-  if(getDrive("B")) millDrives+=getDrive("B");
-  if(getDrive("C")) millDrives+=getDrive("C");
-  if(getDrive("U")) millDrives+=getDrive("U");
-  if(getDrive("V")) millDrives+=getDrive("V");
-  if(getDrive("W")) millDrives+=getDrive("W");
 
   WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
@@ -2152,16 +2150,19 @@ if(!startETraj.isFast())
  curTraj+=ETraj;
  }
 
-/*
-for(int i=0;i<100;i++)
-    if(m_GCode.isMCode(i))
-        curTraj.last().addM(i);
-*/
+QList <int> ListM;
+
+ListM<<3<<4<<5<<7<<8<<9;
+
+for(int i=0;i<ListM.size();i++)
+   if(m_GCode.isMCode(i))
+        curTraj.first().addM(i);
 
 for(int i=0;i<curTraj.size();i++)
      curTraj[i].setS(m_GCode.getValue('S'));
 
-addElementTraj(curTraj);
+//addElementTraj(curTraj);
+baseTraj+=curTraj;
 }
 
 updateMovProgram();
@@ -2255,76 +2256,70 @@ float simpliD=(float)m_mainDim*(1<<xPD);
 
 int isimpli;
 
-if(!MillTraj.isEmpty()&&!MillTraj.last().isEmptyM()) return 0;
-
-
 qDebug()<<"updateMovProgram m_iProgram"<<m_iProgram
                          <<"runProgram"<<isRunProgram()
                           <<"runScript"<<isRunScript()
-                      <<"MList.isEmpty"<<m_MList.isEmpty();
+                       <<"MList.size()"<<m_MList.size();
 
 if(isRunProgram()
 &&!isRunScript()
 &&m_MList.isEmpty())
  {
   {
-  for(;(MillTraj.size()<100)&&(m_iProgram<m_Program->getElementCount());m_iProgram++)
+  for(;MillTraj.size()<100
+       &&(!baseTraj.isEmpty()||m_iProgram<m_Program->getElementCount())
+       &&(MillTraj.isEmpty()||MillTraj.last().isEmptyM());)
    {
-   txt=m_Program->getTextElement(m_iProgram);
-   WLGProgram::translate(txt,curTraj,lastGPoint,&m_GCode,m_iProgram);
-
-   for(int i=0;i<curTraj.size();i++)
-	   if(curTraj[i].isEmpty()) curTraj.removeAt(i--);
- 
-   baseTraj+=curTraj;
-
-  // if(!curTraj.isEmpty())
-   //    qDebug()<<"MCode"<<!curTraj.first().isEmptyM();
-
-/*
-   if(m_GCode.isGCode(61))
-   {
-   addElementTraj(baseTraj);
-   baseTraj.clear();
-   }
-   else*/
-   if(m_iProgram==(m_Program->getElementCount()-1)
-    ||(!curTraj.isEmpty()&&!curTraj.first().isEmptyM())) //если дошли до конца то полностью перебераем и сглаживаем
+   if(m_iProgram<m_Program->getElementCount())
     {
-    isimpli=WLElementTraj::simpliTrajectory(simpliTraj
- 	                                       ,baseTraj
- 	            		 				   ,simpliD
-										   ,false);
-	addElementTraj(simpliTraj);
+    txt=m_Program->getTextElement(m_iProgram);
 
-    baseTraj.clear();
+    WLGProgram::translate(txt,curTraj,lastGPoint,&m_GCode,m_iProgram);
+
+    for(int i=0;i<curTraj.size();i++)  //remove Empty Elements
+        if(curTraj[i].isEmpty()) curTraj.removeAt(i--);
+ 
+    baseTraj+=curTraj;
 
     m_iProgram++;
-    break;
+
+    if(m_iProgram==(m_Program->getElementCount()-1)) m_iProgram++;
     }
-   else
-    {
+
+    do {
 	isimpli=WLElementTraj::simpliTrajectory(simpliTraj
  	                                       ,baseTraj
  	            		 				   ,simpliD
- 								           ,true);
-    
+                                           ,m_iProgram!=(m_Program->getElementCount()));
 
     if(isimpli<baseTraj.size()) //если сгладили и дошли до точки, но не до конца
       {		  
 	  if(simpliTraj.size()==2
 	   &&simpliTraj[0].isLine()
-	   &&simpliTraj[1].isLine())
+	   &&simpliTraj[1].isLine())          
        {
        simpliTraj[0].endPoint=simpliTraj[1].endPoint;
-       simpliTraj.removeLast();
+
+       if(simpliTraj.last().isEmptyM()) simpliTraj.removeLast();
        }	  		
 
       addElementTraj(simpliTraj);
 
-      baseTraj=baseTraj.mid(isimpli+1);
+      baseTraj=baseTraj.mid(isimpli+1); //оставляем один элемент на будущее
       }
-    }
+      else if(m_iProgram==(m_Program->getElementCount())) //до конца
+           {
+           addElementTraj(baseTraj);
+           baseTraj.clear();
+           }
+
+;
+    if(!MillTraj.isEmpty()) qDebug()<<MillTraj.last().isEmptyM()<<simpliTraj.last().isEmptyM();
+
+    }while ((!baseTraj.isEmpty())              //if base traj no empty
+            &&(isimpli==0)                     // simply can comntinue
+            &&(MillTraj.isEmpty()||MillTraj.last().isEmptyM()));   // no M code
+
 	
    }  
   }
@@ -2705,7 +2700,7 @@ m_nowBL=nextBL;
 
 int WLMillMachine::updateMovBuf() 
 {
-qDebug()<<"WLMillMachine::updateMovBuf"<<Flag.get(ma_runprogram);
+qDebug()<<"WLMillMachine::updateMovBuf"<<MillTraj.size();
 
 QMutexLocker locker(&MutexMillTraj);
 
@@ -2716,8 +2711,7 @@ if(!ModulePlanner
 
 if(Flag.get(ma_runprogram)) // if run program
   {    
-  if(!ModulePlanner->isEmpty())
-      {
+  if(!ModulePlanner->isEmpty()) {
       m_Program->setLastMovElement(ModulePlanner->getCurIdElement());
       }
 
@@ -2725,24 +2719,25 @@ if(Flag.get(ma_runprogram)) // if run program
   }
 
 if(!Flag.get(ma_runlist)) return 0;
-
 if(isEmptyMotion())  return 1;
 
-if(0<MillTraj.size()
- &&MillTraj.size()<=1 //wait 1 element in buf
+
+if(MillTraj.size()==1 //wait 1 element in buf
  &&(!m_MList.isEmpty()||!MillTraj.first().isEmptyM())
  &&ModulePlanner->isEmpty()
  &&!ModulePlanner->isMoving())
        {
        m_MList=MillTraj.first().getMList();
        MillTraj.first().clearMList();
-       runMScript(m_MList.takeFirst());
        }
 
+if(!isRunScript()    //execute M Script
+ &&!m_MList.isEmpty()) runMScript(m_MList.takeFirst());;
+
 while((ModulePlanner->getFree()>0)
-    &&(!MillTraj.isEmpty())) //если можно отправлять
+   &&(!MillTraj.isEmpty())) //если можно отправлять
 {
-if(!MillTraj.first().isEmptyM())
+if(!MillTraj.first().isEmptyM()) //если
 {
 qDebug()<<"takeMovElement M";
 break;

@@ -740,12 +740,6 @@ for(int i=0;i<m_MillMachine->showMillTraj.size();i++)
 
 for(int i=0;i<m_MillMachine->showMillTraj.size();i++)
   {
-  if(m_MillMachine->showMillTraj[i].index==indexMPlanner)
-   {
-   //qDebug()<<"pointsCountBuf="<<Points.size();
-   pointsCountBuf=Points.size();
-   }
-
   if(m_typeView==XYZ)
     {
     WLGModel GModel;
@@ -754,7 +748,7 @@ for(int i=0;i<m_MillMachine->showMillTraj.size();i++)
   else
     Points+=m_MillMachine->showMillTraj[i].calcPoints(&ok,m_MillMachine->getGModel(),2);
  
-  if(m_MillMachine->showMillTraj[i].index<=indexMPlanner)
+  if((curId+i)<=indexMPlanner)
    {
    //qDebug()<<"pointsCountBuf="<<Points.size();
    pointsCountBuf=Points.size();
@@ -798,7 +792,9 @@ progOneColor.enableAttributeArray(vertexLocation);
 progOneColor.setAttributeBuffer(vertexLocation,GL_FLOAT,0,3);
 
 glLineWidth(3);
-glDrawArrays(GL_LINE_STRIP, pointsCountBuf,showPoints.size()-pointsCountBuf);
+
+if(showPoints.size()-pointsCountBuf>0)
+   glDrawArrays(GL_LINE_STRIP, pointsCountBuf,showPoints.size()-pointsCountBuf);
 
 glLineWidth(4);
 progOneColor.setUniformValue("u_color",QVector3D(1,1,0));

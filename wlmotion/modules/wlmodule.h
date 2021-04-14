@@ -66,11 +66,11 @@ private:
  typeModule m_type;
        bool m_ready;
 
-
 public slots:
+
 virtual void reset();	
 virtual void callProp();	
-virtual void update() {}
+
 virtual void setReady(bool);
 
 public slots:

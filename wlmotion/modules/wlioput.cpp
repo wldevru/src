@@ -17,20 +17,30 @@ setObjectName("IO");
 
 void WLIOPut::setData(quint8 _flags)
 {
- const auto last=Flags.m_Data;
+const auto last=Flags.m_Data;
 
- Flags.m_Data&=//IOPF_inv
-               //IOPF_enable
-                 IOPF_input
-                |IOPF_asend
-                |IOPF_pulse;
+Flags.m_Data&=//IOPF_inv
+              //IOPF_enable
+                IOPF_input
+               |IOPF_asend
+               |IOPF_pulse;
 
- if(isOutput())
+if(isOutput())
    Flags.m_Data&=IOPF_old;
 
- Flags.m_Data|=_flags;
+if((_flags&IOPF_inv)^(Flags.m_Data&IOPF_inv))
+{
+if(isInput())
+  qDebug()<<"WLIOPut::input"<<getIndex()<<"changed inv"<<((_flags&IOPF_inv)!=0);
+else
+  qDebug()<<"WLIOPut::output"<<getIndex()<<"changed inv"<<((_flags&IOPF_inv)!=0);
 
- if(last!=Flags.m_Data)  emit changed(getIndex());
+// emit changedInv(_flags&IOPF_inv);
+}
+
+Flags.m_Data|=_flags;
+
+if(last!=Flags.m_Data)  emit changed(getIndex());
 }
 
 
@@ -136,6 +146,7 @@ void WLIOPut::setInv(bool _inv)
   Stream<<(quint8)comIOPut_setOutputInv<<getIndex()<<(quint8)_inv;
 
  emit sendCommand(data);
+
  emit changedInv(_inv);
  }
 }

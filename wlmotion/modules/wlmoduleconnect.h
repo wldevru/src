@@ -53,6 +53,7 @@ public:
     bool setEnableHeart(bool enable);
 
     bool isEnableHeart();
+
 public slots:	
 	void sendHeart();
 	void restartHeart();
@@ -65,6 +66,8 @@ signals:
     void timeoutHeart();
     void timeoutConnect();
     void backupConnect();
+
+    void changedConnect(bool);
 
 public:
 virtual void writeXMLData(QXmlStreamWriter &stream);

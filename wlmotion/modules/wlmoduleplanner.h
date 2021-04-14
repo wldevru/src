@@ -33,6 +33,8 @@
 
 #define comPlanner_setOutElementSOut 22 //set selement
 #define comPlanner_resetOutElementSOut 23 //reset selement
+#define comPlanner_setAccSOut 24 //set acceleration SOut
+#define comPlanner_setDecSOut 25 //set deceleration SOut
 
 #define comPlanner_getDataPlanner    101
 
@@ -126,6 +128,12 @@ quint8  m_lastIndexElementBuf;
 quint32 m_curIdElementBuf;
 quint32 m_countAddElement;
 
+float m_accSOut=0;
+float m_decSOut=0;
+
+float m_KF=1;
+float m_KSOut=1;
+
 float m_smoothAng;
 
 qint32  m_hPause;
@@ -133,7 +141,8 @@ qint32  m_hPause;
 typeElement m_typeSOut;
      quint8 m_iSout;
 public:
-
+     float getAccSOut() const;
+     float getDecSOut() const;
 
 typeElement getTypeSOut() const;
      quint8 getISOut() const;
@@ -149,6 +158,9 @@ quint32 getCurIdElement() {return m_curIdElementBuf;}
     bool setIAxisSlave(quint8 *indexsAxis,quint8 size);
     bool setHPause(quint8 enable,qint32 hPause);
 
+    bool setAccSOut(float acc);
+    bool setDecSOut(float dec);
+
     bool setElementSOut(typeElement element,quint8 i);
     bool resetElementSOut();
 
@@ -161,12 +173,14 @@ quint32 getCurIdElement() {return m_curIdElementBuf;}
 	bool pauseMov();
 
 	bool setKF(float _KF);
+   float getKF()  {return m_KF;}
     bool setKFpause(float _KF);
 
 	bool setSmoothAng(float ang_gr);
 
 	bool setSOut(float s);
 	bool setKSOut(float k);
+   float getKSOut(){return m_KSOut;}
 
 	bool setEnableSOut(quint8 enable);
 		
@@ -186,7 +200,8 @@ public slots:
 	void sendGetDataBuf();
 
 public slots:
-    virtual void update();
+virtual void update();
+virtual void backup();
 
 signals:
     void changedFree(int);
@@ -203,6 +218,6 @@ virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 virtual void readCommand(QByteArray data); 
 
-};
+                           };
 #endif // WLModulePLANNER_H
 

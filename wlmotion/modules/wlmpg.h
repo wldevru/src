@@ -135,6 +135,10 @@ public:
     void setPulses(const quint16 &pulses);
  quint16 getPulses() const;
 
+public slots:
+virtual void update();
+virtual void backup();
+
 public:
 
 virtual void writeXMLData(QXmlStreamWriter &stream);

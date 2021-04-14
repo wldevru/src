@@ -54,7 +54,7 @@ float m_Freq;
  quint8 error;
 
 public:
-  float freq() {return m_Freq;}
+  float getFreq() {return m_Freq;}
 
    void setError(quint8 err)  {emit changedError(error=err);}
    bool isInv()               {return Flags.get(PWMF_inv);}
@@ -62,7 +62,7 @@ public:
    bool isInvalid()           {return Flags.get(PWMF_invalid);}
    bool isUnlock()            {return Flags.get(PWMF_unlock);}
 
-   float value() {return m_value;}
+   float getValue() {return m_value;}
 
 signals:
  
@@ -73,7 +73,7 @@ signals:
 
 public:
 
-    bool setOut(float value);
+    bool setOut(float getValue);
     bool togInv() {return setInv(!isInv());}
     bool setInv(bool inv);
 	bool setEnable(bool enable);
@@ -82,6 +82,11 @@ public:
     bool setFreq(float f);
 
     void setData(QDataStream&);
+
+public slots:
+virtual void update();
+virtual void backup();
+
 public:
 
 virtual void writeXMLData(QXmlStreamWriter &stream);

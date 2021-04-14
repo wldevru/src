@@ -13,29 +13,29 @@ WLModuleMPG::~WLModuleMPG()
         delete MPG.takeLast();
 }
 
-bool WLModuleMPG::Init(int sizeWhell)
+bool WLModuleMPG::Init(int sizeMPG)
 {
-if(sizeWhell<1
- ||MPG.size()== sizeWhell
+if(sizeMPG<1
+ ||MPG.size()== sizeMPG
  ||isReady()) return false;
 
-WLMPG *whell;
+WLMPG *mpg;
 
-if(sizeWhell>MPG.size())
- for(int i=MPG.size();i<sizeWhell;i++ )
+if(sizeMPG>MPG.size())
+ for(int i=MPG.size();i<sizeMPG;i++ )
   {
-  whell = new WLMPG;
-  whell->setIndex(i);
-  whell->setParent(this);
-  connect(whell,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
-  MPG+=whell;
+  mpg = new WLMPG;
+  mpg->setIndex(i);
+  mpg->setParent(this);
+  connect(mpg,SIGNAL(sendCommand(QByteArray)),SLOT(setCommand(QByteArray)));
+  MPG+=mpg;
   }
 else
-    while(MPG.size()!= sizeWhell)
-	  {	  
-      whell=MPG.takeLast();
-	  disconnect(whell,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
-	  delete whell;  
+    while(MPG.size()!= sizeMPG)
+      {
+      mpg=MPG.takeLast();
+      disconnect(mpg,SIGNAL(sendCommand(QByteArray)),this,SLOT(setCommand(QByteArray)));
+      delete mpg;
       }
 
 
@@ -51,8 +51,14 @@ return index<getSize() ? MPG[index] : nullptr;
 
 void WLModuleMPG::update()
 {
-    foreach(WLMPG *whell,MPG)
-        whell->sendGetData();
+foreach(WLMPG *mpg,MPG)
+        mpg->update();
+}
+
+void WLModuleMPG::backup()
+{
+foreach(WLMPG *mpg,MPG)
+            mpg->backup();
 }
 
 void WLModuleMPG::readCommand(QByteArray Data)
@@ -88,13 +94,13 @@ case  sendModule_error:Stream>>ui1;
 
                        if(ui1>startIndexErrorModule)
 					    {
-						emit sendMessage("WLModuleWhell "+getErrorStr(errorModule,ui1),QString::number(index),(int)(ui1));	
+                                                emit sendMessage("WLModuleMPG "+getErrorStr(errorModule,ui1),QString::number(index),(int)(ui1));
 					    }
 					    else
                             if(index<getSize())
 								{
                                 MPG[index]->setError(ui1);
-                                emit sendMessage("WLWhell "+getErrorStr(errorMPG,ui1),QString::number(index),(int)(ui1));
+                                emit sendMessage("WLMPG "+getErrorStr(errorMPG,ui1),QString::number(index),(int)(ui1));
 							    }
                        break;
 }

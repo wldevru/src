@@ -30,7 +30,7 @@ public:
 
 public slots:
 virtual void update();
-
+virtual void backup();
 
 signals:
 void changedOutPWM(int n);

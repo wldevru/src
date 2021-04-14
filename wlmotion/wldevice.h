@@ -110,6 +110,7 @@ private:
     QByteArray inBuf;
 
     QString m_nameDevice;
+    QString m_typeFW;
 
     QSerialPort m_serialPort;
 
@@ -136,7 +137,8 @@ bool isValidProtocol() {return m_versionProtocol==WLM_PROTOCOL;}
 bool initSerialPort(QString portName="");
 bool initUdpSocket(QHostAddress HA);
 
-bool  openConnect();
+bool openConnect();
+bool waitForReady(int timeout=500);
 
 WLModule* getModule(typeModule type);
      void addModule(WLModule *module);
@@ -147,6 +149,8 @@ WLModuleConnect* getModuleConnect() {return static_cast<WLModuleConnect*>(getMod
 
 void setNameDevice(QString _name) {if(m_nameDevice.isEmpty()||!_name.isEmpty()) m_nameDevice=_name;}
 QString getNameDevice() {return m_nameDevice;}
+
+QString getTypeFW() {return m_typeFW;}
 
 bool initFromFile(QString nameFile);                              
 
@@ -198,7 +202,8 @@ public slots:
 
     void closeConnect();
 
-    void update();
+    void update(); //get current data
+    void backup(); //backup current data
 
 public slots:
  virtual void callStatus();

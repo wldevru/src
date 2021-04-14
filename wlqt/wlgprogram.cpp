@@ -87,27 +87,53 @@ qDebug()<<"start read File";
 if(File.isOpen()) File.close();
 
 QFile::remove(QCoreApplication::applicationDirPath()+"//prog.bkp");
-QFile::copy(FileName,QCoreApplication::applicationDirPath()+"//prog.bkp");
+QFile srcFile(FileName);
 
 File.setFileName(QCoreApplication::applicationDirPath()+"//prog.bkp");
 
+if(srcFile.open(QIODevice::ReadOnly)
+    &&File.open(QIODevice::WriteOnly)){
+while(!srcFile.atEnd())
+    {
+    srcFile.getChar(&buf);
+
+    if(buf=='\r') continue;
+
+    File.putChar(buf);
+
+    if(buf=='\n')
+       {
+       EP.offsetInFile=File.pos();
+       indexData+=EP;
+       }
+    }
+
+File.close();
+}
+/*
+QFile::copy(FileName,QCoreApplication::applicationDirPath()+"//prog.bkp");
+
+
+File.setFileName(QCoreApplication::applicationDirPath()+"//prog.bkp");
+*/
 if(File.open(QIODevice::ReadOnly))
  {
  ret=true;
-
+ }
+/*
   while(!File.atEnd()) 
       {
 	  File.getChar(&buf);
 
-	  if(buf=='\n')
+      if(buf=='\n')
 	     {
-		 EP.offsetInFile=File.pos();
+         EP.offsetInFile=File.pos();
 	     indexData+=EP;	
 	     }
       }
  }
 
-
+*/
 
 Mutex.unlock();
 
@@ -303,7 +329,7 @@ return QTextCodec::codecForName("Windows-1251")->toUnicode(File.readAll());
 
 QString  WLGProgram::getTextElement(qint32 index)
 {
-QString ret="no data";
+QString ret="";
 
 QMutexLocker locker(&Mutex);
 
@@ -320,7 +346,6 @@ if(index<indexData.size())
      ret=QTextCodec::codecForName("Windows-1251")->toUnicode(File.read(indexData[index].offsetInFile-indexData[index-1].offsetInFile));
      }
   }
-if(index<10) qDebug()<<"getTextElement"<<index<<ret;  
 
 return ret;
 }
@@ -739,12 +764,19 @@ if(GCode->isGCode(83))               //с подъёмами
            Point.z=GCode->getValue('R')+GCode->getHofst();
            Point.z-=step*(i+1-1);
 
-           if((GCode->getOffsetBackLongDrill()>0)
-            &&((Point.z+GCode->getOffsetBackLongDrill())<=R))
-               Point.z+=GCode->getOffsetBackLongDrill();
-
-           ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
-           curListTraj+=ElementTraj;
+           if(GCode->getOffsetBackLongDrill()>0)
+            {
+            if((Point.z+GCode->getOffsetBackLongDrill())<=R)
+                 {
+                 Point.z+=GCode->getOffsetBackLongDrill();
+                 ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
+                 curListTraj+=ElementTraj;
+                 }
+            }
+            else {
+                 ElementTraj.endPoint.z=GCode->getPointActivSC(Point).z;
+                 curListTraj+=ElementTraj;
+                 }
            }
 
    ElementTraj.setF(F);            //сверлим

@@ -37,6 +37,10 @@
 #include "wlmpgwidget.h"
 #include "wleditmpgwidget.h"
 
+#ifdef DEF_CAMERA
+#include "wlcamera.h"
+#endif
+
 #define FileState    QCoreApplication::applicationDirPath()+"//state.dat"
 #define configWLMill QCoreApplication::applicationDirPath()+"//wlmillconfig//config.xml"
 
@@ -159,6 +163,12 @@ QSplashScreen *splash;
 WLLog *Log;
 
 QTime Time;
+
+#ifdef DEF_CAMERA
+WLCamera *camera;
+#endif
+
+QTabWidget *tabWidget;
 
 WLGProgramWidget  *ProgramWidget;
 QUdpSocket *remoteComSocket;

@@ -111,8 +111,18 @@ for(int i=0;i<getSizeAxis();i++)
 
 void WLModuleAxis::update()
 {
-foreach(WLAxis *A,Axis)
-      A->sendGetDataAxis();
+foreach(WLAxis *axis,Axis)
+    axis->update();
+}
+
+void WLModuleAxis::backup()
+{
+foreach(WLAxis *axis,Axis)
+     axis->backup();
+
+setInProbe(getInput(MAXIS_inProbe)->getIndex());
+setInSDStop(getInput(MAXIS_inSDStop)->getIndex());
+setInEMGStop(getInput(MAXIS_inEMGStop)->getIndex());
 }
 
 void WLModuleAxis::readCommand(QByteArray Data)

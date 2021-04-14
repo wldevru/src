@@ -4,14 +4,23 @@
 
 TEMPLATE = app
 TARGET = wlmill
-QT += core widgets serialport gui network script
+QT += core widgets serialport gui network opengl script
+
 
 QMAKE_LFLAGS = -no-pie
 #DEFINES += QT_NO_DEBUG_OUTPUT\
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
-#
-#QT += core widgets serialport gui network opengl script
+
+#DEFINES += DEF_CAMERA
+
+contains(DEFINES, DEF_CAMERA) {
+QT += multimedia multimediawidgets
+SOURCES +=../../wlqt/form/wlcamera.cpp
+HEADERS +=../../wlqt/form/wlcamera.h
+FORMS += ../../wlqt/form/wlcamera.ui
+TARGET = wlmill-cam
+}
 
 
 VERSION = 1.0.0.2
@@ -106,7 +115,9 @@ SOURCES += \
     ../../wlqt/form/wlmpgwidget.cpp \
     ../../wlqt/form/wleditmpgwidget.cpp \
     ../../wlqt/wlmachine.cpp \
-    ../../wlqt/wleditgcode.cpp
+    ../../wlqt/wleditgcode.cpp \
+    wlscriptfunccombobox.cpp \
+       ../../wlqt/wldoublespinbox.cpp
 
 
 HEADERS += \
@@ -183,7 +194,9 @@ HEADERS += \
     ../../wlqt/form/wlmpgwidget.h \
     ../../wlqt/form/wleditmpgwidget.h \
     ../../wlqt/wlmachine.h \
-    ../../wlqt/wleditgcode.h
+    ../../wlqt/wleditgcode.h \
+    wlscriptfunccombobox.h \
+    ../../wlqt/wldoublespinbox.h
 
 
 FORMS += \

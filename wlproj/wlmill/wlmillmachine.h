@@ -212,7 +212,7 @@ public:
     WLMillMachine(WLGProgram *_Program,WLEVScript *_EVMScript,QObject *parent=nullptr);
 	~WLMillMachine();
 
- 	      QMutex Mutex;
+ QMutex Mutex;
 
 QList<WLElementTraj>      MillTraj;
 QList<WLElementTraj>      baseTraj;
@@ -222,6 +222,7 @@ QList<WLElementTraj>  showMillTraj;
  QMutex MutexAuto;
  QMutex MutexMillTraj;
  QMutex MutexShowTraj;
+ QMutex MutexSaveConfig;
 
 Q_INVOKABLE bool runGCode(QString gtxt); 
             bool runGProgram(int istart=0);
@@ -273,7 +274,7 @@ QList<QString> m_listFindDrivePos;
 
 private: 	
 
-WLGCode   m_GCode;
+WLGCode m_GCode;
 
 QList <SCorrectSOut> m_correctSList;
 
@@ -429,7 +430,7 @@ public:
 private:
   int updateMovList();
   int updateMovBuf();
-  int updateMovProgram();
+  int updateMovProgram();  
 
 virtual  bool verifyReadyAutoMotion();
 virtual  bool verifyReadyManualMotion();

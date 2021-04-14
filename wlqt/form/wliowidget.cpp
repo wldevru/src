@@ -136,7 +136,7 @@ WLEnterNum EN;
 
 switch(mindex.column())
 {
-case 0: EN.setMinMaxNow(0,1, m_outPWMViewModel->modulePWM()->getOutPWM(row)->value());
+case 0: EN.setMinMaxNow(0,1, m_outPWMViewModel->modulePWM()->getOutPWM(row)->getValue());
         EN.setLabel(tr("Eneter value:"));
         if(EN.exec())
           {
@@ -144,7 +144,7 @@ case 0: EN.setMinMaxNow(0,1, m_outPWMViewModel->modulePWM()->getOutPWM(row)->val
           }
         break;
 
-case 1: EN.setMinMaxNow(1,30000, m_outPWMViewModel->modulePWM()->getOutPWM(row)->freq());
+case 1: EN.setMinMaxNow(1,30000, m_outPWMViewModel->modulePWM()->getOutPWM(row)->getFreq());
         EN.setLabel(tr("Eneter Frequency:"));
         EN.setSuffix(tr("Hz"));
 
@@ -171,7 +171,7 @@ WLEnterNum EN;
 
 switch(mindex.column())
 {
-case 0: EN.setMinMaxNow(0,1, m_aoutputViewModel->moduleAIOPut()->getOutput(row)->value());
+case 0: EN.setMinMaxNow(0,1, m_aoutputViewModel->moduleAIOPut()->getOutput(row)->getValue());
         EN.setLabel(tr("Eneter value:"));
         if(EN.exec())
           {

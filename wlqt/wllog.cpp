@@ -15,7 +15,9 @@ initDebugFileName();
 
 WLLog::~WLLog()
 {
+
 }
+
 
 WLLog *WLLog::getInstance()
 {
@@ -81,6 +83,15 @@ if(fileOut.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Append))
 
 }
 
+void WLLog::clearDebug()
+{
+qDebug()<<"WLLog::clearDebug()";
+QMutexLocker locker(&debugMutex);
+QFile::remove(debugFile+"2.log");
+QFile::remove(debugFile+"1.log");
+QFile::remove(debugFile+".log");
+}
+
 
 void WLLog::writeLog(QString Name,QString Data)
 {   
@@ -109,7 +120,7 @@ QFile File(fileName);
 if(File.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Append)) 
  {
  QTextStream stream(&File);
- stream<<QTime::currentTime().toString()<<" \""<<Name<<"\" "<<" \""<<Data<<"\""<<endl;
+ stream<<QTime::currentTime().toString()<<" \""<<Name<<"\" "<<" \""<<Data<<"\""<<'\r'<<'\n';
  File.close();
  }
 }
@@ -137,13 +148,15 @@ QFile::rename(debugFile+".log",debugFile+"1.log");
 
 void WLLog::setEnableDebug(bool en)
 {
-QMutexLocker locker(&debugMutex);
-
-    if(en)    {
+    if(en)   {
+    debugMutex.lock();
     initDebugFileName();
     qInstallMessageHandler(WLLog::messageHandler);
+    debugMutex.unlock();
+    qDebug()<<">>WLLog::setEnableDebug start<<<";
     }
     else {
+    qDebug()<<"<<<WLLog::setEnableDebug end>>>";
     qInstallMessageHandler(nullptr);
     }
 
@@ -172,7 +185,7 @@ QFile outFile(debugFile+".log");
 if(outFile.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Append))
  {
  QTextStream stream(&outFile);
- stream<<QTime::currentTime().toString("hh:mm:ss:zzz")<<" "<< txt << endl;
+ stream<<QTime::currentTime().toString("hh:mm:ss:zzz")<<" "<< txt <<'\r'<<'\n';
 
  outFile.close();
  }

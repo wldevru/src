@@ -90,7 +90,7 @@ void WLModuleConnect::setTimeoutConnect()
 emit sendMessage("WLModuleConnect","timeout connect "+QString::number(timeoutConnect_ms),0);
 emit timeoutConnect();
 
-conOk=false;
+emit changedConnect(conOk=false);
 }
 
 void WLModuleConnect::setTimeoutHeart()
@@ -98,7 +98,7 @@ void WLModuleConnect::setTimeoutHeart()
 emit sendMessage("WLModuleConnect","timeout heart "+QString::number(timeHeart_ms),1);
 emit timeoutHeart();
 
-conOk=false;
+emit changedConnect(conOk=false);
 }
 
 void WLModuleConnect::restartHeart()
@@ -116,7 +116,7 @@ if(Flags.get(MCF_enbheart))
 
 timerConnect->start(timeoutConnect_ms);
 
-conOk=true;
+emit changedConnect(conOk=true);
 }
 
 void WLModuleConnect::sendHeart()
@@ -129,7 +129,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMConnect<<(quint8)sigMCon_heart;
 
-conOk=true;
+emit changedConnect(conOk=true);
 
 emit sendCommand(data);
 }

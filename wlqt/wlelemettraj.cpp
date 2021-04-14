@@ -595,7 +595,7 @@ if(indexs.size()==1)
   }
 
 if(indexs.size()>=2)
-  {
+ {
  if(simpliAngle!=0.0f) //по углу
 	{
     ////KUKA
@@ -655,7 +655,7 @@ else
   }
 }
 
- if(!indexs.isEmpty()) 
+ if(!indexs.isEmpty())
   {
   simpliTraj+=baseTraj[indexs.first()];
 
@@ -667,7 +667,6 @@ else
 
   indexs.clear(); 
   }
-
 
 return i;
 }

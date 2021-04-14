@@ -61,6 +61,10 @@ public slots:
 
 signals:
 void changedUnit(QString);
+
+// QWidget interface
+protected:
+void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // WLDRIVEWIDGET_H

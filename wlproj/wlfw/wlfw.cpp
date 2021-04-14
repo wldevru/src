@@ -61,6 +61,8 @@ if(reply->error() == QNetworkReply::NoError)
 {
 if(!fileName.isEmpty())
  {
+ fileName=QCoreApplication::applicationDirPath()+"/FW/";
+
  QFile File(fileName+"/cloud/"+reply->url().fileName());
 
  QDir dir;
@@ -113,6 +115,20 @@ void WLFW::showEndRead()
 
 void WLFW::closeEvent(QCloseEvent *event)
 {
+if(DFW->isConnect())
+ {
+ if(DFW->getTypeFW()=="B0")
+     {
+     QMessageBox::question(this,"Question","please remove B0 selector and reboot device",QMessageBox::Ok);
+     }
+ if(DFW->getTypeFW()=="B1")
+     {
+     if(QMessageBox::question(this,"Question","reboot device?",QMessageBox::Ok|QMessageBox::Cancel)==QMessageBox::Ok)
+      {
+      DFW->reboot(ui.pbFileDevice->isEnabled() ? 1:0);
+      }
+     }
+   }
 }
 
 
@@ -219,6 +235,7 @@ setConnect(!DFW->isOpenConnect());
 void WLFW::onPBReboot()
 {
 DFW->reboot(ui.pbFileDevice->isEnabled() ? 1:0);
+
 setConnect(0);
 
 if(!DFW->getInfo().HA.isNull())

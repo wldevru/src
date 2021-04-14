@@ -1,5 +1,5 @@
-#ifndef WLModuleWhell_H
-#define WLModuleWhell_H
+#ifndef WLModuleMPG_H
+#define WLModuleMPG_H
 
 #include <QObject>
 #include <QDebug>
@@ -10,7 +10,7 @@
 
 
 
-//Whell
+//MPG
 class WLModuleMPG : public WLModule
 {
 	Q_OBJECT
@@ -19,7 +19,7 @@ public:
     WLModuleMPG(QObject *parent=0);
     ~WLModuleMPG();
 
-	bool Init(int _sizeWhell);
+    bool Init(int _sizeMPG);
 
     void setConfigMPG(int m_index,double mainDim);
 
@@ -33,6 +33,7 @@ WLMPG *getMPG(int m_index);
 
 public slots:
 virtual void update();
+virtual void backup();
 
 public:
 

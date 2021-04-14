@@ -20,6 +20,16 @@ WLModulePlanner::~WLModulePlanner()
 
 }
 
+float WLModulePlanner::getDecSOut() const
+{
+    return m_decSOut;
+}
+
+float WLModulePlanner::getAccSOut() const
+{
+    return m_accSOut;
+}
+
 quint8 WLModulePlanner::getISOut() const
 {
     return m_iSout;
@@ -50,7 +60,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_getDataPlanner;
 
-qDebug()<<"getDataBuf";
+qDebug()<<"WLModulePlanner::sendGetDataBuf()";
 
 emit sendCommand(data);
 }
@@ -58,6 +68,16 @@ emit sendCommand(data);
 void WLModulePlanner::update()
 {    
 sendGetDataBuf();
+}
+
+void WLModulePlanner::backup()
+{
+setKF(getKF());
+setKSOut(getKSOut());
+setSmoothAng(getSmoothAng());
+
+setElementSOut(getTypeSOut(),getISOut());
+
 }
 
 
@@ -120,6 +140,45 @@ return true;
 }
 
 return false;
+}
+
+
+bool WLModulePlanner::setAccSOut(float acc)
+{
+if(acc<0) return false;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setAccSOut<<acc;
+
+emit sendCommand(data);
+
+m_accSOut=acc;
+
+return true;
+}
+
+bool WLModulePlanner::setDecSOut(float dec)
+{
+if(dec>0) return false;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setDecSOut<<dec;
+
+emit sendCommand(data);
+
+m_decSOut=dec;
+
+return true;
 }
 
 bool WLModulePlanner::resetElementSOut()
@@ -309,7 +368,8 @@ return true;
 
 bool WLModulePlanner::setKF(float _KF)
 {
-{
+m_KF=_KF;
+
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 
@@ -319,8 +379,7 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setKF<<_KF;
 
 emit sendCommand(data);
-return true;
-    }
+return true;    
 }
 
 bool WLModulePlanner::setKFpause(float _F)
@@ -381,6 +440,8 @@ return true;
 
 bool WLModulePlanner::setKSOut(float k)
 {
+m_KSOut=k;
+
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 
@@ -416,6 +477,10 @@ stream.writeAttribute("SmoothAngGr",QString::number(getSmoothAng()));
 stream.writeAttribute("KFpause",QString::number(getKFpause()));
 stream.writeAttribute("SOut",QString::number(getTypeSOut())
                         +","+QString::number(getISOut()));
+
+stream.writeAttribute("accSOut",QString::number(getAccSOut()));
+stream.writeAttribute("decSOut",QString::number(getDecSOut()));
+
 }
 
 void WLModulePlanner::readXMLData(QXmlStreamReader &stream)
@@ -436,6 +501,12 @@ if(!stream.attributes().value("SOut").isEmpty())
                    ,(quint8)list.at(1).toUShort());
      }
    }
+
+if(!stream.attributes().value("accSOut").isEmpty())
+     setAccSOut(stream.attributes().value("accSOut").toFloat());
+
+if(!stream.attributes().value("decSOut").isEmpty())
+     setDecSOut(stream.attributes().value("decSOut").toFloat());
 }
 
 void  WLModulePlanner::readCommand(QByteArray Data)

@@ -31,7 +31,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox">
+    <widget class="WLDoubleSpinBox" name="doubleSpinBox">
      <property name="decimals">
       <number>3</number>
      </property>
@@ -53,6 +53,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>WLDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>wldoublespinbox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

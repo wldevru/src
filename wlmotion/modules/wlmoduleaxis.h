@@ -78,6 +78,7 @@ private slots:
 
 public slots:
 virtual void update();
+virtual void backup();
 
 public:
     bool setInputMAxis(typeIOPutAXIS type,quint8 num);

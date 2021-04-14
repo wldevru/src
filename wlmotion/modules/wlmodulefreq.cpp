@@ -50,8 +50,13 @@ return index<getSizeOutFreq() ? outFreq[index]:nullptr;
 
 void WLModuleFreq::update()
 {
-    foreach(WLFreq *freq,outFreq)
+foreach(WLFreq *freq,outFreq)
         freq->sendGetData();
+}
+
+void WLModuleFreq::backup()
+{
+
 }
 
 void  WLModuleFreq::readCommand(QByteArray Data)

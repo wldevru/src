@@ -17,7 +17,7 @@ public:
 	WLEditMillWidget(WLMillMachine *_MillMachine,QDialog *parent = 0);
 	~WLEditMillWidget();
 
-void addTabWidget(QDialog *dialog,QString name) {ui.tabWidget->addTab(dialog,name);}
+void addTabWidget(QDialog *dialog,QString name)              {ui.tabWidget->addTab(dialog,name); dialogList+=dialog;}
 void insertTabWidget(int index,QDialog *dialog,QString name) {ui.tabWidget->insertTab(index,dialog,name);}
 
 
@@ -25,10 +25,16 @@ bool saveDataMill();
 
 QString verifyError();
 
+bool getNeedClose() const;
+
 private:
-	WLMillMachine *MillMachine;
+WLMillMachine *MillMachine;
+
+QList <QDialog*> dialogList;
 
 	Ui::WLEditMillWidget ui;
+
+    bool m_needClose=false;
 
 private:
    void initTableCorrectS();
@@ -41,6 +47,10 @@ private slots:
     // QDialog interface
 public slots:
     void accept();
+
+    // QWidget interface
+protected:
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // WLEDITMILLWIDGET_H

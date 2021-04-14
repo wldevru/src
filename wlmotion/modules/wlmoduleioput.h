@@ -76,13 +76,11 @@ private:
 	void sendGetIOSize();	
 
 private slots:
-    void updateAllInputData();
-    void updateAllOutputData();
-
 	void sendSetOData(bool all=true);
 
 public slots:
 virtual void update();
+virtual void backup();
 
 
 signals:

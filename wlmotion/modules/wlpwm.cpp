@@ -16,19 +16,17 @@ WLPWM::~WLPWM()
 
 
 
-bool WLPWM::setOut(float P)
+bool WLPWM::setOut(float value)
 {
+if(value<0||value>1) return false;
+
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
 
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-qDebug()<<data.size();
-
-Stream<<(quint8)comPWM_setOut<<getIndex()<<P;
-
-qDebug()<<"send setOutPWM"<<data.size();
+Stream<<(quint8)comPWM_setOut<<getIndex()<<value;
 
 emit sendCommand(data);
 return true;
@@ -127,9 +125,21 @@ default: break;
 
 }
 
+void WLPWM::update()
+{
+sendGetData();
+}
+
+void WLPWM::backup()
+{
+setInv(isInv());
+setFreq(getFreq());
+setOut(getValue());
+}
+
 void WLPWM::writeXMLData(QXmlStreamWriter &stream)
 {
-stream.writeAttribute("Freq",QString::number(freq()));
+stream.writeAttribute("Freq",QString::number(getFreq()));
 stream.writeAttribute("inv", QString::number(isInv()));
 
 }

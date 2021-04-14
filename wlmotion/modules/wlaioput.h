@@ -69,6 +69,8 @@ bool isInv(void)      {return Flags.get(AIOPF_inv);}
 bool isEnable()       {return Flags.get(AIOPF_enable);}
 bool isInvalid(void)  {return Flags.get(AIOPF_invalid);}
 
+bool isInput()        {return Flags.get(AIOPF_input);}
+
 QString toString() {
                    QString ret=QString::number(getIndex());
                    return ret;
@@ -88,10 +90,8 @@ void sendGetData(enum  typeDataAIOPut);
 
 void setData(QDataStream&);
 
-float value() {return  m_value;}
+float getValue() {return  m_value;}
  void setValue(float _value);
-
-bool isInput() {return  Flags.get(AIOPF_input);}
 
 signals:
   void changedValue(float);
@@ -101,6 +101,10 @@ signals:
   void changedInv(bool);
 
   void changed(int);
+
+public slots:
+virtual void update();
+virtual void backup();
 
 public:
 
